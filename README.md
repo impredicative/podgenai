@@ -14,4 +14,6 @@ Interactively run `rye run podgenai` or `python -m podgenai`. You will be prompt
 The podcast mp3 file will be written to the repo directory. As of March 2024, the estimated cost per generation is under $2 USD.
 
 ## Samples
-* [PyTorch](https://jmp.sh/s/GD0Qbz8hRix80AprAFjX)
+These samples are shared on [Jumpshare](https://jumpshare.com/file-sharing/mp3):
+* [PyTorch](https://jmp.sh/s/GD0Qbz8hRix80AprAFjX) (generated 2024-03-30)
+* [New York City](https://jmp.sh/PCNVwdJ4) (generated 2024-03-30)
