@@ -7,15 +7,22 @@ from podgenai.config import REPO_PATH, WORK_PATH
 from podgenai.subtopics import list_subtopics, get_subtopic
 from podgenai.topic import is_topic_valid
 from podgenai.util.openai import is_openai_key_available, TTS_DISCLAIMER, write_speech
+from podgenai.util.sys import print_error
 
 
-def generate_podcast(topic: str, *, output_path: Optional[Path] = None) -> Path:
-    """Return the output path after generating and writing a podcast to file for the given topic."""
+def generate_podcast(topic: str, *, output_path: Optional[Path] = None) -> Optional[Path]:
+    """Return the output path after generating and writing a podcast to file for the given topic.
+
+    No path is returned if the podcast fails to be generated.
+    """
     assert is_openai_key_available()
     assert is_topic_valid(topic)
     print(f'\nTOPIC: {topic}')
 
     subtopics_list = list_subtopics(topic)  # Already validated.
+    if not subtopics_list:
+        print_error(f'Failed to generate podcast for topic: {topic}')
+        return
     print(f'\nSUBTOPICS:\n{'\n'.join(subtopics_list)}')
     subtopics = {s: get_subtopic(topic=topic, subtopics=subtopics_list, subtopic=s) for s in subtopics_list}
     subtopics = [f'Section {subtopic_name.replace('.', ':', 1)}:\n{subtopic_text} {{pause}}' for subtopic_name, subtopic_text in subtopics.items()]
