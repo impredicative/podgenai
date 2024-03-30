@@ -1,10 +1,10 @@
 # podgenai
-Generate about an hour-long audio podcast mp3 on a given topic.
+Generate approximately an hour-long audio podcast mp3 on a given topic using GPT4.
 
-This very much is alpha software, with a lot of work left to do, but it has been tested to work.
+This very much is alpha software, with a lot of work left to be done, but it is tested to work.
 
 ## Setup
-* Install `rye`.
+* Install [`rye`](https://rye-up.com/).
 * Run `rye sync` in repo directory.
 * Create `.env` file with contents `OPENAI_API_KEY=<your OpenAI API key>`.
 * Ensure that `ffmpeg` is available.

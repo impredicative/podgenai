@@ -58,8 +58,8 @@ def generate_podcast(topic: str, *, output_path: Optional[Path] = None) -> Optio
                 if not portion_path.exists():  # TODO: Use proper disk cache instead.
                     write_speech(portion, portion_path)
 
-    ffmpeg_filelist_path = WORK_PATH / f'{topic}.list'
-    ffmpeg_filelist_path.write_text('\n'.join(f"file '{str(p).replace("'", "\\'")}'" for p in part_paths))  # Note: Use of `replace` for escaping single-quotes for ffmpeg is untested.
+    ffmpeg_filelist_path = work_path / 'mp3.list'
+    ffmpeg_filelist_path.write_text('\n'.join(f"file '{str(p).replace("'", "'\\''")}'" for p in part_paths))
     print(f'\nMerging {len(part_paths)} parts to: {output_path}')
     subprocess.run(['ffmpeg', '-f', 'concat', '-safe', '0', '-i', str(ffmpeg_filelist_path), '-c', 'copy', str(output_path)], check=True)
     print(f'Finished merging {len(part_paths)} parts to: {output_path}')

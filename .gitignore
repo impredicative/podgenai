@@ -163,5 +163,5 @@ cython_debug/
 .diskcache/
 
 # Output:
-work/*.list
 *.mp3
+mp3.list
