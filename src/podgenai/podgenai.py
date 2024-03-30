@@ -5,19 +5,22 @@ from typing import Optional
 from podgenai.config import REPO_PATH
 from podgenai.subtopics import list_subtopics, get_subtopic
 from podgenai.topic import is_topic_valid
-from podgenai.util.openai import is_openai_key_available
+from podgenai.util.openai import is_openai_key_available, TTS_DISCLAIMER
 
 
 def generate_podcast(topic: str, *, output_path: Optional[Path] = None) -> Path:
     """Return the output path after generating and writing a podcast to file for the given topic."""
     assert is_openai_key_available()
     assert is_topic_valid(topic)
+    print(f'TOPIC: {topic}')
 
     subtopics_list = list_subtopics(topic)  # Already validated.
     print(f'\nSUBTOPICS:\n{'\n'.join(subtopics_list)}')
     subtopics = {s: get_subtopic(topic=topic, subtopics=subtopics_list, subtopic=s) for s in subtopics_list}
-    for subtopic_name, subtopic_text in subtopics.items():
-        print(f'\nSECTION {subtopic_name.replace('.', ':', 1)}:\n{subtopic_text}')
+    subtopics = [f'{{pause}} SECTION {subtopic_name.replace('.', ':', 1)}:\n{subtopic_text}' for subtopic_name, subtopic_text in subtopics.items()]
+
+    text = f'{topic}\n\n{'\n\n'.join(subtopics)}\n\n{{pause}} {TTS_DISCLAIMER}'
+    print(f'\nTEXT:\n{text}')
 
     if output_path is None:
         now = datetime.datetime.now().isoformat(timespec='seconds')

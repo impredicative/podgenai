@@ -1,5 +1,6 @@
 import datetime
 import os
+from pathlib import Path
 from typing import Optional
 
 import dotenv
@@ -14,7 +15,11 @@ dotenv.load_dotenv()
 ChatCompletion = openai.types.chat.chat_completion.ChatCompletion
 OpenAI = openai.OpenAI
 
-MODEL = "gpt-4-turbo-preview"  # Note: gpt-4 is not used because it is much older in its training data.
+MODELS = {
+    'text': "gpt-4-turbo-preview",  # Note: gpt-4 is not used because it is much older in its training data.
+    'tts': "tts-1",  # TODO: Compare with tts-1-hd.
+}
+TTS_DISCLAIMER = 'Both the text and the audio of this podcast are AI generated, and inaccuracies may exist.'  # Required by OpenAI as per https://platform.openai.com/docs/guides/text-to-speech/do-i-own-the-outputted-audio-files
 
 
 def is_openai_key_available() -> bool:
@@ -36,7 +41,7 @@ def get_completion(prompt: str, *, client: Optional[OpenAI] = None) -> ChatCompl
     if not client:
         client = get_openai_client()
     print(f'Getting completion for prompt of length {len(prompt)}.')
-    completion = client.chat.completions.create(model=MODEL, messages=[{"role": "user", "content": prompt}])
+    completion = client.chat.completions.create(model=MODELS['text'], messages=[{"role": "user", "content": prompt}])
     return completion
 
 
@@ -52,3 +57,14 @@ def get_content(prompt: str, *, client: Optional[OpenAI] = None, completion: Opt
 @DISKCACHE.memoize(expire=datetime.timedelta(weeks=4).total_seconds(), tag='get_cached_content')
 def get_cached_content(prompt: str) -> str:
     return get_content(prompt)
+
+
+def write_speech(prompt: str, path: Path, *, client: Optional[OpenAI] = None) -> None:  # TODO: Use disk caching.
+    if not client:
+        client = get_openai_client()
+    response = client.audio.speech.create(model=MODELS['tts'], voice="alloy", input=prompt)
+
+    relative_path = path.relative_to(Path.cwd())
+    print(f'Writing to: {relative_path}')
+    response.stream_to_file(path)
+    print(f'\nWrote to: {relative_path}')
