@@ -1,9 +1,4 @@
-def get_topic() -> str:
-    topic = input('Specify the topic for which to generate a podcast: ')
-    topic = topic.strip()
-    if len(topic) < 2:
-        raise ValueError('Invalid topic.')
-    return topic
+from podgenai.topic import get_topic
 
 
 def main() -> None:
