@@ -62,9 +62,10 @@ def get_cached_content(prompt: str) -> str:
 def write_speech(prompt: str, path: Path, *, client: Optional[OpenAI] = None) -> None:  # TODO: Use disk caching.
     if not client:
         client = get_openai_client()
+    print(f'Getting speech for input of length {len(prompt)}.')
     response = client.audio.speech.create(model=MODELS['tts'], voice="alloy", input=prompt)
 
     relative_path = path.relative_to(Path.cwd())
     print(f'Writing to: {relative_path}')
     response.stream_to_file(path)
-    print(f'\nWrote to: {relative_path}')
+    print(f'Wrote to: {relative_path}')
