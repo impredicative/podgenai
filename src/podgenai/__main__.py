@@ -10,7 +10,8 @@ def main() -> None:
     if not is_openai_key_available():
         exit(1)
     topic = get_topic()
-    generate_podcast(topic)
+    if not generate_podcast(topic):
+        exit(2)
 
 
 if __name__ == "__main__":
