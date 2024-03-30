@@ -31,7 +31,8 @@ def generate_podcast(topic: str, *, output_path: Optional[Path] = None) -> Path:
 
     for num, part in enumerate(parts):
         assert len(part) < 4096  # TODO: Split part across paragraphs if longer.
-        part_path = output_path.with_name(f'{output_path.stem} - {subtopics_list[num]}.mp3')
-        write_speech(part, part_path)
+        part_path = output_path.with_name(f'{topic} - {subtopics_list[num]}.mp3')
+        if not part_path.exists():  # TODO: Use proper disk cache instead.
+            write_speech(part, part_path)
 
     return output_path

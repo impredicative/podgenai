@@ -161,3 +161,6 @@ cython_debug/
 
 # Cache
 .diskcache/
+
+# Output:
+*.mp3
