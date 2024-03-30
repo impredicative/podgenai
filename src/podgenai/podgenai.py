@@ -29,7 +29,7 @@ def generate_podcast(topic: str, *, output_path: Optional[Path] = None) -> Optio
     # Note: A pause at the beginning is skipped by the TTS generator, but it is not skipped if at the end, and so it is kept at the end.
 
     parts = subtopics.copy()
-    parts[0] = f'{topic}\n\n{{pause}} {parts[0]}'
+    parts[0] = f'{topic}\n\n{{pause}}\n{parts[0]}'  # Note: It has proven more reliable for the pause to be structured in this way for section 1, rather than be in the leading line.
     parts[-1] = f'{parts[-1]}\n\n {TTS_DISCLAIMER}'
     text = '\n\n'.join(parts)
     print(f'\nTEXT:\n{text}')
