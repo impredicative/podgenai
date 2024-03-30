@@ -6,7 +6,7 @@ This very much is alpha software, with a lot of work left to be done, but it is 
 ## Setup
 * Install [`rye`](https://rye-up.com/).
 * Run `rye sync` in repo directory.
-* Create `.env` file with contents `OPENAI_API_KEY=<your OpenAI API key>`.
+* Create a file named `.env` in the repo directory, with the intended environment variable `OPENAI_API_KEY=<your OpenAI API key>`, or set it in a different way.
 * Ensure that `ffmpeg` is available.
 
 ## Usage
