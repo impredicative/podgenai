@@ -31,7 +31,7 @@ def generate_podcast(topic: str, *, output_path: Optional[Path] = None) -> Optio
 
     parts = subtopics.copy()
     parts[0] = f'{topic}\n\n{{pause}}\n{parts[0]}'  # Note: It has proven more reliable for the pause to be structured in this way for section 1, rather than be in the leading line.
-    parts[-1] = f'{parts[-1]}\n\n {TTS_DISCLAIMER}'
+    parts[-1] = f'{parts[-1]}\n\n{TTS_DISCLAIMER}'
     text = '\n\n'.join(parts)
     print(f'\nTEXT:\n{text}')
 
