@@ -19,5 +19,6 @@ The podcast mp3 file will be written to the repo directory. As of 2024, the esti
 
 ## Samples
 These generated samples are on [Jumpshare](https://jumpshare.com/file-sharing/mp3):
-* [PyTorch](https://jmp.sh/s/GD0Qbz8hRix80AprAFjX) (2024-03-30)
+* [PyTorch](https://jmp.sh/pUNi9R3a) (2024-03-30)
+* [Advanced PyTorch](https://jmp.sh/LhwtgxJK) (2024-03-30)
 * [New York City](https://jmp.sh/PCNVwdJ4) (2024-03-30)
