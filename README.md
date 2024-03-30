@@ -22,3 +22,4 @@ These generated samples are on [Jumpshare](https://jumpshare.com/file-sharing/mp
 * [PyTorch](https://jmp.sh/pUNi9R3a) (2024-03-30)
 * [Advanced PyTorch](https://jmp.sh/LhwtgxJK) (2024-03-30)
 * [New York City](https://jmp.sh/PCNVwdJ4) (2024-03-30)
+* [Reverse osmosis water purification](https://jmp.sh/PJj7Ti9z) (2024-03-30)
