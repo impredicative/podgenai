@@ -1,8 +1,12 @@
 import os
 
+import dotenv
 import openai
 
 from podgenai.util.sys import print_error
+
+
+dotenv.load_dotenv()
 
 
 def is_openai_key_available() -> bool:
