@@ -11,7 +11,7 @@ This very much is alpha software, with a lot of work left to be done, but it is 
 
 ## Usage
 Interactively run `rye run podgenai` or `python -m podgenai`. You will be prompted for a topic of your choice.
-The podcast mp3 file will be written to the repo directory. As of March 2024, the estimated cost per generation is under $2 USD.
+The podcast mp3 file will be written to the repo directory. As of 2024, the estimated cost per generation is under $2 USD.
 
 ## Caching
 * Text outputs are cached locally for four weeks in the `.diskcache` subdirectory.
@@ -19,5 +19,5 @@ The podcast mp3 file will be written to the repo directory. As of March 2024, th
 
 ## Samples
 These generated samples are on [Jumpshare](https://jumpshare.com/file-sharing/mp3):
-* [PyTorch](https://jmp.sh/s/GD0Qbz8hRix80AprAFjX) (generated 2024-03-30)
-* [New York City](https://jmp.sh/PCNVwdJ4) (generated 2024-03-30)
+* [PyTorch](https://jmp.sh/s/GD0Qbz8hRix80AprAFjX) (2024-03-30)
+* [New York City](https://jmp.sh/PCNVwdJ4) (2024-03-30)
