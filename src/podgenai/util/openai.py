@@ -1,9 +1,11 @@
+import datetime
 import os
 from typing import Optional
 
 import dotenv
 import openai
 
+from podgenai.config import DISKCACHE
 from podgenai.util.sys import print_error
 
 
@@ -33,6 +35,7 @@ def get_completion(prompt: str, *, client: Optional[OpenAI] = None) -> ChatCompl
     """Return the completion for the given prompt."""
     if not client:
         client = get_openai_client()
+    print(f'Getting completion for prompt of length {len(prompt)}.')
     completion = client.chat.completions.create(model=MODEL, messages=[{"role": "user", "content": prompt}])
     return completion
 
@@ -44,3 +47,8 @@ def get_content(prompt: str, *, client: Optional[OpenAI] = None, completion: Opt
     content = completion.choices[0].message.content
     assert (content == content.strip()), content
     return content
+
+
+@DISKCACHE.memoize(expire=datetime.timedelta(weeks=4).total_seconds(), tag='get_cached_content')
+def get_cached_content(prompt: str) -> str:
+    return get_content(prompt)

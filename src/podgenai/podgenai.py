@@ -12,7 +12,7 @@ def generate_podcast(topic: str, *, output_path: Optional[Path] = None) -> Path:
     """Return the output path after generating and writing a podcast to file for the given topic."""
     assert is_openai_key_available()
     assert is_topic_valid(topic)
-    get_subtopics(topic)
+    subtopics = get_subtopics(topic)
 
     if output_path is None:
         now = datetime.datetime.now().isoformat(timespec='seconds')
