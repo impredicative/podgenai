@@ -11,4 +11,4 @@ This very much is alpha software, but it does work.
 
 ## Usage
 Interactively run `rye run podgenai`. You will be prompted for a topic of your choice, e.g. "PyTorch" (specify without quotes).
-The podcast mp3 file will be written to the repo directory.
+The podcast mp3 file will be written to the repo directory. As of March 2024, the estimated cost per generation is under $2 USD.
