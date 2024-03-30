@@ -10,10 +10,10 @@ def main() -> None:
     if not is_openai_key_available():
         exit(1)
     topic = get_topic()
-    print(f'Generating podcast on: {topic}')
+    print(f'Generating podcast on topic: {topic}')
     path = generate_podcast(topic)
     relative_path = path.relative_to(Path.cwd())
-    print(f'Wrote podcast to: {relative_path}')
+    print(f'\nWrote podcast to: {relative_path}')
 
 
 if __name__ == "__main__":

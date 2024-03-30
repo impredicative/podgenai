@@ -2,12 +2,39 @@ from typing import Optional
 
 from podgenai.config import PROMPTS
 from podgenai.util.openai import get_cached_content
+from podgenai.util.sys import print_error
+
+
+def are_subtopics_valid(subtopics: list[str]) -> bool:
+    """Return true if the subtopics are structurally valid, otherwise false.
+
+    A validation error is printed if a subtopic is invalid.
+    """
+    seen = set()
+    for num, subtopic in enumerate(subtopics, start=1):
+        expected_num_prefix = f'{num}. '
+        if not subtopic.startswith(expected_num_prefix):
+            print_error(f'Subtopic {num} is invalid because it is not numbered correctly: {subtopic}')
+            return False
+        subtopic_text = subtopic.removeprefix(expected_num_prefix).strip()
+        if not subtopic_text:
+            print_error(f'Subtopic {num} is invalid because it has no value: {subtopic}')
+            return False
+        if subtopic_text in seen:
+            print_error(f'Subtopic {num} is invalid because it is a duplicate: {subtopic}')
+            return False
+        return True
 
 
 def get_subtopics(topic: str) -> Optional[list[str]]:
     prompt = PROMPTS['list_subtopics'].format(topic=topic)
     subtopics = get_cached_content(prompt)
+    assert subtopics, subtopics
     if subtopics.lower() in ('none', 'none.'):
+        print_error(f'No subtopics exist for topic: {topic}')
         return
-    subtopics = subtopics.splitlines()
+    subtopics = [s for s in subtopics.splitlines() if s]
+    if not are_subtopics_valid(subtopics):
+        print_error(f'Invalid subtopic exists for topic: {topic}')
+        return
     return subtopics
