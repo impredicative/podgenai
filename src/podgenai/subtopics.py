@@ -5,7 +5,7 @@ from podgenai.util.openai import get_cached_content
 from podgenai.util.sys import print_error
 
 
-def are_subtopics_valid(subtopics: list[str]) -> bool:
+def is_subtopics_list_valid(subtopics: list[str]) -> bool:
     """Return true if the subtopics are structurally valid, otherwise false.
 
     A validation error is printed if a subtopic is invalid.
@@ -26,7 +26,7 @@ def are_subtopics_valid(subtopics: list[str]) -> bool:
         return True
 
 
-def get_subtopics(topic: str) -> Optional[list[str]]:
+def list_subtopics(topic: str) -> Optional[list[str]]:
     prompt = PROMPTS['list_subtopics'].format(topic=topic)
     subtopics = get_cached_content(prompt)
     assert subtopics, subtopics
@@ -34,7 +34,13 @@ def get_subtopics(topic: str) -> Optional[list[str]]:
         print_error(f'No subtopics exist for topic: {topic}')
         return
     subtopics = [s for s in subtopics.splitlines() if s]
-    if not are_subtopics_valid(subtopics):
+    if not is_subtopics_list_valid(subtopics):
         print_error(f'Invalid subtopic exists for topic: {topic}')
         return
     return subtopics
+
+
+def get_subtopic(*, topic: str, subtopics: list[str], subtopic: str) -> str:
+    prompt = PROMPTS['generate_subtopic_oneshot'].format(topic=topic, subtopics='\n'.join(subtopics), subtopic=subtopic)
+    subtopic = get_cached_content(prompt)
+    return subtopic
