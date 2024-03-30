@@ -10,7 +10,7 @@ This very much is alpha software, with a lot of work left to do, but it does wor
 * Ensure that `ffmpeg` is available.
 
 ## Usage
-Interactively run `rye run podgenai`. You will be prompted for a topic of your choice.
+Interactively run `rye run podgenai` or `python -m podgenai`. You will be prompted for a topic of your choice.
 The podcast mp3 file will be written to the repo directory. As of March 2024, the estimated cost per generation is under $2 USD.
 
 ## Samples
