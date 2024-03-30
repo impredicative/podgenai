@@ -42,5 +42,6 @@ def list_subtopics(topic: str) -> Optional[list[str]]:
 
 def get_subtopic(*, topic: str, subtopics: list[str], subtopic: str) -> str:
     prompt = PROMPTS['generate_subtopic_oneshot'].format(topic=topic, subtopics='\n'.join(subtopics), subtopic=subtopic)
+    # TODO: Switch to multi-shot subtopic generation.
     subtopic = get_cached_content(prompt)
     return subtopic
