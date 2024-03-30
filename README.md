@@ -1,7 +1,7 @@
 # podgenai
 Generate about an hour-long audio podcast mp3 on a given topic.
 
-This very much is alpha software, with a lot of work left to do, but it does work.
+This very much is alpha software, with a lot of work left to do, but it has been tested to work.
 
 ## Setup
 * Install `rye`.
