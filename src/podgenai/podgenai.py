@@ -7,6 +7,7 @@ from podgenai.config import REPO_PATH, WORK_PATH
 from podgenai.subtopics import list_subtopics, get_subtopic
 from podgenai.topic import is_topic_valid
 from podgenai.util.openai import is_openai_key_available, TTS_DISCLAIMER, write_speech
+from podgenai.util.str import split_text_by_paragraphs_and_limit
 from podgenai.util.sys import print_error
 
 
@@ -39,12 +40,23 @@ def generate_podcast(topic: str, *, output_path: Optional[Path] = None) -> Optio
         output_path = REPO_PATH / f'{now} {topic}.mp3'
 
     part_paths = []
-    for num, part in enumerate(parts):
-        assert (len(part) < 4096), (num + 1, len(part))  # TODO: Split part across paragraphs if longer.
-        part_path = WORK_PATH / f'{topic} - {subtopics_list[num]}.mp3'
-        part_paths.append(part_path)
-        if not part_path.exists():  # TODO: Use proper disk cache instead.
-            write_speech(part, part_path)
+    max_tts_input_len = 4096
+    work_path = WORK_PATH / topic
+    work_path.mkdir(parents=False, exist_ok=True)
+    for part_idx, part in enumerate(parts):
+        if len(part) <= max_tts_input_len:
+            part_path = work_path / f'{subtopics_list[part_idx]}.mp3'
+            part_paths.append(part_path)
+            if not part_path.exists():  # TODO: Use proper disk cache instead.
+                write_speech(part, part_path)
+        else:
+            portions = split_text_by_paragraphs_and_limit(part, max_tts_input_len)
+            for portion_num, portion in enumerate(portions, start=1):
+                assert len(portion) <= max_tts_input_len
+                portion_path = work_path / f'{subtopics_list[part_idx]} ({portion_num}).mp3'
+                part_paths.append(portion_path)
+                if not portion_path.exists():  # TODO: Use proper disk cache instead.
+                    write_speech(portion, portion_path)
 
     ffmpeg_filelist_path = WORK_PATH / f'{topic}.list'
     ffmpeg_filelist_path.write_text('\n'.join(f"file '{str(p).replace("'", "\\'")}'" for p in part_paths))  # Note: Use of `replace` for escaping single-quotes for ffmpeg is untested.
