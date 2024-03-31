@@ -9,6 +9,9 @@ def is_topic_valid(topic: str) -> bool:
     if topic != topic.strip():
         print_error('Topic must not have leading or trailing whitespace.')
         return False
+    if len(topic) == 0:
+        print_error('No topic was provided.')
+        return False
     if len(topic) < 2:
         print_error('Topic must be at least two characters long.')
         return False
