@@ -1,7 +1,5 @@
-from pathlib import Path
-
 from podgenai.podgenai import generate_podcast
-from podgenai.topic import get_topic
+from podgenai.content.topic import get_topic
 from podgenai.util.openai import is_openai_key_available
 from podgenai.util.sys import print_error
 

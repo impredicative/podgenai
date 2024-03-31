@@ -4,12 +4,11 @@ import subprocess
 from typing import Optional
 
 from podgenai.config import REPO_PATH, WORK_PATH
-from podgenai.subtopics import list_subtopics, get_subtopic
-from podgenai.topic import is_topic_valid
-from podgenai.voice import get_voice
+from podgenai.content.subtopics import list_subtopics, get_subtopic
+from podgenai.content.topic import is_topic_valid
+from podgenai.content.voice import get_voice
 from podgenai.util.openai import is_openai_key_available, TTS_DISCLAIMER, TTS_VOICE_MAP, write_speech
 from podgenai.util.str import split_text_by_paragraphs_and_limit
-from podgenai.util.sys import print_error
 
 
 def generate_podcast(topic: str, *, output_path: Optional[Path] = None) -> Optional[Path]:
