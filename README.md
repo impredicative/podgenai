@@ -1,13 +1,13 @@
 # podgenai
-Generate approximately an hour-long audio podcast mp3 on a given topic using GPT4 AI. An [OpenAI API key](https://platform.openai.com/api-keys) is required.
+Generate approximately an hour-long audio podcast mp3 on a given topic using the GPT-4 LLM. An [OpenAI API key](https://platform.openai.com/api-keys) is required.
 
 This very much is hurriedly-written alpha software, with a lot of work left to be done, but it is tested to work.
 
 ## Approach
 For a given topic, the high-level approach is:
-* The voice is selected using AI.
-* A list of applicable subtopics are listed using AI.
-* For each subtopic, the corresponding text and speech are generated using AI.
+* The choice of voice is selected using the LLM.
+* A list of applicable subtopics are listed using the LLM.
+* For each subtopic, the corresponding text and speech are generated using the LLM.
 * The speech files are concatenated using `ffmpeg`.
 
 ## Samples
