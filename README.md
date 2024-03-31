@@ -10,6 +10,14 @@ For a given topic, the high-level approach is:
 * For each subtopic, the corresponding text and speech are generated using AI.
 * The speech files are concatenated using `ffmpeg`.
 
+## Samples
+These generated samples are on [Jumpshare](https://jumpshare.com/file-sharing/mp3):
+* [PyTorch](https://jmp.sh/pUNi9R3a) (2024-03-30) (default voice)
+* [Advanced PyTorch](https://jmp.sh/LhwtgxJK) (2024-03-30) (default voice)
+* [New York City](https://jmp.sh/PCNVwdJ4) (2024-03-30) (default voice)
+* [Reverse osmosis water purification](https://jmp.sh/PJj7Ti9z) (2024-03-30)
+* [Buffy the Vampire Slayer](https://jmp.sh/LnHdU6ic) (2024-03-31) (female voice)
+
 ## Setup
 * Install [`rye`](https://rye-up.com/).
 * Run `rye sync` in repo directory.
@@ -23,11 +31,3 @@ The podcast mp3 file will be written to the repo directory. As of 2024, the esti
 ## Caching
 * Text outputs are cached locally for four weeks in the `.diskcache` subdirectory.
 * Audio segments are currently cached locally by the segment name in the `work` subdirectory. They can manually be deleted. This deletion is currently not automatic. Moreover, it can currently be necessary to delete them if the cache is to be bypassed.
-
-## Samples
-These generated samples are on [Jumpshare](https://jumpshare.com/file-sharing/mp3):
-* [PyTorch](https://jmp.sh/pUNi9R3a) (2024-03-30)
-* [Advanced PyTorch](https://jmp.sh/LhwtgxJK) (2024-03-30)
-* [New York City](https://jmp.sh/PCNVwdJ4) (2024-03-30)
-* [Reverse osmosis water purification](https://jmp.sh/PJj7Ti9z) (2024-03-30)
-* [Buffy the Vampire Slayer](https://jmp.sh/LnHdU6ic) (2024-03-31) (female voice)
