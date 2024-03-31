@@ -12,11 +12,11 @@ For a given topic, the high-level approach is:
 
 ## Samples
 These generated samples are on [Jumpshare](https://jumpshare.com/file-sharing/mp3):
-* [PyTorch](https://jmp.sh/pUNi9R3a) (2024-03-30) (default voice)
-* [Advanced PyTorch](https://jmp.sh/LhwtgxJK) (2024-03-30) (default voice)
-* [New York City](https://jmp.sh/PCNVwdJ4) (2024-03-30) (default voice)
-* [Reverse osmosis water purification](https://jmp.sh/PJj7Ti9z) (2024-03-30)
-* [Buffy the Vampire Slayer](https://jmp.sh/LnHdU6ic) (2024-03-31) (female voice)
+* [PyTorch](https://jmp.sh/pUNi9R3a) (default voice) (2024-03-30)
+* [Advanced PyTorch](https://jmp.sh/LhwtgxJK) (default voice) (2024-03-30)
+* [New York City](https://jmp.sh/PCNVwdJ4) (default voice) (2024-03-30)
+* [Reverse osmosis water purification](https://jmp.sh/PJj7Ti9z) (default voice) (2024-03-30)
+* [Buffy the Vampire Slayer](https://jmp.sh/LnHdU6ic) (female voice) (2024-03-31)
 
 ## Setup
 * Install [`rye`](https://rye-up.com/).
