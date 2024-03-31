@@ -57,10 +57,17 @@ def get_content(prompt: str, *, client: Optional[OpenAI] = None, completion: Opt
 
 @DISKCACHE.memoize(expire=datetime.timedelta(weeks=4).total_seconds(), tag='get_cached_content')
 def get_cached_content(prompt: str) -> str:
+    """Return the content for the given prompt using the disk cache if available, otherwise normally."""
     return get_content(prompt)
 
 
 def write_speech(prompt: str, path: Path, *, voice: str = 'default', client: Optional[OpenAI] = None) -> None:  # TODO: Use disk caching.
+    """Write the speech for the given prompt to the given path.
+
+    The prompt must not be longer than 4096 characters, as this is the maximum supported length by the client.
+
+    `voice` can be one of the keys or values in TTS_VOICE_MAP, or one of the other supported voices.
+    """
     if not client:
         client = get_openai_client()
 
