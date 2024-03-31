@@ -7,7 +7,7 @@ import dotenv
 import openai
 
 from podgenai.config import DISKCACHE
-from podgenai.util.sys import print_error
+from podgenai.util.sys import print_error, print_warning
 
 
 dotenv.load_dotenv()
@@ -46,6 +46,31 @@ def get_completion(prompt: str, *, client: Optional[OpenAI] = None) -> ChatCompl
     return completion
 
 
+def get_multipart_content(prompt: str, *, max_completions: int = 5, client: Optional[OpenAI] = None) -> str:
+    if not client:
+        client = get_openai_client()
+    messages = [{"role": "user", "content": prompt}]
+    continuation = 'Continue if you\'d like, or say "Done."'
+    done = ('done', 'done.')
+    responses = []
+    for completion_num in range(1, max_completions + 1):
+        print(f'Getting completion {completion_num} for prompt of length {len(prompt)}.')
+        completion = client.chat.completions.create(model=MODELS['text'], messages=messages)
+        content = get_content(prompt='', completion=completion)
+        if (completion_num != 1) and (content.lower() in done):
+            break
+        assert (content.lower() not in done), {"prompt": prompt, "content": content}  # Enforced for when `completion_num == 1`.
+        responses.append(content)
+        if completion_num == max_completions:
+            print_warning(f'The quota of a maximum of {max_completions} completions is exhausted for prompt of length {len(prompt)}.')
+            break
+        messages.append({'role': 'assistant', 'content': content})
+        messages.append({'role': 'user', 'content': continuation})
+    assert responses
+    response = '\n\n'.join(responses)
+    return response
+
+
 def get_content(prompt: str, *, client: Optional[OpenAI] = None, completion: Optional[ChatCompletion] = None) -> str:
     """Return the content for the given prompt."""
     if not completion:
@@ -60,6 +85,12 @@ def get_content(prompt: str, *, client: Optional[OpenAI] = None, completion: Opt
 def get_cached_content(prompt: str) -> str:
     """Return the content for the given prompt using the disk cache if available, otherwise normally."""
     return get_content(prompt)
+
+
+@DISKCACHE.memoize(expire=datetime.timedelta(weeks=4).total_seconds(), tag='get_cached_multipart_content')
+def get_cached_multipart_content(prompt: str) -> str:
+    """Return the content for the given prompt using the disk cache if available, otherwise normally."""
+    return get_multipart_content(prompt)
 
 
 def write_speech(prompt: str, path: Path, *, voice: str = 'default', client: Optional[OpenAI] = None) -> None:  # TODO: Use disk caching.
