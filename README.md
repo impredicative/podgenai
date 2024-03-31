@@ -16,6 +16,7 @@ These generated samples are on [Jumpshare](https://jumpshare.com/file-sharing/mp
 * [Advanced PyTorch](https://jmp.sh/LhwtgxJK) (default voice) (2024-03-30)
 * [New York City](https://jmp.sh/PCNVwdJ4) (default voice) (2024-03-30)
 * [Reverse osmosis water purification](https://jmp.sh/PJj7Ti9z) (default voice) (2024-03-30)
+* [Bitcoin for nerds](https://jmp.sh/Kafqt66V) (male voice) (2024-03-31)
 * [Buffy the Vampire Slayer](https://jmp.sh/LnHdU6ic) (female voice) (2024-03-31)
 
 ## Setup
