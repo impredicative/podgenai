@@ -1,0 +1,3 @@
+I am making a podcast on a topic. Specify which voice might be better for the topic from one of: default, male, female. Provide only a single-word response that is one of these three choices. Do not otherwise comment on the task.
+
+The topic is: {topic}

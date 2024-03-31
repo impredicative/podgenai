@@ -27,6 +27,7 @@ def is_subtopics_list_valid(subtopics: list[str]) -> bool:
 
 
 def list_subtopics(topic: str) -> Optional[list[str]]:
+    """Get the list of subtopics for the given topic."""
     prompt = PROMPTS['list_subtopics'].format(topic=topic)
     subtopics = get_cached_content(prompt)
     assert subtopics, subtopics
@@ -41,6 +42,7 @@ def list_subtopics(topic: str) -> Optional[list[str]]:
 
 
 def get_subtopic(*, topic: str, subtopics: list[str], subtopic: str) -> str:
+    """Get the full text for a given subtopic within the context of the given topic and list of subtopics."""
     prompt = PROMPTS['generate_subtopic_oneshot'].format(topic=topic, subtopics='\n'.join(subtopics), subtopic=subtopic)
     # TODO: Switch to multi-shot subtopic generation.
     subtopic = get_cached_content(prompt)

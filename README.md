@@ -1,7 +1,14 @@
 # podgenai
-Generate approximately an hour-long audio podcast mp3 on a given topic using GPT4.
+Generate approximately an hour-long audio podcast mp3 on a given topic using GPT4 AI.
 
 This very much is alpha software, with a lot of work left to be done, but it is tested to work.
+
+## Approach
+For a given topic, the high-level approach is:
+* The voice is selected using AI.
+* A list of applicable subtopics are listed using AI.
+* For each subtopic, the corresponding text and speech are generated using AI.
+* The speech files are concatenated using `ffmpeg`.
 
 ## Setup
 * Install [`rye`](https://rye-up.com/).

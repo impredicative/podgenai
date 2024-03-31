@@ -6,7 +6,8 @@ from typing import Optional
 from podgenai.config import REPO_PATH, WORK_PATH
 from podgenai.subtopics import list_subtopics, get_subtopic
 from podgenai.topic import is_topic_valid
-from podgenai.util.openai import is_openai_key_available, TTS_DISCLAIMER, write_speech
+from podgenai.voice import get_voice
+from podgenai.util.openai import is_openai_key_available, TTS_DISCLAIMER, TTS_VOICE_MAP, write_speech
 from podgenai.util.str import split_text_by_paragraphs_and_limit
 from podgenai.util.sys import print_error
 
@@ -20,9 +21,12 @@ def generate_podcast(topic: str, *, output_path: Optional[Path] = None) -> Optio
     assert is_topic_valid(topic)
     print(f'\nTOPIC: {topic}')
 
+    voice = get_voice(topic)
+    mapped_voice = TTS_VOICE_MAP[voice]
+    print(f'\nVOICE: {voice} ({mapped_voice})')
+
     subtopics_list = list_subtopics(topic)  # Already validated.
     if not subtopics_list:
-        print_error(f'Failed to generate podcast for topic: {topic}')
         return
     print(f'\nSUBTOPICS:\n{'\n'.join(subtopics_list)}')
     subtopics = {s: get_subtopic(topic=topic, subtopics=subtopics_list, subtopic=s) for s in subtopics_list}
@@ -44,19 +48,20 @@ def generate_podcast(topic: str, *, output_path: Optional[Path] = None) -> Optio
     work_path = WORK_PATH / topic
     work_path.mkdir(parents=False, exist_ok=True)
     for part_idx, part in enumerate(parts):
+        part_stem = f'{subtopics_list[part_idx]} ({mapped_voice})'
         if len(part) <= max_tts_input_len:
-            part_path = work_path / f'{subtopics_list[part_idx]}.mp3'
+            part_path = work_path / f'{part_stem}.mp3'
             part_paths.append(part_path)
             if not part_path.exists():  # TODO: Use proper disk cache instead.
-                write_speech(part, part_path)
+                write_speech(part, part_path, voice=voice)
         else:
             portions = split_text_by_paragraphs_and_limit(part, max_tts_input_len)
             for portion_num, portion in enumerate(portions, start=1):
                 assert len(portion) <= max_tts_input_len
-                portion_path = work_path / f'{subtopics_list[part_idx]} ({portion_num}).mp3'
+                portion_path = work_path / f'{part_stem} ({portion_num}).mp3'
                 part_paths.append(portion_path)
                 if not portion_path.exists():  # TODO: Use proper disk cache instead.
-                    write_speech(portion, portion_path)
+                    write_speech(portion, path=portion_path, voice=voice)
 
     ffmpeg_filelist_path = work_path / 'mp3.list'
     ffmpeg_filelist_path.write_text('\n'.join(f"file '{str(p).replace("'", "'\\''")}'" for p in part_paths))
