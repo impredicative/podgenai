@@ -25,6 +25,7 @@ These generated podcasts can be downloaded from [Jumpshare](https://jumpshare.co
 * Run `rye sync` in the repo directory.
 * Create a file named `.env` in the repo directory, with the intended environment variable `OPENAI_API_KEY=<your OpenAI API key>`, or set it in a different way.
 * Ensure that `ffmpeg` is available.
+* If updating the repo, rerun `rye sync`.
 
 ## Usage
 Interactively run `rye run podgenai` or `python -m podgenai`. You will be prompted for a topic of your choice.
