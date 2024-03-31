@@ -11,7 +11,7 @@ For a given topic, the high-level approach is:
 * The speech files are concatenated using `ffmpeg`.
 
 ## Samples
-These generated samples are on [Jumpshare](https://jumpshare.com/file-sharing/mp3):
+These generated podcasts are on [Jumpshare](https://jumpshare.com/file-sharing/mp3):
 * [PyTorch](https://jmp.sh/pUNi9R3a) (default voice) (2024-03-30)
 * [Advanced PyTorch](https://jmp.sh/LhwtgxJK) (default voice) (2024-03-30)
 * [New York City](https://jmp.sh/PCNVwdJ4) (default voice) (2024-03-30)
