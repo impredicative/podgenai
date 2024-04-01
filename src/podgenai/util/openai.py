@@ -46,13 +46,13 @@ def get_completion(prompt: str, *, client: Optional[OpenAI] = None) -> ChatCompl
     return completion
 
 
-def get_multipart_content(prompt: str, *, max_completions: int = 5, client: Optional[OpenAI] = None) -> str:
+def get_multipart_content(prompt: str, *, max_completions: int = 10, client: Optional[OpenAI] = None) -> str:
     """Return the multipart completion for the given prompt.
 
     The model is given continuation messages until a maximum of `max_completions` are received, or until the model is done.
     """
-    continuation = 'Continue if you\'d like, or say "Done."'
-    done = ('done', 'done.')  # Must be lowercase for comparison.
+    continuation = 'Continue if you\'d like, or otherwise say "Done".'
+    endings = ('Done', 'Done.', 'done', 'done.')
 
     if not client:
         client = get_openai_client()
@@ -63,9 +63,16 @@ def get_multipart_content(prompt: str, *, max_completions: int = 5, client: Opti
         print(f'Getting completion {completion_num} for prompt of length {len(prompt)}.')
         completion = client.chat.completions.create(model=MODELS['text'], messages=messages)
         content = get_content(prompt='', completion=completion)
-        if (completion_num != 1) and (content.lower() in done):
+        if content in endings:
+            print(f'Completion {completion_num} is an ending.')
             break
-        assert (content.lower() not in done), {"prompt": prompt, "content": content}  # Enforced for when `completion_num == 1`.
+        for ending in endings:
+            if content.endswith((f' {ending}', f'\n{ending}')):
+                print(f'Completion {completion_num} has an ending.')
+                content = content.removesuffix(ending).rstrip()
+                assert content, {'prompt': prompt, 'content': content, 'ending': ending}
+                break
+        assert not content.endswith(endings), {"prompt": prompt, "content": content}
         responses.append(content)
         if completion_num == max_completions:
             print_warning(f'The quota of a maximum of {max_completions} completions is exhausted for prompt of length {len(prompt)}.')
@@ -73,7 +80,6 @@ def get_multipart_content(prompt: str, *, max_completions: int = 5, client: Opti
         messages.append({'role': 'assistant', 'content': content})
         messages.append({'role': 'user', 'content': continuation})
 
-    assert responses
     response = '\n\n'.join(responses)
     return response
 
