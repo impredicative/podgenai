@@ -46,7 +46,7 @@ def get_completion(prompt: str, *, client: Optional[OpenAI] = None) -> ChatCompl
     return completion
 
 
-def get_multipart_messages(prompt: str, *, max_completions: int = 10, client: Optional[OpenAI] = None, update_prompt: bool = False, continuation: str = PROMPTS['continuation_next'].rstrip()) -> list[dict]:
+def get_multipart_messages(prompt: str, *, max_completions: int = 10, client: Optional[OpenAI] = None, update_prompt: bool = False, continuation: str = PROMPTS['continuation_next']) -> list[dict]:
     """Return the multipart completion messages for the given initial prompt.
 
     After the initial completion, continuation prompts are subsequently given, either until the assistant is done, or until a maximum of `max_completions` are received, whichever is first.
@@ -57,7 +57,7 @@ def get_multipart_messages(prompt: str, *, max_completions: int = 10, client: Op
     If `continuation` is specified, it is used iteratively as the continuation prompt, otherwise a default continuation prompt is used.
     """
     if update_prompt:
-        prompt = prompt + '\n\n' + PROMPTS['continuation_first'].rstrip()
+        prompt = prompt + '\n\n' + PROMPTS['continuation_first']
     endings = ('Done', 'Done.', 'done', 'done.')
 
     if not client:
