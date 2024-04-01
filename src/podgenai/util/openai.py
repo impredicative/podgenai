@@ -160,4 +160,5 @@ def write_speech(prompt: str, path: Path, *, voice: str = 'default', client: Opt
     relative_path = path.relative_to(Path.cwd())
     print(f'Writing to: {relative_path}')
     response.stream_to_file(path)
+    assert path.exists(), path
     print(f'Wrote to: {relative_path}')
