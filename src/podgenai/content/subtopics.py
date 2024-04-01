@@ -47,12 +47,13 @@ def get_subtopic(*, topic: str, subtopics: list[str], subtopic: str, strategy: s
     If `strategy` is 'oneshot', the assistant is requested only one output, which is usually sufficient.
     If `strategy` is 'multishot', the assistant is permitted multiple outputs up to a limit.
     """
+    assert subtopic[0].isdigit()  # Is numbered.
     match strategy:
         case 'oneshot':
-            prompt = PROMPTS['generate_subtopic'].format(optional_continuation='', topic=topic, subtopics='\n'.join(subtopics), subtopic=subtopic)
+            prompt = PROMPTS['generate_subtopic'].format(optional_continuation='', topic=topic, subtopics='\n'.join(subtopics), numbered_subtopic=subtopic)
             subtopic = get_cached_content(prompt)
         case 'multishot':  # Observed to never really benefit or produce longer content relative to oneshot.
-            prompt = PROMPTS['generate_subtopic'].format(optional_continuation='\n\n' + PROMPTS['continuation_first'], topic=topic, subtopics='\n'.join(subtopics), subtopic=subtopic)
+            prompt = PROMPTS['generate_subtopic'].format(optional_continuation='\n\n' + PROMPTS['continuation_first'], topic=topic, subtopics='\n'.join(subtopics), numbered_subtopic=subtopic)
             subtopic = get_cached_multipart_content(prompt, max_completions=5, update_prompt=False)
         case _:
             assert False, strategy

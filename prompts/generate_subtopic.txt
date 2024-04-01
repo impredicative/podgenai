@@ -13,4 +13,4 @@ For your reference, the full list of intended numbered points for the podcast is
 
 The current specific topic on which you are to expound at great length is:
 
-{subtopic}
+{numbered_subtopic}
