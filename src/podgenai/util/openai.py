@@ -93,8 +93,8 @@ def get_content(prompt: str, *, client: Optional[OpenAI] = None, completion: Opt
     if not completion:
         completion = get_completion(prompt, client=client)
     content = completion.choices[0].message.content
+    content = content.strip()
     assert content
-    assert (content == content.strip()), content
     return content
 
 
