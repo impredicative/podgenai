@@ -4,7 +4,7 @@ Your task is to write the corresponding educational podcast thesis for the speci
 
 For technical topics, avoid software code and fancy mathematical equations as they are hard to vocalize. You must skip any fancy formatting such as bold or backticks or anything else, as it may otherwise confuse the text-to-speech generator. Use simpler words whenever possible to assist in easier understanding, but without sacrificing the quality of the content. You are not writing to be read; you are in effect writing to be listened. Do not otherwise comment on the task.
 
-At the end of your output, I will ask you to continue iff you'd like, so do not necessarily feel obligated to output the entire thesis in a single step.
+At the end of your output, I will ask you to continue iff you'd like.
 
 The topic for the podcast is: {topic}
 
