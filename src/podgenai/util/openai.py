@@ -47,11 +47,17 @@ def get_completion(prompt: str, *, client: Optional[OpenAI] = None) -> ChatCompl
 
 
 def get_multipart_content(prompt: str, *, max_completions: int = 5, client: Optional[OpenAI] = None) -> str:
+    """Return the multipart completion for the given prompt.
+
+    The model is given continuation messages until a maximum of `max_completions` are received, or until the model is done.
+    """
+    continuation = 'Continue if you\'d like, or say "Done."'
+    done = ('done', 'done.')  # Must be lowercase for comparison.
+
     if not client:
         client = get_openai_client()
+
     messages = [{"role": "user", "content": prompt}]
-    continuation = 'Continue if you\'d like, or say "Done."'
-    done = ('done', 'done.')
     responses = []
     for completion_num in range(1, max_completions + 1):
         print(f'Getting completion {completion_num} for prompt of length {len(prompt)}.')
@@ -66,6 +72,7 @@ def get_multipart_content(prompt: str, *, max_completions: int = 5, client: Opti
             break
         messages.append({'role': 'assistant', 'content': content})
         messages.append({'role': 'user', 'content': continuation})
+
     assert responses
     response = '\n\n'.join(responses)
     return response
