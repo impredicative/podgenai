@@ -29,7 +29,7 @@ These generated podcasts can be downloaded from [Jumpshare](https://jumpshare.co
 
 ## Usage
 Interactively run `rye run podgenai` or `python -m podgenai`. You will be prompted for a topic of your choice.
-The podcast mp3 file will be written to the repo directory. As of 2024, the estimated cost per generation is under $2 USD.
+The podcast mp3 file will be written to the repo directory. As of 2024, the estimated cost per generation is under $2 USD and the time taken is under three minutes. 
 
 ## Caching
 * Text outputs are cached locally for four weeks in the `.diskcache` subdirectory.
