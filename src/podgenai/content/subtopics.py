@@ -1,7 +1,7 @@
 from typing import Optional
 
 from podgenai.config import PROMPTS
-from podgenai.util.openai import get_cached_content
+from podgenai.util.openai import get_cached_content, get_cached_multipart_content
 from podgenai.util.sys import print_error
 
 
@@ -41,8 +41,19 @@ def list_subtopics(topic: str) -> Optional[list[str]]:
     return subtopics
 
 
-def get_subtopic(*, topic: str, subtopics: list[str], subtopic: str) -> str:
-    """Get the full text for a given subtopic within the context of the given topic and list of subtopics."""
-    prompt = PROMPTS['generate_subtopic'].format(optional_continuation='', topic=topic, subtopics='\n'.join(subtopics), subtopic=subtopic)
-    subtopic = get_cached_content(prompt)
+def get_subtopic(*, topic: str, subtopics: list[str], subtopic: str, strategy: str = 'multishot') -> str:
+    """Get the full text for a given subtopic within the context of the given topic and list of subtopics.
+
+    If `strategy` is 'oneshot', the assistant is requested only one output, which is usually sufficient.
+    If `strategy` is 'multishot', the assistant is permitted multiple outputs up to a limit.
+    """
+    match strategy:
+        case 'oneshot':
+            prompt = PROMPTS['generate_subtopic'].format(optional_continuation='', topic=topic, subtopics='\n'.join(subtopics), subtopic=subtopic)
+            subtopic = get_cached_content(prompt)
+        case 'multishot':
+            prompt = PROMPTS['generate_subtopic'].format(optional_continuation='\n\n' + PROMPTS['continuation_first'], topic=topic, subtopics='\n'.join(subtopics), subtopic=subtopic)
+            subtopic = get_cached_multipart_content(prompt, max_completions=5, update_prompt=False)
+        case _:
+            assert False, strategy
     return subtopic
