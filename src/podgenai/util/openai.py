@@ -133,9 +133,12 @@ def get_multipart_content(prompt: str, **kwargs) -> str:
 
 
 @DISKCACHE.memoize(expire=datetime.timedelta(weeks=4).total_seconds(), tag='get_cached_multipart_content')
-def get_cached_multipart_content(prompt: str) -> str:
-    """Return the content for the given prompt using the disk cache if available, otherwise normally."""
-    return get_multipart_content(prompt)
+def get_cached_multipart_content(prompt: str, **kwargs) -> str:
+    """Return the multipart content for the given prompt using the disk cache if available, otherwise normally.
+
+    Additional keyword arguments are forwarded to `get_multipart_content`.
+    """
+    return get_multipart_content(prompt, **kwargs)
 
 
 def write_speech(prompt: str, path: Path, *, voice: str = 'default', client: Optional[OpenAI] = None) -> None:  # TODO: Use disk caching.
