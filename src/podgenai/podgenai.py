@@ -48,28 +48,36 @@ def generate_podcast(topic: str, *, output_path: Optional[Path] = None) -> Optio
         now = datetime.datetime.now().isoformat(timespec='seconds')
         output_path = REPO_PATH / f'{now} {topic}.mp3'
 
-    part_paths = []
     max_tts_input_len = 4096
     work_path = WORK_PATH / topic
-    work_path.mkdir(parents=False, exist_ok=True)
+    tts_tasks = []
     for part_idx, part in enumerate(parts):
         part_stem = f'{subtopics_list[part_idx]} ({mapped_voice})'
         if len(part) <= max_tts_input_len:
             part_path = work_path / f'{part_stem}.mp3'
-            part_paths.append(part_path)
             if not part_path.exists():  # TODO: Use proper disk cache instead.
-                write_speech(part, part_path, voice=voice)
+                tts_tasks.append({'path': part_path, 'text': part})
         else:
             portions = split_text_by_paragraphs_and_limit(part, max_tts_input_len)
             for portion_num, portion in enumerate(portions, start=1):
                 assert len(portion) <= max_tts_input_len
                 portion_path = work_path / f'{part_stem} ({portion_num}).mp3'
-                part_paths.append(portion_path)
                 if not portion_path.exists():  # TODO: Use proper disk cache instead.
-                    write_speech(portion, path=portion_path, voice=voice)
+                    tts_tasks.append({'path': portion_path, 'text': portion})
+    work_path.mkdir(parents=False, exist_ok=True)
+    if MAX_CONCURRENT_WORKERS == 1:
+        for tts_task in tts_tasks:
+            write_speech(tts_task['text'], path=tts_task['path'], voice=voice)
+    else:
+        assert MAX_CONCURRENT_WORKERS > 1
+        with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_CONCURRENT_WORKERS) as executor:
+            fn_write_speech = lambda tts_task: write_speech(tts_task['text'], path=tts_task['path'], voice=voice)
+            list(executor.map(fn_write_speech, tts_tasks))
 
+    part_paths = [t['path'] for t in tts_tasks]
+    ffmpeg_paths = [str(p).replace("'", "'\\''") for p in part_paths]
     ffmpeg_filelist_path = work_path / 'mp3.list'
-    ffmpeg_filelist_path.write_text('\n'.join(f"file '{str(p).replace("'", "'\\''")}'" for p in part_paths))
+    ffmpeg_filelist_path.write_text('\n'.join(f"file '{p}'" for p in ffmpeg_paths))
     print(f'\nMerging {len(part_paths)} parts to: {output_path}')
     subprocess.run(['ffmpeg', '-f', 'concat', '-safe', '0', '-i', str(ffmpeg_filelist_path), '-c', 'copy', str(output_path)], check=True)
     print(f'Finished merging {len(part_paths)} parts to: {output_path}')
