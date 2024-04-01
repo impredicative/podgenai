@@ -12,17 +12,17 @@ For a given topic, the high-level reference approach is:
 * The speech files are concatenated using `ffmpeg`.
 
 ## Samples
-These generated podcasts can be downloaded from [Jumpshare](https://jumpshare.com/file-sharing/mp3). As a reminder, the voice is selected by the LLM.
+These generated podcasts can be downloaded from Mega. As a reminder, the voice is selected by the LLM.
 
 * Default voice:
-  * [New York City](https://jmp.sh/PCNVwdJ4) (2024-03-30)
-  * [PyTorch](https://jmp.sh/XxmPnm5d) (2024-04-01)
-  * [Advanced PyTorch](https://jmp.sh/Q08OBzBj) (2024-04-01)
-  * [Reverse osmosis water purification](https://jmp.sh/PJj7Ti9z) (2024-03-30)
+  * [PyTorch](https://mega.nz/file/Ed0xXa4a#6N4rchVpKymzoFPSCtDvMVxPqRwmeD21ApTWX1CpILc) (2024-04-01)
+  * [Advanced PyTorch](https://mega.nz/file/0c1gAA6I#L0Q0dDHham6esi5ZUPvJwdUgXmrRaktq8eh9rvuU50k) (2024-04-01)
+  * [New York City](https://mega.nz/file/0MshXJZZ#64gCSDwtfE-vDa1A1kwx346CYei9pZWQbYIU59droVk) (2024-04-01)
+  * [Reverse osmosis water purification](https://mega.nz/file/JUkwiLzZ#EFsyEMVova_ifSDwOZNvSiHXCIATfzZTBKyqfE8Pe48) (2024-03-30)
 * Female voice:
-  * [Buffy the Vampire Slayer](https://jmp.sh/LnHdU6ic) (2024-03-31)
+  * [Buffy the Vampire Slayer](https://mega.nz/file/9AcBhLRA#x_BCjVn5KiIYu-irr6UYZjNZ3A_V1W5mUWspArNKLbQ) (2024-04-01)
 * Male voice:
-  * [Bitcoin for nerds](https://jmp.sh/x1ATrIH3) (2024-04-01)
+  * [Bitcoin for nerds](https://mega.nz/file/tA9jHaZR#SNFGRSR_QqmKgGSNhWRxYrNZ-JqBcQIAEQxO858MjpI) (2024-04-01)
 
 
 ## Setup
