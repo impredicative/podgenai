@@ -29,10 +29,9 @@ def generate_podcast(topic: str, *, output_path: Optional[Path] = None) -> Optio
         return
     print(f'\nSUBTOPICS:\n{'\n'.join(subtopics_list)}')
     subtopics = {s: get_subtopic(topic=topic, subtopics=subtopics_list, subtopic=s) for s in subtopics_list}
-    subtopics = [f'Section {subtopic_name.replace('.', ':', 1)}:\n{subtopic_text} {{pause}}' for subtopic_name, subtopic_text in subtopics.items()]
-    # Note: A pause at the beginning is skipped by the TTS generator, but it is not skipped if at the end, and so it is kept at the end.
 
-    parts = subtopics.copy()
+    parts = [f'Section {subtopic_name.replace('.', ':', 1)}:\n\n{subtopic_text} {{pause}}' for subtopic_name, subtopic_text in subtopics.items()]
+    # Note: A pause at the beginning is skipped by the TTS generator, but it is not skipped if at the end, and so it is kept at the end.
     parts[0] = f'{topic}\n\n{{pause}}\n{parts[0]}'  # Note: It has proven more reliable for the pause to be structured in this way for section 1, rather than be in the leading line.
     parts[-1] = f'{parts[-1]}\n\n{TTS_DISCLAIMER}'
     text = '\n\n'.join(parts)
