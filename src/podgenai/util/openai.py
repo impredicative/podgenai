@@ -6,7 +6,7 @@ from typing import Optional
 import dotenv
 import openai
 
-from podgenai.config import DISKCACHE
+from podgenai.config import DISKCACHE, PROMPTS
 from podgenai.util.sys import print_error, print_warning
 
 
@@ -46,42 +46,46 @@ def get_completion(prompt: str, *, client: Optional[OpenAI] = None) -> ChatCompl
     return completion
 
 
-def get_multipart_content(prompt: str, *, max_completions: int = 10, client: Optional[OpenAI] = None) -> str:
-    """Return the multipart completion for the given prompt.
+def get_multipart_messages(prompt: str, *, max_completions: int = 10, client: Optional[OpenAI] = None, update_prompt: bool = False, continuation: str = PROMPTS['continuation_next'].rstrip()) -> list[dict]:
+    """Return the multipart completion messages for the given initial prompt.
 
-    The model is given continuation messages until a maximum of `max_completions` are received, or until the model is done.
+    After the initial completion, continuation prompts are subsequently given, either until the assistant is done, or until a maximum of `max_completions` are received, whichever is first.
+
+    If `update_prompt` is True, the initial prompt is appended a default note that continuation prompts will subsequently be sent.
+    If `update_prompt` is False, the initial prompt can be provided with an included continuation note.
+
+    If `continuation` is specified, it is used iteratively as the continuation prompt, otherwise a default continuation prompt is used.
     """
-    continuation = 'Continue if you\'d like, or otherwise say "Done".'
+    if update_prompt:
+        prompt = prompt + '\n\n' + PROMPTS['continuation_first'].rstrip()
     endings = ('Done', 'Done.', 'done', 'done.')
 
     if not client:
         client = get_openai_client()
 
     messages = [{"role": "user", "content": prompt}]
-    responses = []
     for completion_num in range(1, max_completions + 1):
-        print(f'Getting completion {completion_num} for prompt of length {len(prompt)}.')
+        print(f'Getting completion {completion_num} for initial prompt of length {len(prompt)}.')
         completion = client.chat.completions.create(model=MODELS['text'], messages=messages)
         content = get_content(prompt='', completion=completion)
+        messages.append({'role': 'assistant', 'content': content})
+
         if content in endings:
             print(f'Completion {completion_num} is an ending.')
-            break
-        for ending in endings:
-            if content.endswith((f' {ending}', f'\n{ending}')):
-                print(f'Completion {completion_num} has an ending.')
-                content = content.removesuffix(ending).rstrip()
-                assert content, {'prompt': prompt, 'content': content, 'ending': ending}
-                break
-        assert not content.endswith(endings), {"prompt": prompt, "content": content}
-        responses.append(content)
+            return messages
+        else:
+            for ending in endings:
+                if content.endswith((f' {ending}', f'\n{ending}')):
+                    print(f'Completion {completion_num} has an ending.')
+                    return messages
+
         if completion_num == max_completions:
-            print_warning(f'The quota of a maximum of {max_completions} completions is exhausted for prompt of length {len(prompt)}.')
-            break
-        messages.append({'role': 'assistant', 'content': content})
+            print_warning(f'The quota of a maximum of {max_completions} completions is exhausted for initial prompt of length {len(prompt)}.')
+            return messages
+
         messages.append({'role': 'user', 'content': continuation})
 
-    response = '\n\n'.join(responses)
-    return response
+    assert False
 
 
 def get_content(prompt: str, *, client: Optional[OpenAI] = None, completion: Optional[ChatCompletion] = None) -> str:
@@ -98,6 +102,34 @@ def get_content(prompt: str, *, client: Optional[OpenAI] = None, completion: Opt
 def get_cached_content(prompt: str) -> str:
     """Return the content for the given prompt using the disk cache if available, otherwise normally."""
     return get_content(prompt)
+
+
+def get_multipart_content(prompt: str, **kwargs) -> str:
+    """Return the multipart completion content for the given initial prompt.
+
+    Additional keyword arguments are forwarded to `get_multipart_messages`.
+
+    The completions are joined using paragraph breaks (double line breaks).
+    """
+    endings = ('Done', 'Done.', 'done', 'done.')
+    messages = get_multipart_messages(prompt, **kwargs)
+
+    completions = []
+    for message_count, message in enumerate(messages, start=1):
+        if message['role'] != 'assistant':
+            continue
+        completion = message['content']
+        assert completion == completion.strip()
+        if completion in endings:
+            assert (message_count == len(messages)), {'prompt': prompt, 'messages': messages, 'message_count': message_count, 'completion': completion}
+            break
+        for ending in endings:
+            if completion.endswith((f' {ending}', f'\n{ending}')):
+                completion = completion.removesuffix(ending).rstrip()
+                break
+        completions.append(completion)
+
+    return '\n\n'.join(completions)
 
 
 @DISKCACHE.memoize(expire=datetime.timedelta(weeks=4).total_seconds(), tag='get_cached_multipart_content')
