@@ -13,14 +13,17 @@ def is_subtopics_list_valid(subtopics: list[str]) -> bool:
     seen = set()
     for num, subtopic in enumerate(subtopics, start=1):
         expected_num_prefix = f'{num}. '
+        if subtopic != subtopic.strip():
+            print_error(f'Subtopic {num} is invalid because it has leading or trailing whitespace: {subtopic!r}')
+            return False
         if not subtopic.startswith(expected_num_prefix):
             print_error(f'Subtopic {num} is invalid because it is not numbered correctly: {subtopic}')
             return False
-        subtopic_text = subtopic.removeprefix(expected_num_prefix).strip()
-        if not subtopic_text:
+        subtopic_name = subtopic.removeprefix(expected_num_prefix).strip()
+        if not subtopic_name:
             print_error(f'Subtopic {num} is invalid because it has no value: {subtopic}')
             return False
-        if subtopic_text in seen:
+        if subtopic_name in seen:
             print_error(f'Subtopic {num} is invalid because it is a duplicate: {subtopic}')
             return False
         return True
@@ -34,7 +37,7 @@ def list_subtopics(topic: str) -> Optional[list[str]]:
     if subtopics.lower() in ('none', 'none.'):
         print_error(f'No subtopics exist for topic: {topic}')
         return
-    subtopics = [s for s in subtopics.splitlines() if s]
+    subtopics = [s.strip() for s in subtopics.splitlines() if s]
     if not is_subtopics_list_valid(subtopics):
         print_error(f'Invalid subtopic exists for topic: {topic}')
         return
