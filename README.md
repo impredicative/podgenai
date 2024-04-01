@@ -7,7 +7,7 @@ This very much is hurriedly-written alpha software, but it is tested to work, an
 For a given topic, the high-level approach is:
 * The choice of voice is selected using the LLM.
 * A list of applicable subtopics are listed using the LLM.
-* For each subtopic, the corresponding text and speech are generated using the LLM.
+* For each subtopic, the corresponding text and speech are generated using the LLM and TTS respectively.
 * The speech files are concatenated using `ffmpeg`.
 
 ## Samples
