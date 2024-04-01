@@ -31,6 +31,8 @@ idna==3.6
     # via httpx
 openai==1.14.3
     # via podgenai
+pathvalidate==3.2.0
+    # via podgenai
 pydantic==2.6.4
     # via openai
 pydantic-core==2.16.3
