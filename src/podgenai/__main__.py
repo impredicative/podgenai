@@ -6,12 +6,16 @@ from podgenai.util.sys import print_error
 
 def main() -> None:  # TODO: Use cmdline arg for topic, with cmdline help also supported.
     """Generate and write podcast to file for a user-specified topic."""
-    if not is_openai_key_available():
-        exit(1)
-    topic = get_topic()
-    if not generate_podcast(topic):
-        print_error(f'Failed to generate podcast for topic: {topic}')
-        exit(2)
+    try:
+        if not is_openai_key_available():
+            exit(1)
+        topic = get_topic()
+        if not generate_podcast(topic):
+            print_error(f'Failed to generate podcast for topic: {topic}')
+            exit(2)
+    except KeyboardInterrupt:
+        print_error('Interrupted by user.')
+        exit(3)
 
 
 if __name__ == "__main__":
