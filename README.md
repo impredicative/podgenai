@@ -5,19 +5,25 @@ This very much is hurriedly-written alpha software, but it is tested to work, an
 
 ## Approach
 For a given topic, the high-level reference approach is:
+
 * The choice of voice is selected using the LLM.
 * A list of applicable subtopics are listed using the LLM.
 * Concurrently for each subtopic, the corresponding text and speech are generated using the LLM and TTS respectively.
 * The speech files are concatenated using `ffmpeg`.
 
 ## Samples
-These generated podcasts can be downloaded from [Jumpshare](https://jumpshare.com/file-sharing/mp3):
-* [New York City](https://jmp.sh/PCNVwdJ4) (default voice) (2024-03-30)
-* [Reverse osmosis water purification](https://jmp.sh/PJj7Ti9z) (default voice) (2024-03-30)
-* [Buffy the Vampire Slayer](https://jmp.sh/LnHdU6ic) (female voice) (2024-03-31)
-* [Bitcoin for nerds](https://jmp.sh/x1ATrIH3) (male voice) (2024-04-01)
-* [PyTorch](https://jmp.sh/XxmPnm5d) (default voice) (2024-04-01)
-* [Advanced PyTorch](https://jmp.sh/Q08OBzBj) (default voice) (2024-04-01)
+These generated podcasts can be downloaded from [Jumpshare](https://jumpshare.com/file-sharing/mp3). As a reminder, the voice is auto-selected by the LLM from one of three choices.
+
+* Default voice:
+  * [New York City](https://jmp.sh/PCNVwdJ4) (2024-03-30)
+  * [PyTorch](https://jmp.sh/XxmPnm5d) (2024-04-01)
+  * [Advanced PyTorch](https://jmp.sh/Q08OBzBj) (2024-04-01)
+  * [Reverse osmosis water purification](https://jmp.sh/PJj7Ti9z) (2024-03-30)
+* Female voice:
+  * [Buffy the Vampire Slayer](https://jmp.sh/LnHdU6ic) (2024-03-31)
+* Male voice:
+  * [Bitcoin for nerds](https://jmp.sh/x1ATrIH3) (2024-04-01)
+
 
 ## Setup
 * Install [`rye`](https://rye-up.com/).
