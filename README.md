@@ -4,7 +4,7 @@ Generate approximately an hour-long informational audio podcast mp3 file on a gi
 This very much is hurriedly-written alpha software, but it is tested to work, and the used prompts have been customized to obtain reasonable results.
 
 ## Approach
-For a given topic, the high-level approach is:
+For a given topic, the high-level reference approach is:
 * The choice of voice is selected using the LLM.
 * A list of applicable subtopics are listed using the LLM.
 * For each subtopic, the corresponding text and speech are generated using the LLM and TTS respectively.
