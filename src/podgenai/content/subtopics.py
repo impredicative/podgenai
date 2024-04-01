@@ -44,6 +44,5 @@ def list_subtopics(topic: str) -> Optional[list[str]]:
 def get_subtopic(*, topic: str, subtopics: list[str], subtopic: str) -> str:
     """Get the full text for a given subtopic within the context of the given topic and list of subtopics."""
     prompt = PROMPTS['generate_subtopic'].format(optional_continuation='', topic=topic, subtopics='\n'.join(subtopics), subtopic=subtopic)
-    # TODO: Switch to multi-shot subtopic generation.
     subtopic = get_cached_content(prompt)
     return subtopic
