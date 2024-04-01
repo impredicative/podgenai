@@ -41,7 +41,7 @@ def list_subtopics(topic: str) -> Optional[list[str]]:
     return subtopics
 
 
-def get_subtopic(*, topic: str, subtopics: list[str], subtopic: str, strategy: str = 'multishot') -> str:
+def get_subtopic(*, topic: str, subtopics: list[str], subtopic: str, strategy: str = 'oneshot') -> str:
     """Get the full text for a given subtopic within the context of the given topic and list of subtopics.
 
     If `strategy` is 'oneshot', the assistant is requested only one output, which is usually sufficient.
