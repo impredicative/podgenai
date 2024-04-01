@@ -17,12 +17,13 @@ These generated podcasts can be downloaded from Mega. As a reminder, the voice i
 * Default voice:
   * [PyTorch](https://mega.nz/file/Ed0xXa4a#6N4rchVpKymzoFPSCtDvMVxPqRwmeD21ApTWX1CpILc) (2024-04-01)
   * [Advanced PyTorch](https://mega.nz/file/0c1gAA6I#L0Q0dDHham6esi5ZUPvJwdUgXmrRaktq8eh9rvuU50k) (2024-04-01)
-  * [New York City](https://mega.nz/file/0MshXJZZ#64gCSDwtfE-vDa1A1kwx346CYei9pZWQbYIU59droVk) (2024-04-01)
+  * [Machine Learning Engineering and MLOps](https://mega.nz/file/5EsSnJ6D#GIeoAG80bFCLPDjahom9L9z7BQmN6SyBhKjiT5ZtYMA) (2024-04-01)
+  * [New York City](https://mega.nz/file/kBUGEYJA#eveoiEiolXIauEwITlP7yykBvnEP9ORKOXQ8ID5k9gM) (2024-04-01)
   * [Reverse osmosis water purification](https://mega.nz/file/JUkwiLzZ#EFsyEMVova_ifSDwOZNvSiHXCIATfzZTBKyqfE8Pe48) (2024-03-30)
 * Female voice:
-  * [Buffy the Vampire Slayer](https://mega.nz/file/9AcBhLRA#x_BCjVn5KiIYu-irr6UYZjNZ3A_V1W5mUWspArNKLbQ) (2024-04-01)
+  * [Buffy the Vampire Slayer](https://mega.nz/file/0VtjQAAB#xozvkNTTbBv5VszbLLtYO8HMUrpCREhRZa5DtkjJn0U) (2024-04-01)
 * Male voice:
-  * [Bitcoin for nerds](https://mega.nz/file/tA9jHaZR#SNFGRSR_QqmKgGSNhWRxYrNZ-JqBcQIAEQxO858MjpI) (2024-04-01)
+  * [Bitcoin for nerds](https://mega.nz/file/VNc1hBwA#HtJ3AG8yamw6GqQYR_GRgEhSYOyaUOEpl_jEqJo0fR0) (2024-04-01)
 
 
 ## Setup
