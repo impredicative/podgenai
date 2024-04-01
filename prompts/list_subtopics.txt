@@ -6,4 +6,6 @@ You do not need to cover any prerequisite or foundational topics because they wo
 
 For your information, in a subsequent step, I will ask you to generate the corresponding text for each of the listed subtopic points, one point at a time. As such, it would help for each of the points you list to be those that you can subsequently expound upon at great length.
 
-The topic for the podcast is: {topic}
+The topic for the podcast is:
+
+{topic}
