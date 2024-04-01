@@ -4,6 +4,8 @@ from pathlib import Path
 import subprocess
 from typing import Optional
 
+import pathvalidate
+
 from podgenai.config import MAX_CONCURRENT_WORKERS, REPO_PATH, WORK_PATH
 from podgenai.content.subtopics import list_subtopics, get_subtopic
 from podgenai.content.topic import is_topic_valid
@@ -46,21 +48,28 @@ def generate_podcast(topic: str, *, output_path: Optional[Path] = None) -> Optio
 
     if output_path is None:
         now = datetime.datetime.now().isoformat(timespec='seconds')
-        output_path = REPO_PATH / f'{now} {topic}.mp3'
+        output_filename = f'{now} {topic}.mp3'
+        output_filename = pathvalidate.sanitize_filename(output_filename, platform='auto')
+        output_path = REPO_PATH / output_filename
+    pathvalidate.validate_filepath(output_path, platform='auto')
 
     max_tts_input_len = 4096
-    work_path = WORK_PATH / topic
+    work_path = WORK_PATH / pathvalidate.sanitize_filepath(topic, platform='auto')
+    pathvalidate.validate_filepath(work_path, platform='auto')
     tts_tasks = []
     for part_idx, part in enumerate(parts):
         part_stem = f'{subtopics_list[part_idx]} ({mapped_voice})'
+        part_stem = pathvalidate.sanitize_filename(part_stem, platform='auto')
         if len(part) <= max_tts_input_len:
             part_path = work_path / f'{part_stem}.mp3'
+            pathvalidate.validate_filepath(part_path, platform='auto')
             tts_tasks.append({'path': part_path, 'text': part})
         else:
             portions = split_text_by_paragraphs_and_limit(part, max_tts_input_len)
             for portion_num, portion in enumerate(portions, start=1):
                 assert len(portion) <= max_tts_input_len
                 portion_path = work_path / f'{part_stem} ({portion_num}).mp3'
+                pathvalidate.validate_filepath(portion_path, platform='auto')
                 tts_tasks.append({'path': portion_path, 'text': portion})
     work_path.mkdir(parents=False, exist_ok=True)
     tts_tasks_pending = [t for t in tts_tasks if not t['path'].exists()]  # TODO: Use proper disk cache instead.
@@ -79,6 +88,7 @@ def generate_podcast(topic: str, *, output_path: Optional[Path] = None) -> Optio
     ffmpeg_filelist_path.write_text('\n'.join(f"file '{p}'" for p in ffmpeg_paths))
     print(f'\nMerging {len(part_paths)} parts to: {output_path}')
     subprocess.run(['ffmpeg', '-f', 'concat', '-safe', '0', '-i', str(ffmpeg_filelist_path), '-c', 'copy', str(output_path)], check=True)
+    assert output_path.exists()
     print(f'Finished merging {len(part_paths)} parts to: {output_path}')
 
     return output_path
