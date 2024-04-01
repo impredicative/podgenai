@@ -55,24 +55,23 @@ def generate_podcast(topic: str, *, output_path: Optional[Path] = None) -> Optio
         part_stem = f'{subtopics_list[part_idx]} ({mapped_voice})'
         if len(part) <= max_tts_input_len:
             part_path = work_path / f'{part_stem}.mp3'
-            if not part_path.exists():  # TODO: Use proper disk cache instead.
-                tts_tasks.append({'path': part_path, 'text': part})
+            tts_tasks.append({'path': part_path, 'text': part})
         else:
             portions = split_text_by_paragraphs_and_limit(part, max_tts_input_len)
             for portion_num, portion in enumerate(portions, start=1):
                 assert len(portion) <= max_tts_input_len
                 portion_path = work_path / f'{part_stem} ({portion_num}).mp3'
-                if not portion_path.exists():  # TODO: Use proper disk cache instead.
-                    tts_tasks.append({'path': portion_path, 'text': portion})
+                tts_tasks.append({'path': portion_path, 'text': portion})
     work_path.mkdir(parents=False, exist_ok=True)
+    tts_tasks_pending = [t for t in tts_tasks if not t['path'].exists()]  # TODO: Use proper disk cache instead.
     if MAX_CONCURRENT_WORKERS == 1:
-        for tts_task in tts_tasks:
+        for tts_task in tts_tasks_pending:
             write_speech(tts_task['text'], path=tts_task['path'], voice=voice)
     else:
         assert MAX_CONCURRENT_WORKERS > 1
         with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_CONCURRENT_WORKERS) as executor:
             fn_write_speech = lambda tts_task: write_speech(tts_task['text'], path=tts_task['path'], voice=voice)
-            list(executor.map(fn_write_speech, tts_tasks))
+            list(executor.map(fn_write_speech, tts_tasks_pending))
 
     part_paths = [t['path'] for t in tts_tasks]
     ffmpeg_paths = [str(p).replace("'", "'\\''") for p in part_paths]
