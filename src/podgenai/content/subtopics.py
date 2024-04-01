@@ -57,4 +57,4 @@ def get_subtopic(*, topic: str, subtopics: list[str], subtopic: str, strategy: s
             subtopic = get_cached_multipart_content(prompt, max_completions=5, update_prompt=False)
         case _:
             assert False, strategy
-    return subtopic.strip()
+    return subtopic.rstrip()
