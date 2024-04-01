@@ -1,7 +1,7 @@
 # podgenai
 Generate approximately an hour-long informational audio podcast mp3 on a given topic using the GPT-4 LLM. A funded [OpenAI API key](https://platform.openai.com/api-keys) is required.
 
-This very much is hurriedly-written alpha software, but it is tested to work.
+This very much is hurriedly-written alpha software, but it is tested to work, and the used prompts have been customized to obtain reasonable results.
 
 ## Approach
 For a given topic, the high-level approach is:
