@@ -15,8 +15,8 @@ For a given topic, the high-level reference approach is:
 These generated podcasts can be downloaded from Mega. As a reminder, the voice is selected by the LLM.
 
 * Default voice:
-  * [PyTorch](https://mega.nz/file/Ed0xXa4a#6N4rchVpKymzoFPSCtDvMVxPqRwmeD21ApTWX1CpILc) (2024-04-01)
-  * [Advanced PyTorch](https://mega.nz/file/0c1gAA6I#L0Q0dDHham6esi5ZUPvJwdUgXmrRaktq8eh9rvuU50k) (2024-04-01)
+  * [PyTorch](https://mega.nz/file/0RUxwKYA#CsP_K0_f1NdJSNsMN4cx3dCWEgtttI8wMSi__kZh-mo) (2024-04-01)
+  * [Advanced PyTorch](https://mega.nz/file/EU0AyR4R#KpD5SdaMEBZBcEhH3qOPHW3fkffdrxuaPgMldNOItcU) (2024-04-01)
   * [Machine Learning Engineering and MLOps](https://mega.nz/file/5EsSnJ6D#GIeoAG80bFCLPDjahom9L9z7BQmN6SyBhKjiT5ZtYMA) (2024-04-01)
   * [New York City](https://mega.nz/file/kBUGEYJA#eveoiEiolXIauEwITlP7yykBvnEP9ORKOXQ8ID5k9gM) (2024-04-01)
   * [Reverse osmosis water purification](https://mega.nz/file/JUkwiLzZ#EFsyEMVova_ifSDwOZNvSiHXCIATfzZTBKyqfE8Pe48) (2024-03-30)
