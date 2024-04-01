@@ -6,13 +6,13 @@ This very much is hurriedly-written alpha software, but it is tested to work, an
 ## Approach
 For a given topic, the high-level reference approach is:
 
-* The choice of voice is selected using the LLM.
+* The voice is selected using the LLM from three choices.
 * A list of applicable subtopics are listed using the LLM.
 * Concurrently for each subtopic, the corresponding text and speech are generated using the LLM and TTS respectively.
 * The speech files are concatenated using `ffmpeg`.
 
 ## Samples
-These generated podcasts can be downloaded from [Jumpshare](https://jumpshare.com/file-sharing/mp3). As a reminder, the voice is auto-selected by the LLM from one of three choices.
+These generated podcasts can be downloaded from [Jumpshare](https://jumpshare.com/file-sharing/mp3). As a reminder, the voice is selected by the LLM.
 
 * Default voice:
   * [New York City](https://jmp.sh/PCNVwdJ4) (2024-03-30)
