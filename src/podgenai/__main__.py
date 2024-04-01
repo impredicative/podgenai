@@ -4,7 +4,7 @@ from podgenai.util.openai import is_openai_key_available
 from podgenai.util.sys import print_error
 
 
-def main() -> None:
+def main() -> None:  # TODO: Use cmdline arg for topic, with cmdline help also supported.
     """Generate and write podcast to file for a user-specified topic."""
     if not is_openai_key_available():
         exit(1)
@@ -16,7 +16,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
-# use cmdline arg for topic using latest fire
-# show cmdline help, perhaps from docstring
-# use multishot response, logging when used
