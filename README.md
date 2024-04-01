@@ -12,12 +12,12 @@ For a given topic, the high-level reference approach is:
 
 ## Samples
 These generated podcasts can be downloaded from [Jumpshare](https://jumpshare.com/file-sharing/mp3):
-* [PyTorch](https://jmp.sh/pUNi9R3a) (default voice) (2024-03-30)
-* [Advanced PyTorch](https://jmp.sh/LhwtgxJK) (default voice) (2024-03-30)
 * [New York City](https://jmp.sh/PCNVwdJ4) (default voice) (2024-03-30)
 * [Reverse osmosis water purification](https://jmp.sh/PJj7Ti9z) (default voice) (2024-03-30)
-* [Bitcoin for nerds](https://jmp.sh/Kafqt66V) (male voice) (2024-03-31)
 * [Buffy the Vampire Slayer](https://jmp.sh/LnHdU6ic) (female voice) (2024-03-31)
+* [Bitcoin for nerds](https://jmp.sh/x1ATrIH3) (male voice) (2024-04-01)
+* [PyTorch](https://jmp.sh/XxmPnm5d) (default voice) (2024-04-01)
+* [Advanced PyTorch](https://jmp.sh/Q08OBzBj) (default voice) (2024-04-01)
 
 ## Setup
 * Install [`rye`](https://rye-up.com/).
