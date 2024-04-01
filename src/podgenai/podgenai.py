@@ -1,9 +1,10 @@
+import concurrent.futures
 import datetime
 from pathlib import Path
 import subprocess
 from typing import Optional
 
-from podgenai.config import REPO_PATH, WORK_PATH
+from podgenai.config import MAX_CONCURRENT_WORKERS, REPO_PATH, WORK_PATH
 from podgenai.content.subtopics import list_subtopics, get_subtopic
 from podgenai.content.topic import is_topic_valid
 from podgenai.content.voice import get_voice
@@ -28,7 +29,13 @@ def generate_podcast(topic: str, *, output_path: Optional[Path] = None) -> Optio
     if not subtopics_list:
         return
     print(f'\nSUBTOPICS:\n{'\n'.join(subtopics_list)}')
-    subtopics = {s: get_subtopic(topic=topic, subtopics=subtopics_list, subtopic=s) for s in subtopics_list}
+    if MAX_CONCURRENT_WORKERS == 1:
+        subtopics = {s: get_subtopic(topic=topic, subtopics=subtopics_list, subtopic=s) for s in subtopics_list}
+    else:
+        assert MAX_CONCURRENT_WORKERS > 1
+        with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_CONCURRENT_WORKERS) as executor:
+            fn_get_subtopic = lambda subtopic: get_subtopic(topic=topic, subtopics=subtopics_list, subtopic=subtopic)
+            subtopics = {s: text for s, text in zip(subtopics_list, executor.map(fn_get_subtopic, subtopics_list))}
 
     parts = [f'Section {subtopic_name.replace('.', ':', 1)}:\n\n{subtopic_text} {{pause}}' for subtopic_name, subtopic_text in subtopics.items()]
     # Note: A pause at the beginning is skipped by the TTS generator, but it is not skipped if at the end, and so it is kept at the end.
