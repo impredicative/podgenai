@@ -45,7 +45,7 @@ Usage can be as a command-line application or as a Python library. By default, t
 The `generate_podcast` function can be called. If successful, the output path is returned. If failed for a common reason, `None` is returned, and a relevant error is printed. As such, the return value must be checked. This section is subject to change as per Python best practices.
 ```python
 from pathlib import Path
-from podgenai.podgenai import generate_podcast
+from podgenai import generate_podcast
 
 # With default output path:
 output_file_path = generate_podcast("My favorite topic")  # Check return value!
