@@ -1,5 +1,5 @@
 # podgenai
-**podgenai** is a Python 3.12 application to generate approximately an hour-long informational audio podcast mp3 file on a given topic using the GPT-4 LLM. A funded [OpenAI API key](https://platform.openai.com/api-keys) is required.
+**podgenai** is a Python 3.12 application to generate approximately an hour-long informational audiobook podcast mp3 file on a given topic using the GPT-4 LLM. A funded [OpenAI API key](https://platform.openai.com/api-keys) is required.
 
 This very much is hurriedly-written alpha software, but it is tested to work, and the used prompts have been customized to obtain reasonable results.
 
@@ -12,7 +12,7 @@ For a given topic, the high-level reference approach is:
 * The speech files are concatenated using `ffmpeg`.
 
 ## Samples
-These generated podcasts can be downloaded from Mega. As a reminder, the voice is selected by the LLM.
+These generated files can be downloaded from Mega. As a reminder, the voice is selected by the LLM.
 
 * Default voice:
   * [PyTorch](https://mega.nz/file/0RUxwKYA#CsP_K0_f1NdJSNsMN4cx3dCWEgtttI8wMSi__kZh-mo) (2024-04-01)
@@ -36,7 +36,7 @@ These generated podcasts can be downloaded from Mega. As a reminder, the voice i
 
 ## Usage
 Interactively run `rye run podgenai` or `python -m podgenai`. You will be prompted for a topic of your choice.
-The podcast mp3 file will be written to the repo directory. As of 2024, the estimated cost per generation is under $2 USD and the time taken is under three minutes. 
+The generated mp3 file will be written to the repo directory. As of 2024, the estimated cost per generation is under $2 USD and the time taken is under three minutes. 
 
 ## Caching
 * Text outputs are cached locally for four weeks in the `.diskcache` subdirectory.
@@ -45,7 +45,7 @@ The podcast mp3 file will be written to the repo directory. As of 2024, the esti
 ## Disclaimer
 <sub>This software is provided "as is," without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose, and noninfringement. In no event shall the authors or copyright holders be liable for any claim, damages, or other liability, whether in an action of contract, tort, or otherwise, arising from, out of, or in connection with the software or the use or other dealings in the software.</sub>
 
-<sub>Users should be aware that both the text and the audio of the generated podcasts are produced by artificial intelligence (AI) based on the inputs given and the data available to the AI model at the time of generation. As such, inaccuracies, errors, or unintended content may occur. Users are advised to exercise caution and verify the accuracy and appropriateness of the generated content before any use or reliance.</sub>
+<sub>Users should be aware that both the text and the audio of the generated files are produced by artificial intelligence (AI) based on the inputs given and the data available to the AI model at the time of generation. As such, inaccuracies, errors, or unintended content may occur. Users are advised to exercise caution and verify the accuracy and appropriateness of the generated content before any use or reliance.</sub>
 
 <sub>You are responsible for the costs associated with the use of the OpenAI API as required by the software, and you must comply with the OpenAI API terms of service. The software's functionality is dependent on the availability and functionality of external services and software, including but not limited to the OpenAI API and ffmpeg, over which the authors have no control.</sub>
 
