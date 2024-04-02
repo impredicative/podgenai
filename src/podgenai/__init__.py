@@ -1,1 +1,1 @@
-from podgenai.podgenai import generate_podcast
+from podgenai.podgenai import generate_media

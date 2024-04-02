@@ -22,7 +22,7 @@ def _get_default_output_filename(topic: str) -> str:
     return output_filename
 
 
-def generate_podcast(topic: str, *, output_path: Optional[Path] = None) -> Optional[Path]:
+def generate_media(topic: str, *, output_path: Optional[Path] = None) -> Optional[Path]:
     """Return the output path after generating and writing an audiobook podcast to file for the given topic.
 
     Params:

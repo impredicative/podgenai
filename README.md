@@ -42,19 +42,20 @@ Usage can be as a command-line application or as a Python library. By default, t
 * To specify an output file path, use `python -m podgenai -t "My favorite topic" -p "~/something.mp3"`.
 
 ### Library usage
-The `generate_podcast` function can be called. If successful, the output path is returned. If failed for a common reason, `None` is returned, and a relevant error is printed. As such, the return value must be checked. This section is subject to change as per Python best practices.
+This package is not available on PyPI due to its unpolished nature, but it can nevertheless be called as a library. If successful, the output path is returned. If failed for a common reason, `None` is returned, and a relevant error is printed. As such, the return value must be checked. This section is subject to change as per Python best practices.
+
 ```python
 from pathlib import Path
-from podgenai import generate_podcast
+from podgenai import generate_media
 
 # With default output path:
-output_file_path = generate_podcast("My favorite topic")  # Check return value!
+output_file_path = generate_media("My favorite topic")  # Check return value!
 
 # With preexisting output directory path:
-output_file_path = generate_podcast("My favorite topic", output_path=Path('/tmp'))  # Check return value!
+output_file_path = generate_media("My favorite topic", output_path=Path('/tmp'))  # Check return value!
 
 # With output file path:
-status = bool(generate_podcast("My favorite topic", output_path=Path('~/foo.mp3')))  # Check return value!
+status = bool(generate_media("My favorite topic", output_path=Path('~/foo.mp3')))  # Check return value!
 ```
 
 ## Caching

@@ -4,7 +4,7 @@ import fire
 import os
 from pathlib import Path
 
-from podgenai.podgenai import generate_podcast
+from podgenai.podgenai import generate_media
 from podgenai.content.topic import get_topic, is_topic_valid
 from podgenai.util.openai import is_openai_key_available
 from podgenai.util.sys import print_error
@@ -33,7 +33,7 @@ def main(topic: Optional[str] = None, path: Optional[Path] = None) -> None:
         if path:
             path = Path(path)
 
-        if not generate_podcast(topic, output_path=path):
+        if not generate_media(topic, output_path=path):
             print_error(f'Failed to generate podcast for topic: {topic}')
             exit(3)
     except KeyboardInterrupt:
