@@ -33,8 +33,23 @@ These generated mp3 files can be downloaded from Mega. In effect, these also con
 * If updating the repo, rerun `rye sync`.
 
 ## Usage
-Interactively run `rye run podgenai` or `python -m podgenai`. You will be prompted for a topic of your choice.
-The generated mp3 file will be written to the repo directory. As of 2024, the estimated cost per generation is under $2 USD and the time taken is under three minutes. 
+Usage can be as an application or as a library. By default, the generated mp3 file will be written to the repo directory. As of 2024, the estimated cost per generation is under $2 USD and the time taken is under three minutes.
+
+### Application usage
+* To show help, run `python -m podgenai -h`.
+* To run for a specified topic, `python -m podgenai "My favorite topic"`. If a topic is not specified, you will interactively be prompted for it. 
+
+### Library usage
+```python
+from pathlib import Path
+from podgenai.podgenai import generate_podcast
+
+# With default output path:
+output_path = generate_podcast("My favorite topic")
+
+# With explicit output path:
+generate_podcast("My favorite topic", output_path=Path('~/foo.mp3').resolve())
+```
 
 ## Caching
 * Text outputs are cached locally for four weeks in the `.diskcache` subdirectory.

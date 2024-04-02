@@ -1,22 +1,39 @@
+from typing import Optional
+
+import fire
+import os
+
 from podgenai.podgenai import generate_podcast
-from podgenai.content.topic import get_topic
+from podgenai.content.topic import get_topic, is_topic_valid
 from podgenai.util.openai import is_openai_key_available
 from podgenai.util.sys import print_error
 
 
-def main() -> None:  # TODO: Use cmdline arg for topic, with cmdline help also supported.
-    """Generate and write podcast to file for a user-specified topic."""
+def main(topic: Optional[str] = None) -> None:
+    """Generate and write an audiobook podcast mp3 file for the specified topic.
+
+    If the topic is not specified, the user is prompted for it.
+
+    The output file is written to the repo directory.
+    """
     try:
         if not is_openai_key_available():
             exit(1)
-        topic = get_topic()
+
+        if topic:
+            if not is_topic_valid(topic):
+                print_error(f'Failed to generate podcast for topic: {topic}')
+                exit(2)
+        else:
+            topic = get_topic()
+
         if not generate_podcast(topic):
             print_error(f'Failed to generate podcast for topic: {topic}')
-            exit(2)
+            exit(3)
     except KeyboardInterrupt:
         print_error('Interrupted by user.')
-        exit(3)
+        os._exit(-2)  # Plain `exit` is not used because it may not immediately terminate, with background threads potentially still running.
 
 
 if __name__ == "__main__":
-    main()
+    fire.Fire(main)
