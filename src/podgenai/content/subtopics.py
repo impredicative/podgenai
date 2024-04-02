@@ -26,7 +26,7 @@ def is_subtopics_list_valid(subtopics: list[str]) -> bool:
         if subtopic_name in seen:
             print_error(f'Subtopic {num} is invalid because it is a duplicate: {subtopic}')
             return False
-        return True
+    return True
 
 
 def list_subtopics(topic: str) -> Optional[list[str]]:
