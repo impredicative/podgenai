@@ -40,7 +40,7 @@ Usage can be as a command-line application or as a Python library. By default, t
 * To run for a specified topic, run `python -m podgenai "My favorite topic"`. If a topic is not specified, you will interactively be prompted for it. 
 
 ### Library usage
-The `generate_podcast` function can be called. If successful, it returns the output path. If failed, it returns `None`, also printing a relevant error. As such, the return value must be checked. This is subject to change as per Python best practices.
+The `generate_podcast` function can be called. If successful, it returns the output path. If failed, it returns `None`, also printing a relevant error. As such, the return value must be checked. This section is subject to change as per Python best practices.
 ```python
 from pathlib import Path
 from podgenai.podgenai import generate_podcast
