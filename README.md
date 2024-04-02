@@ -37,18 +37,19 @@ Usage can be as a command-line application or as a Python library. By default, t
 
 ### Application usage
 * To show help, run `python -m podgenai -h`.
-* To run for a specified topic, `python -m podgenai "My favorite topic"`. If a topic is not specified, you will interactively be prompted for it. 
+* To run for a specified topic, run `python -m podgenai "My favorite topic"`. If a topic is not specified, you will interactively be prompted for it. 
 
 ### Library usage
+The `generate_podcast` function can be called. If successful, it returns the output path. If failed, it returns `None`, also printing a relevant error. As such, the return value must be checked. This is subject to change as per Python best practices.
 ```python
 from pathlib import Path
 from podgenai.podgenai import generate_podcast
 
 # With default output path:
-output_path = generate_podcast("My favorite topic")
+output_path = generate_podcast("My favorite topic")  # Check return value!
 
 # With explicit output path:
-generate_podcast("My favorite topic", output_path=Path('~/foo.mp3').resolve())
+status = bool(generate_podcast("My favorite topic", output_path=Path('~/foo.mp3').resolve()))  # Check return value!
 ```
 
 ## Caching
