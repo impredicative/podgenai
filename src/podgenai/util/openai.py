@@ -148,6 +148,7 @@ def write_speech(prompt: str, path: Path, *, voice: str = 'default', client: Opt
 
     `voice` can be one of the keys or values in TTS_VOICE_MAP, or one of the other supported voices.
     """
+    assert path.suffix == '.mp3'
     if not client:
         client = get_openai_client()
 
