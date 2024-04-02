@@ -15,15 +15,13 @@ For a given topic, the high-level reference approach is:
 These generated files can be downloaded from Mega. As a reminder, the voice is selected by the LLM.
 
 * Default voice:
-  * [PyTorch](https://mega.nz/file/0RUxwKYA#CsP_K0_f1NdJSNsMN4cx3dCWEgtttI8wMSi__kZh-mo) (2024-04-01)
-  * [Advanced PyTorch](https://mega.nz/file/EU0AyR4R#KpD5SdaMEBZBcEhH3qOPHW3fkffdrxuaPgMldNOItcU) (2024-04-01)
-  * [Machine Learning Engineering and MLOps](https://mega.nz/file/5EsSnJ6D#GIeoAG80bFCLPDjahom9L9z7BQmN6SyBhKjiT5ZtYMA) (2024-04-01)
-  * [New York City](https://mega.nz/file/kBUGEYJA#eveoiEiolXIauEwITlP7yykBvnEP9ORKOXQ8ID5k9gM) (2024-04-01)
-  * [Reverse osmosis water purification](https://mega.nz/file/JUkwiLzZ#EFsyEMVova_ifSDwOZNvSiHXCIATfzZTBKyqfE8Pe48) (2024-03-30)
+  * <sub>[PyTorch](https://mega.nz/file/kEVRXSqS#J0o9wRpTxGMMH4q7_SmrPkIpUEF0VAYheMzJBTQ0L_0)</sub>
+  * <sub>[Advanced PyTorch](https://mega.nz/file/QF10lToJ#p-Pnxy8G2sKwcPPU5TTFyelhTOSm7uHxOTlYHN-r2bA)</sub>
+  * <sub>[New York City: present and future](https://mega.nz/file/EBEVDKwJ#eqJ1gDWh2Pr0Tfw-WT1PR2bmCQjlyR_TlJYjvNTibhM)</sub>
 * Female voice:
-  * [Buffy the Vampire Slayer](https://mega.nz/file/0VtjQAAB#xozvkNTTbBv5VszbLLtYO8HMUrpCREhRZa5DtkjJn0U) (2024-04-01)
+  * <sub>[Buffy the Vampire Slayer](https://mega.nz/file/AV0hQTiA#apUKjUZHwlzWLafIKZDSnVb5b0mULkqQM74a3zNYDhU)</sub>
 * Male voice:
-  * [Bitcoin for nerds](https://mega.nz/file/VNc1hBwA#HtJ3AG8yamw6GqQYR_GRgEhSYOyaUOEpl_jEqJo0fR0) (2024-04-01)
+  * <sub>[Bitcoin for nerds](https://mega.nz/file/pZ9GiDQD#5xhPKeR1pFX73p4PJeWmFQbqBVH-dQPstLS1PDtNJV0)</sub>
 
 
 ## Setup
