@@ -15,7 +15,9 @@ def main(topic: Optional[str] = None, path: Optional[Path] = None) -> None:
 
     Params:
     * `topic`: Topic. If not given, the user is prompted for it.
-    * `path`: Output file path. It must have an ".mp3" suffix. If not given, the output file is written to the repo directory.
+    * `path`: Output file or directory path.
+        If an intended file path, it must have an ".mp3" suffix. If a directory, it must exist, and the file name is auto-determined.
+        If not given, the output file is written to the repo directory with an auto-determined file name.
     """
     try:
         if not is_openai_key_available():

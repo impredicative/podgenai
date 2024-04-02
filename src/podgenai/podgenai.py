@@ -14,12 +14,22 @@ from podgenai.util.openai import is_openai_key_available, DISCLAIMER, TTS_VOICE_
 from podgenai.util.str import split_text_by_paragraphs_and_limit
 
 
+def _get_default_output_filename(topic: str) -> str:
+    """Return the default output filename for the given topic."""
+    now = datetime.datetime.now().isoformat(timespec='seconds')
+    output_filename = f'{now} {topic}.mp3'
+    output_filename = pathvalidate.sanitize_filename(output_filename, platform='auto')
+    return output_filename
+
+
 def generate_podcast(topic: str, *, output_path: Optional[Path] = None) -> Optional[Path]:
-    """Return the output path after generating and writing a podcast to file for the given topic.
+    """Return the output path after generating and writing an audiobook podcast to file for the given topic.
 
     Params:
     * `topic`: Topic.
-    * `path`: Output file path. It must have an ".mp3" suffix. If not given, the output file is written to the repo directory.
+    * `path`: Output file or directory path.
+        If an intended file path, it must have an ".mp3" suffix. If a directory, it must exist, and the file name is auto-determined.
+        If not given, the output file is written to the repo directory with an auto-determined file name.
 
     If successful, the output path is returned. If failed for a common reason, `None` is returned, and a relevant error is printed.
     As such, the return value must be checked.
@@ -51,14 +61,17 @@ def generate_podcast(topic: str, *, output_path: Optional[Path] = None) -> Optio
     print(f'\nTEXT:\n{text}')
 
     if output_path is None:
-        now = datetime.datetime.now().isoformat(timespec='seconds')
-        output_filename = f'{now} {topic}.mp3'
-        output_filename = pathvalidate.sanitize_filename(output_filename, platform='auto')
+        output_filename = _get_default_output_filename(topic)
         output_path = REPO_PATH / output_filename
     else:
         output_path = output_path.expanduser().resolve()
-        assert output_path.suffix == '.mp3'
-        output_path.parent.mkdir(parents=True, exist_ok=True)
+        if output_path.is_dir():
+            assert output_path.exists()
+            output_filename = _get_default_output_filename(topic)
+            output_path = output_path / output_filename
+        else:
+            assert output_path.suffix == '.mp3'
+            output_path.parent.mkdir(parents=True, exist_ok=True)
 
     pathvalidate.validate_filepath(output_path, platform='auto')
 
@@ -96,7 +109,7 @@ def generate_podcast(topic: str, *, output_path: Optional[Path] = None) -> Optio
     ffmpeg_filelist_path = work_path / 'mp3.list'
     ffmpeg_filelist_path.write_text('\n'.join(f"file '{p}'" for p in ffmpeg_paths))
     print(f'\nMerging {len(part_paths)} parts to: {output_path}')
-    subprocess.run(['ffmpeg', '-f', 'concat', '-safe', '0', '-i', str(ffmpeg_filelist_path), '-c', 'copy', str(output_path)], check=True)
+    subprocess.run(['ffmpeg', '-y', '-f', 'concat', '-safe', '0', '-i', str(ffmpeg_filelist_path), '-c', 'copy', str(output_path)], check=True)
     assert output_path.exists()
     print(f'Finished merging {len(part_paths)} parts to: {output_path}')
 
