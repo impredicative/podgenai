@@ -17,15 +17,20 @@ from podgenai.util.str import split_text_by_paragraphs_and_limit
 def generate_podcast(topic: str, *, output_path: Optional[Path] = None) -> Optional[Path]:
     """Return the output path after generating and writing a podcast to file for the given topic.
 
-    No path is returned if the podcast fails to be generated.
+    Params:
+    * `topic`: Topic.
+    * `path`: Output file path. It must have an ".mp3" suffix. If not given, the output file is written to the repo directory.
+
+    If successful, the output path is returned. If failed for a common reason, `None` is returned, and a relevant error is printed.
+    As such, the return value must be checked.
     """
     assert is_openai_key_available()
     assert is_topic_valid(topic)
-    print(f'\nTOPIC: {topic}')
+    print(f'TOPIC: {topic}')
 
     voice = get_voice(topic)
     mapped_voice = TTS_VOICE_MAP[voice]
-    print(f'\nVOICE: {voice} ({mapped_voice})')
+    print(f'VOICE: {voice} ({mapped_voice})')
 
     subtopics_list = list_subtopics(topic)  # Already validated.
     if not subtopics_list:
@@ -50,6 +55,11 @@ def generate_podcast(topic: str, *, output_path: Optional[Path] = None) -> Optio
         output_filename = f'{now} {topic}.mp3'
         output_filename = pathvalidate.sanitize_filename(output_filename, platform='auto')
         output_path = REPO_PATH / output_filename
+    else:
+        output_path = output_path.expanduser().resolve()
+        assert output_path.suffix == '.mp3'
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+
     pathvalidate.validate_filepath(output_path, platform='auto')
 
     max_tts_input_len = 4096
