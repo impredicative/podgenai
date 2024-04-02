@@ -18,6 +18,9 @@ def is_topic_valid(topic: str) -> bool:
     if len(topic.splitlines()) > 1:
         print_error('Topic must be in a single line.')
         return False
+    if (topic[0] == topic[-1] == "'") or (topic[0] == topic[-1] == '"'):
+        print_error('Topic must not be quoted.')
+        return False
     return True
 
 
