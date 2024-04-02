@@ -20,7 +20,6 @@ MODELS = {
     'tts': "tts-1",  # TODO: Compare with tts-1-hd.
 }
 TTS_VOICE_MAP = {'default': 'alloy', 'neutral': 'echo', 'female': 'nova', 'male': 'onyx'}  # Note: An unsolicited 'neutral' response has been observed, and is therefore supported.
-DISCLAIMER = 'Both the text and the audio of this media are AI generated, and inaccuracies or unintended content may exist.'  # Disclaimer about AI generated audio is required by OpenAI as per https://platform.openai.com/docs/guides/text-to-speech/do-i-own-the-outputted-audio-files
 
 
 def is_openai_key_available() -> bool:

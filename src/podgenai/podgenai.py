@@ -6,11 +6,11 @@ from typing import Optional
 
 import pathvalidate
 
-from podgenai.config import MAX_CONCURRENT_WORKERS, REPO_PATH, WORK_PATH
+from podgenai.config import MAX_CONCURRENT_WORKERS, PROMPTS, REPO_PATH, WORK_PATH
 from podgenai.content.subtopics import list_subtopics, get_subtopic
 from podgenai.content.topic import is_topic_valid
 from podgenai.content.voice import get_voice
-from podgenai.util.openai import is_openai_key_available, DISCLAIMER, TTS_VOICE_MAP, write_speech
+from podgenai.util.openai import is_openai_key_available, TTS_VOICE_MAP, write_speech
 from podgenai.util.str import split_text_by_paragraphs_and_limit
 
 
@@ -56,7 +56,9 @@ def generate_media(topic: str, *, output_path: Optional[Path] = None) -> Optiona
 
     parts = [f'Section {subtopic_name.replace('.', ':', 1)}:\n\n{subtopic_text} {{pause}}' for subtopic_name, subtopic_text in subtopics.items()]
     # Note: A pause at the beginning is skipped by the TTS generator, but it is not skipped if at the end, and so it is kept at the end.
-    parts[0] = f'"{topic}"\n\n{{pause}}\n{DISCLAIMER} {{pause}}\n\n{parts[0]}'  # Note: It has proven more reliable for the pause to be structured in this way for section 1, rather than be in the leading line.
+    parts[0] = f'"{topic}"\n\n{{pause}}\n{PROMPTS['tts_disclaimer']} {{pause}}\n\n{parts[0]}'
+    # Note: TTS disclaimer about AI generated audio is required by OpenAI as per https://platform.openai.com/docs/guides/text-to-speech/do-i-own-the-outputted-audio-files
+    # Note: It has proven more reliable for the pause to be structured in this way for section 1, rather than be in the leading topic line.
     text = '\n\n'.join(parts)
     print(f'\nTEXT:\n{text}')
 
