@@ -33,7 +33,7 @@ These generated mp3 files can be downloaded from Mega. In effect, these also con
 * If updating the repo, rerun `rye sync`.
 
 ## Usage
-Usage can be as an application or as a library. By default, the generated mp3 file will be written to the repo directory. As of 2024, the estimated cost per generation is under $2 USD and the time taken is under three minutes.
+Usage can be as an application or as a Python library. By default, the generated mp3 file will be written to the repo directory. As of 2024, the estimated cost per generation is under $2 USD and the time taken is under three minutes.
 
 ### Application usage
 * To show help, run `python -m podgenai -h`.
