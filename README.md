@@ -12,15 +12,16 @@ For a given topic, the high-level reference approach is:
 * The speech files are concatenated using `ffmpeg`.
 
 ## Samples
-These generated mp3 files can be downloaded from Mega. In effect, these also constitute a test suite, with the unique purpose of each sample noted. As a reminder, the voice is selected by the LLM.
+These generated mp3 files can be downloaded from Mega. In effect, these also constitute a minimal test suite, with the unique purpose of each sample noted. As a reminder, the voice is selected by the LLM.
 
-| Voice    | Name                                                                                     | Purpose                               |
-|----------|------------------------------------------------------------------------------------------|---------------------------------------|
-| Default  | [PyTorch](https://mega.nz/file/kEVRXSqS#J0o9wRpTxGMMH4q7_SmrPkIpUEF0VAYheMzJBTQ0L_0)            | Technical content generation          |
-| Default  | [Advanced PyTorch](https://mega.nz/file/QF10lToJ#p-Pnxy8G2sKwcPPU5TTFyelhTOSm7uHxOTlYHN-r2bA)      | Advanced technical content generation |
-| Default  | [New York City: present and future](https://mega.nz/file/EBEVDKwJ#eqJ1gDWh2Pr0Tfw-WT1PR2bmCQjlyR_TlJYjvNTibhM) | Non-technical content generation      |
-| Female   | [Buffy the Vampire Slayer](https://mega.nz/file/AV0hQTiA#apUKjUZHwlzWLafIKZDSnVb5b0mULkqQM74a3zNYDhU)        | Female voice selection                |
-| Male     | [Bitcoin for nerds](https://mega.nz/file/pZ9GiDQD#5xhPKeR1pFX73p4PJeWmFQbqBVH-dQPstLS1PDtNJV0)               | Male voice selection                  |
+| Voice    | Name                                                                                                                                          | Purpose                                                           |
+|----------|-----------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------|
+| Default  | [PyTorch](https://mega.nz/file/kEVRXSqS#J0o9wRpTxGMMH4q7_SmrPkIpUEF0VAYheMzJBTQ0L_0)                                                          | Technical content generation                                      |
+| Default  | [Advanced PyTorch](https://mega.nz/file/QF10lToJ#p-Pnxy8G2sKwcPPU5TTFyelhTOSm7uHxOTlYHN-r2bA)                                                 | Advanced technical content generation                             |
+| Default  | [New York City: present and future](https://mega.nz/file/EBEVDKwJ#eqJ1gDWh2Pr0Tfw-WT1PR2bmCQjlyR_TlJYjvNTibhM)                                | Non-technical content generation                                  |
+| Default  | [Artificial General Intelligence (AGI): Approaches and Algorithms](https://mega.nz/file/wNUn2JiT#-cwrVns0kciaQ3PKE9JW159jEP_6FkE9luyowXYu4kM) | Non-hierarchical flattened single-level subtopic list enforcement |
+| Female   | [Buffy the Vampire Slayer](https://mega.nz/file/AV0hQTiA#apUKjUZHwlzWLafIKZDSnVb5b0mULkqQM74a3zNYDhU)                                         | Female voice selection                                            |
+| Male     | [Bitcoin for nerds](https://mega.nz/file/pZ9GiDQD#5xhPKeR1pFX73p4PJeWmFQbqBVH-dQPstLS1PDtNJV0)                                                | Male voice selection                                              |
 
 
 ## Setup
