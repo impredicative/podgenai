@@ -12,7 +12,7 @@ For a given topic, the high-level reference approach is:
 * The speech files are concatenated using `ffmpeg`.
 
 ## Samples
-These generated files can be downloaded from Mega. In effect, these also constitute a test suite, with the unique purpose of each sample noted. As a reminder, the voice is selected by the LLM.
+These generated mp3 files can be downloaded from Mega. In effect, these also constitute a test suite, with the unique purpose of each sample noted. As a reminder, the voice is selected by the LLM.
 
 | Voice    | Name                                                                                     | Purpose                               |
 |----------|------------------------------------------------------------------------------------------|---------------------------------------|
