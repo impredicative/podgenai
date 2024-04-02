@@ -19,7 +19,7 @@ MODELS = {
     'text': "gpt-4-turbo-preview",  # Note: gpt-4 is not used because it is much older in its training data.
     'tts': "tts-1",  # TODO: Compare with tts-1-hd.
 }
-TTS_VOICE_MAP = {'default': 'alloy', 'neutral': 'alloy', 'female': 'nova', 'male': 'onyx'}  # Note: An unsolicited 'neutral' response has been observed, and is therefore supported.
+TTS_VOICE_MAP = {'default': 'alloy', 'neutral': 'echo', 'female': 'nova', 'male': 'onyx'}  # Note: An unsolicited 'neutral' response has been observed, and is therefore supported.
 DISCLAIMER = 'Both the text and the audio of this media are AI generated, and inaccuracies or unintended content may exist.'  # Disclaimer about AI generated audio is required by OpenAI as per https://platform.openai.com/docs/guides/text-to-speech/do-i-own-the-outputted-audio-files
 
 
