@@ -42,9 +42,12 @@ Usage can be as a command-line application or as a Python library. By default, t
 
 ### Usage as application
 * To show help, run `python -m podgenai -h`.
-* To run for a specified topic, use `python -m podgenai "My favorite topic"`. If a topic is not specified, you will interactively be prompted for it. 
-* To specify a preexisting output directory path, use `python -m podgenai -t "My favorite topic" -p "/my/preexisting/dir"`.
-* To specify an output file path, use `python -m podgenai -t "My favorite topic" -p "~/something.mp3"`.
+* To run for a specified topic, use `-t "My favorite topic"`. If a topic is not specified, you will interactively be prompted for it. 
+* To specify a preexisting output directory path, use `-p "/my/preexisting/dir"`.
+* To specify an output file path, use `-p "~/something.mp3"`.
+* To require confirmation after the list of subtopics are printed, but before full-text generation, use `-c`.
+
+For example, `python -m podgenai "PyTorch" -p "~/Downloads/" -c`.
 
 ### Usage as library
 This package is not available on PyPI due to its unpolished nature, but it can nevertheless be called as a library. If successful, the output path is returned. If failed for a common reason, `None` is returned, and a relevant error is printed. As such, the return value must be checked. This section is subject to change as per Python best practices.

@@ -13,6 +13,7 @@ from podgenai.content.voice import get_voice
 from podgenai.util.binascii import crc32 as hasher
 from podgenai.util.openai import is_openai_key_available, TTS_VOICE_MAP, write_speech
 from podgenai.util.str import split_text_by_paragraphs_and_limit
+from podgenai.util.sys import print_warning
 
 
 def _get_default_output_filename(topic: str) -> str:
@@ -23,7 +24,7 @@ def _get_default_output_filename(topic: str) -> str:
     return output_filename
 
 
-def generate_media(topic: str, *, output_path: Optional[Path] = None) -> Optional[Path]:
+def generate_media(topic: str, *, output_path: Optional[Path] = None, confirm: bool = False) -> Optional[Path]:
     """Return the output path after generating and writing an audiobook podcast to file for the given topic.
 
     Params:
@@ -31,6 +32,8 @@ def generate_media(topic: str, *, output_path: Optional[Path] = None) -> Optiona
     * `path`: Output file or directory path.
         If an intended file path, it must have an ".mp3" suffix. If a directory, it must exist, and the file name is auto-determined.
         If not given, the output file is written to the repo directory with an auto-determined file name.
+    * `confirm`: Confirm before full-text generation.
+        If true, a confirmation is interactively sought after generating and printing the list of subtopics, before generating the full-text. Its default is false.
 
     If successful, the output path is returned. If failed for a common reason, `None` is returned, and a relevant error is printed.
     As such, the return value must be checked.
@@ -47,6 +50,18 @@ def generate_media(topic: str, *, output_path: Optional[Path] = None) -> Optiona
     if not subtopics_list:
         return
     print(f'\nSUBTOPICS:\n{'\n'.join(subtopics_list)}')
+
+    if confirm:
+        while True:
+            response = input('\nContinue? [y/n]: ')
+            response = response.strip().lower()
+            match response:
+                case 'y' | 'yes':
+                    break
+                case 'n' | 'no':
+                    print_warning('User aborted.')
+                    return
+
     print(f'\nWORKERS: {MAX_CONCURRENT_WORKERS}')
     if MAX_CONCURRENT_WORKERS == 1:
         subtopics = {s: get_subtopic(topic=topic, subtopics=subtopics_list, subtopic=s) for s in subtopics_list}
