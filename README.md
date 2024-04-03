@@ -25,7 +25,7 @@ These generated mp3 files are available for download. In effect, these also cons
 
 
 ## Setup
-* Install [`rye`](https://rye-up.com/).
+* Ensure that [`rye`](https://rye-up.com/) is installed and available.
 * Clone the repo.
 * In the repo directory, run `rye sync` or more narrowly just `rye sync --no-lock` if on Linux.
 * In the repo directory, create a file named `.env`, with the intended environment variable `OPENAI_API_KEY=<your OpenAI API key>`, or set it in a different way.
