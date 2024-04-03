@@ -36,13 +36,16 @@ These generated mp3 files are available for download. In effect, these also cons
 ## Usage
 Usage can be as a command-line application or as a Python library. By default, the generated mp3 file will be written to the repo directory. As of 2024, the estimated cost per generation is under $2 USD and the time taken is under three minutes.
 
-### Application usage
+### Usage tips
+* For a potentially longer list of covered subtopics, consider appending the "(unabridged)" suffix to the requested topic, e.g. "PyTorch (unabridged)".
+
+### Usage as application
 * To show help, run `python -m podgenai -h`.
 * To run for a specified topic, use `python -m podgenai "My favorite topic"`. If a topic is not specified, you will interactively be prompted for it. 
 * To specify a preexisting output directory path, use `python -m podgenai -t "My favorite topic" -p "/my/preexisting/dir"`.
 * To specify an output file path, use `python -m podgenai -t "My favorite topic" -p "~/something.mp3"`.
 
-### Library usage
+### Usage as library
 This package is not available on PyPI due to its unpolished nature, but it can nevertheless be called as a library. If successful, the output path is returned. If failed for a common reason, `None` is returned, and a relevant error is printed. As such, the return value must be checked. This section is subject to change as per Python best practices.
 
 ```python
@@ -58,9 +61,6 @@ output_file_path = generate_media("My favorite topic", output_path=Path('/tmp'))
 # With output file path:
 status = bool(generate_media("My favorite topic", output_path=Path('~/foo.mp3')))  # Check return value!
 ```
-
-### Tips
-* For a potentially longer list of covered subtopics, consider appending the "(unabridged)" suffix to the requested topic, e.g. "PyTorch (unabridged)".
 
 ## Caching
 * Text outputs are cached locally for four weeks in the `.diskcache` subdirectory.
