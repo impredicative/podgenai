@@ -10,6 +10,7 @@ from podgenai.config import MAX_CONCURRENT_WORKERS, PROMPTS, REPO_PATH, WORK_PAT
 from podgenai.content.subtopics import list_subtopics, get_subtopic
 from podgenai.content.topic import is_topic_valid
 from podgenai.content.voice import get_voice
+from podgenai.util.binascii import crc32 as hasher
 from podgenai.util.openai import is_openai_key_available, TTS_VOICE_MAP, write_speech
 from podgenai.util.str import split_text_by_paragraphs_and_limit
 
@@ -82,7 +83,9 @@ def generate_media(topic: str, *, output_path: Optional[Path] = None) -> Optiona
     pathvalidate.validate_filepath(work_path, platform='auto')
     tts_tasks = []
     for part_idx, part in enumerate(parts):
-        part_stem = f'{subtopics_list[part_idx]} ({mapped_voice})'
+        part_title = subtopics_list[part_idx]
+        part_dedup_hash = hasher(part)
+        part_stem = f'{part_title} ({mapped_voice}) [{part_dedup_hash}]'
         part_stem = pathvalidate.sanitize_filename(part_stem, platform='auto')
         if len(part) <= max_tts_input_len:
             part_path = work_path / f'{part_stem}.mp3'
