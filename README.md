@@ -30,6 +30,7 @@ These generated mp3 files are available for download. In effect, these also cons
 * Clone or download this repo.
 * In the repo directory, run `rye sync` or more narrowly just `rye sync --no-lock` if on Linux.
 * In the repo directory, create a file named `.env`, with the intended environment variable `OPENAI_API_KEY=<your OpenAI API key>`, or set it in a different way.
+* Optionally set the environment variable `PODGENAI_OPENAI_MAX_WORKERS=32` for faster generation, with its default value being 16.
 * Ensure that `ffmpeg` is available.
 * If updating the repo, rerun `rye sync`.
 

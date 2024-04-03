@@ -47,6 +47,7 @@ def generate_media(topic: str, *, output_path: Optional[Path] = None) -> Optiona
     if not subtopics_list:
         return
     print(f'\nSUBTOPICS:\n{'\n'.join(subtopics_list)}')
+    print(f'\nWORKERS: {MAX_CONCURRENT_WORKERS}')
     if MAX_CONCURRENT_WORKERS == 1:
         subtopics = {s: get_subtopic(topic=topic, subtopics=subtopics_list, subtopic=s) for s in subtopics_list}
     else:
