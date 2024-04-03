@@ -1,12 +1,13 @@
-import datetime
 import os
 from pathlib import Path
 from typing import Optional
 
 import dotenv
 import openai
+import pathvalidate
 
-from podgenai.config import DISKCACHE, PROMPTS
+from podgenai.config import PROMPTS
+from podgenai.util.binascii import crc32
 from podgenai.util.sys import print_error, print_warning
 
 
@@ -97,12 +98,6 @@ def get_content(prompt: str, *, client: Optional[OpenAI] = None, completion: Opt
     return content
 
 
-@DISKCACHE.memoize(expire=datetime.timedelta(weeks=4).total_seconds(), tag='get_cached_content')
-def get_cached_content(prompt: str) -> str:
-    """Return the content for the given prompt using the disk cache if available, otherwise normally."""
-    return get_content(prompt)
-
-
 def get_multipart_content(prompt: str, **kwargs) -> str:
     """Return the multipart completion content for the given initial prompt.
 
@@ -128,16 +123,41 @@ def get_multipart_content(prompt: str, **kwargs) -> str:
                 break
         completions.append(completion)
 
-    return '\n\n'.join(completions)
+    return '\n\n'.join(completions).strip()
 
 
-@DISKCACHE.memoize(expire=datetime.timedelta(weeks=4).total_seconds(), tag='get_cached_multipart_content')
-def get_cached_multipart_content(prompt: str, **kwargs) -> str:
-    """Return the multipart content for the given prompt using the disk cache if available, otherwise normally.
+def get_cached_content(prompt: str, *, strategy: str = 'oneshot', cache_key_prefix: str, cache_path: Path, **kwargs) -> str:
+    """Return the content for the given prompt using the disk cache if available, otherwise normally.
 
-    Additional keyword arguments are forwarded to `get_multipart_content`.
+    Params:
+    * `strategy`:
+        If `strategy` is 'oneshot', the assistant is requested only one output, which is usually sufficient.
+        If `strategy` is 'multishot', the assistant is permitted multiple outputs up to a limit.
+    * `cache_key_prefix`: Friendly identifying name of request, used in filename in cache directory. Deduplication by prompt is done by this function; it does not have to be done externally.
+    * `cache_path`: Cache directory.
+
+    Additional keyword arguments are forwarded to the respective underlying function, namely `get_content` for 'oneshot', and `get_multipart_content` for 'multishot'.
     """
-    return get_multipart_content(prompt, **kwargs)
+    cache_key_prefix = cache_key_prefix.strip()
+    assert cache_key_prefix
+    assert cache_path.is_dir()
+
+    cache_key_prefix = pathvalidate.sanitize_filepath(cache_key_prefix, platform='auto')
+    assert cache_key_prefix
+    cache_key = f'{cache_key_prefix} ({strategy}) [{crc32(prompt)}].txt'
+    cache_file_path = cache_path / cache_key
+    pathvalidate.validate_filepath(cache_file_path, platform='auto')
+
+    if cache_file_path.exists():
+        assert cache_file_path.is_file()
+        content = cache_file_path.read_text()
+    else:
+        content_getter = {'oneshot': get_content, 'multishot': get_multipart_content}[strategy]
+        content = content_getter(prompt, **kwargs)
+        cache_file_path.write_text(content)
+
+    assert content == content.rstrip()
+    return content
 
 
 def write_speech(prompt: str, path: Path, *, voice: str = 'default', client: Optional[OpenAI] = None) -> None:

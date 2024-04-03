@@ -1,7 +1,8 @@
 from typing import Optional
 
 from podgenai.config import PROMPTS
-from podgenai.util.openai import get_cached_content, get_cached_multipart_content
+from podgenai.util.openai import get_cached_content
+from podgenai.util.pathvalidate import get_topic_work_path
 from podgenai.util.sys import print_error
 
 
@@ -31,8 +32,9 @@ def is_subtopics_list_valid(subtopics: list[str]) -> bool:
 
 def list_subtopics(topic: str) -> Optional[list[str]]:
     """Get the list of subtopics for the given topic."""
-    prompt = PROMPTS['list_subtopics'].format(topic=topic)
-    subtopics = get_cached_content(prompt)
+    prompt_name = 'list_subtopics'
+    prompt = PROMPTS[prompt_name].format(topic=topic)
+    subtopics = get_cached_content(prompt, cache_key_prefix=f'0. {prompt_name}', cache_path=get_topic_work_path(topic))
     assert subtopics, subtopics
     if subtopics.lower() in ('none', 'none.'):
         print_error(f'No subtopics exist for topic: {topic}')
@@ -47,17 +49,17 @@ def list_subtopics(topic: str) -> Optional[list[str]]:
 def get_subtopic(*, topic: str, subtopics: list[str], subtopic: str, strategy: str = 'oneshot') -> str:
     """Get the full text for a given subtopic within the context of the given topic and list of subtopics.
 
-    If `strategy` is 'oneshot', the assistant is requested only one output, which is usually sufficient.
-    If `strategy` is 'multishot', the assistant is permitted multiple outputs up to a limit.
+
     """
     assert subtopic[0].isdigit()  # Is numbered.
+    common_kwargs = {'strategy': strategy, 'cache_key_prefix': subtopic, 'cache_path': get_topic_work_path(topic)}
     match strategy:
         case 'oneshot':
             prompt = PROMPTS['generate_subtopic'].format(optional_continuation='', topic=topic, subtopics='\n'.join(subtopics), numbered_subtopic=subtopic)
-            subtopic = get_cached_content(prompt)
+            subtopic = get_cached_content(prompt, **common_kwargs)
         case 'multishot':  # Observed to never really benefit or produce longer content relative to oneshot.
             prompt = PROMPTS['generate_subtopic'].format(optional_continuation='\n\n' + PROMPTS['continuation_first'], topic=topic, subtopics='\n'.join(subtopics), numbered_subtopic=subtopic)
-            subtopic = get_cached_multipart_content(prompt, max_completions=5, update_prompt=False)
+            subtopic = get_cached_content(prompt, **common_kwargs, max_completions=5, update_prompt=False)
         case _:
             assert False, strategy
     return subtopic.rstrip()

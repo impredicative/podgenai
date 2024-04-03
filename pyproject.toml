@@ -6,11 +6,10 @@ authors = [
     { name = "Ouroboros Chrysopoeia", email = "impredicative@users.noreply.github.com" }
 ]
 dependencies = [
-    "openai>=1.14.3",
-    "python-dotenv>=1.0.1",
-    "diskcache>=5.6.3",
-    "pathvalidate>=3.2.0",
     "fire>=0.6.0",
+    "openai>=1.14.3",
+    "pathvalidate>=3.2.0",
+    "python-dotenv>=1.0.1",
 ]
 readme = "README.md"
 requires-python = ">= 3.8"

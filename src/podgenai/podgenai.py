@@ -6,12 +6,13 @@ from typing import Optional
 
 import pathvalidate
 
-from podgenai.config import MAX_CONCURRENT_WORKERS, PROMPTS, REPO_PATH, WORK_PATH
+from podgenai.config import MAX_CONCURRENT_WORKERS, PROMPTS, REPO_PATH
 from podgenai.content.subtopics import list_subtopics, get_subtopic
 from podgenai.content.topic import is_topic_valid
 from podgenai.content.voice import get_voice
 from podgenai.util.binascii import crc32 as hasher
 from podgenai.util.openai import is_openai_key_available, TTS_VOICE_MAP, write_speech
+from podgenai.util.pathvalidate import get_topic_work_path
 from podgenai.util.str import split_text_by_paragraphs_and_limit
 from podgenai.util.sys import print_warning
 
@@ -41,6 +42,9 @@ def generate_media(topic: str, *, output_path: Optional[Path] = None, confirm: b
     assert is_openai_key_available()
     assert is_topic_valid(topic)
     print(f'TOPIC: {topic}')
+
+    work_path = get_topic_work_path(topic)
+    print(f'CACHE: {work_path}')
 
     voice = get_voice(topic)
     mapped_voice = TTS_VOICE_MAP[voice]
@@ -93,10 +97,7 @@ def generate_media(topic: str, *, output_path: Optional[Path] = None, confirm: b
             output_path.parent.mkdir(parents=True, exist_ok=True)
 
     pathvalidate.validate_filepath(output_path, platform='auto')
-
     max_tts_input_len = 4096
-    work_path = WORK_PATH / pathvalidate.sanitize_filepath(topic, platform='auto')
-    pathvalidate.validate_filepath(work_path, platform='auto')
     tts_tasks = []
     for part_idx, part in enumerate(parts):
         part_title = subtopics_list[part_idx]
@@ -114,7 +115,7 @@ def generate_media(topic: str, *, output_path: Optional[Path] = None, confirm: b
                 portion_path = work_path / f'{part_stem} ({portion_num}).mp3'
                 pathvalidate.validate_filepath(portion_path, platform='auto')
                 tts_tasks.append({'path': portion_path, 'text': portion})
-    work_path.mkdir(parents=False, exist_ok=True)
+
     tts_tasks_pending = [t for t in tts_tasks if not t['path'].exists()]
     if MAX_CONCURRENT_WORKERS == 1:
         for tts_task in tts_tasks_pending:

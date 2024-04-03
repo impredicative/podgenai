@@ -67,8 +67,7 @@ status = bool(generate_media("My favorite topic", output_path=Path('~/foo.mp3'))
 ```
 
 ## Caching
-* Text outputs are cached locally for four weeks in the `.diskcache` subdirectory.
-* Audio segments are currently cached locally by the segment name in the `work` subdirectory. They can manually be deleted. This deletion is currently not automatic. Moreover, it can currently be necessary to delete them if the cache is to be bypassed.
+Text and speech segments are cached locally on disk in the `<repo>/work/<topic>` directory. They can manually be deleted. This deletion is currently not automatic. Moreover, it can currently be necessary to delete one or more applicable cached files if the cache is to be bypassed.
 
 ## Disclaimer
 <sub>This software is provided "as is," without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose, and noninfringement. In no event shall the authors or copyright holders be liable for any claim, damages, or other liability, whether in an action of contract, tort, or otherwise, arising from, out of, or in connection with the software or the use or other dealings in the software.</sub>
