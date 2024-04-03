@@ -99,7 +99,7 @@ def generate_media(topic: str, *, output_path: Optional[Path] = None) -> Optiona
                 pathvalidate.validate_filepath(portion_path, platform='auto')
                 tts_tasks.append({'path': portion_path, 'text': portion})
     work_path.mkdir(parents=False, exist_ok=True)
-    tts_tasks_pending = [t for t in tts_tasks if not t['path'].exists()]  # TODO: Use proper disk cache instead.
+    tts_tasks_pending = [t for t in tts_tasks if not t['path'].exists()]
     if MAX_CONCURRENT_WORKERS == 1:
         for tts_task in tts_tasks_pending:
             write_speech(tts_task['text'], path=tts_task['path'], voice=voice)

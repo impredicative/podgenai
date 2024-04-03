@@ -140,7 +140,7 @@ def get_cached_multipart_content(prompt: str, **kwargs) -> str:
     return get_multipart_content(prompt, **kwargs)
 
 
-def write_speech(prompt: str, path: Path, *, voice: str = 'default', client: Optional[OpenAI] = None) -> None:  # TODO: Use disk caching.
+def write_speech(prompt: str, path: Path, *, voice: str = 'default', client: Optional[OpenAI] = None) -> None:
     """Write the speech for the given prompt to the given path.
 
     The prompt must not be longer than 4096 characters, as this is the maximum supported length by the client.
