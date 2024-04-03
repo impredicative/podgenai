@@ -57,10 +57,10 @@ from pathlib import Path
 from podgenai import generate_media
 
 # With default output path:
-output_file_path = generate_media("My favorite topic")  # Check return value!
+optional_output_file_path = generate_media("My favorite topic")  # Check return value!
 
 # With preexisting output directory path:
-output_file_path = generate_media("My favorite topic", output_path=Path('/tmp'))  # Check return value!
+optional_output_file_path = generate_media("My favorite topic", output_path=Path('/tmp'))  # Check return value!
 
 # With output file path:
 status = bool(generate_media("My favorite topic", output_path=Path('~/foo.mp3')))  # Check return value!
