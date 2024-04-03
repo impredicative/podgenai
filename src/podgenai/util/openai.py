@@ -17,7 +17,7 @@ OpenAI = openai.OpenAI
 
 MODELS = {
     'text': "gpt-4-turbo-preview",  # Note: gpt-4 is not used because it is much older in its training data.
-    'tts': "tts-1",  # TODO: Compare with tts-1-hd.
+    'tts': "tts-1-hd",  # Note: tts-1-hd is twice as expensive, and has a more limited concurrent usage quota resulting in openai.RateLimitError, thereby making it undesirable.
 }
 TTS_VOICE_MAP = {'default': 'alloy', 'neutral': 'echo', 'female': 'nova', 'male': 'onyx'}  # Note: An unsolicited 'neutral' response has been observed, and is therefore supported.
 
