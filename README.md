@@ -32,7 +32,7 @@ These generated mp3 files are available for download. In effect, these also cons
 * In the repo directory, create a file named `.env`, with the intended environment variable `OPENAI_API_KEY=<your OpenAI API key>`, or set it in a different way.
 * Optionally set the environment variable `PODGENAI_OPENAI_MAX_WORKERS=32` for faster generation, with its default value being 16.
 * Ensure that `ffmpeg` is available.
-* If updating the repo, rerun `rye sync`.
+* If updating the repo, rerun the `rye sync` step.
 
 ## Usage
 Usage can be as a command-line application or as a Python library. By default, the generated mp3 file will be written to the repo directory. As of 2024, the estimated cost per generation is under $2 USD and the time taken is under three minutes.
