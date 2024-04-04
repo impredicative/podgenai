@@ -1,6 +1,7 @@
+import concurrent.futures
 from typing import Optional
 
-from podgenai.config import PROMPTS
+from podgenai.config import MAX_CONCURRENT_WORKERS, PROMPTS
 from podgenai.util.openai import get_cached_content
 from podgenai.util.pathvalidate import get_topic_work_path
 from podgenai.util.sys import print_error
@@ -62,3 +63,24 @@ def get_subtopic(*, topic: str, subtopics: list[str], subtopic: str, strategy: s
         case _:
             assert False, strategy
     return subtopic.rstrip()
+
+
+def get_subtopics(*, topic: str, subtopics: Optional[list[str]] = None) -> Optional[dict[str, str]]:
+    """Get the full text for all subtopics within the context of the given topic and optional list of subtopics.
+
+    If the list of subtopics is not provided, it is read.
+    """
+    if not subtopics:
+        subtopics = list_subtopics(topic)
+    if not subtopics:
+        print_error(f"No subtopic texts exist for topic: {topic}")
+        return
+
+    if MAX_CONCURRENT_WORKERS == 1:
+        subtopics = {s: get_subtopic(topic=topic, subtopics=subtopics, subtopic=s) for s in subtopics}
+    else:
+        assert MAX_CONCURRENT_WORKERS > 1
+        with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_CONCURRENT_WORKERS) as executor:
+            fn_get_subtopic = lambda subtopic: get_subtopic(topic=topic, subtopics=subtopics, subtopic=subtopic)
+            subtopics = {s: text for s, text in zip(subtopics, executor.map(fn_get_subtopic, subtopics))}
+    return subtopics

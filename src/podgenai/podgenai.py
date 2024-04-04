@@ -7,7 +7,7 @@ from typing import Optional
 import pathvalidate
 
 from podgenai.config import MAX_CONCURRENT_WORKERS, PROMPTS, REPO_PATH
-from podgenai.content.subtopics import list_subtopics, get_subtopic
+from podgenai.content.subtopics import list_subtopics, get_subtopics
 from podgenai.content.topic import is_topic_valid
 from podgenai.content.voice import get_voice
 from podgenai.util.binascii import crc32 as hasher
@@ -45,6 +45,7 @@ def generate_media(topic: str, *, output_path: Optional[Path] = None, confirm: b
 
     work_path = get_topic_work_path(topic)
     print(f"CACHE: {work_path}")
+    print(f"WORKERS: {MAX_CONCURRENT_WORKERS}")
 
     voice = get_voice(topic)
     mapped_voice = TTS_VOICE_MAP[voice]
@@ -66,15 +67,7 @@ def generate_media(topic: str, *, output_path: Optional[Path] = None, confirm: b
                     print_warning("User aborted.")
                     return
 
-    print(f"\nWORKERS: {MAX_CONCURRENT_WORKERS}")
-    if MAX_CONCURRENT_WORKERS == 1:
-        subtopics = {s: get_subtopic(topic=topic, subtopics=subtopics_list, subtopic=s) for s in subtopics_list}
-    else:
-        assert MAX_CONCURRENT_WORKERS > 1
-        with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_CONCURRENT_WORKERS) as executor:
-            fn_get_subtopic = lambda subtopic: get_subtopic(topic=topic, subtopics=subtopics_list, subtopic=subtopic)
-            subtopics = {s: text for s, text in zip(subtopics_list, executor.map(fn_get_subtopic, subtopics_list))}
-
+    subtopics = get_subtopics(topic=topic, subtopics=subtopics_list)
     parts = [f'Section {subtopic_name.replace('.', ':', 1)}:\n\n{subtopic_text} {{pause}}' for subtopic_name, subtopic_text in subtopics.items()]
     # Note: A pause at the beginning is skipped by the TTS generator, but it is not skipped if at the end, and so it is kept at the end.
     parts[0] = f'"{topic}"\n\n{{pause}}\n{PROMPTS['tts_disclaimer']} {{pause}}\n\n{parts[0]}'
