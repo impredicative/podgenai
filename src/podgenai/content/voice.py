@@ -1,5 +1,3 @@
-from typing import Optional
-
 from podgenai.config import PROMPTS
 from podgenai.util.openai import get_cached_content, TTS_VOICE_MAP
 from podgenai.util.pathvalidate import get_topic_work_path
