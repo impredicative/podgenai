@@ -133,6 +133,6 @@ def generate_media(topic: str, *, output_path: Optional[Path] = None, confirm: b
     print(f"\nMerging {len(part_paths)} parts to: {output_path}")
     subprocess.run(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(ffmpeg_filelist_path), "-c", "copy", "-loglevel", "error", str(output_path)], check=True)
     assert output_path.exists()
-    print(f"Finished merging {len(part_paths)} parts to: {output_path}")
+    print(f"Merged {len(part_paths)} parts to: {output_path}")
 
     return output_path
