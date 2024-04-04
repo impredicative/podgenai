@@ -30,3 +30,6 @@ allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/podgenai"]
+
+[tool.ruff.lint]
+ignore = ["E731"]
