@@ -25,6 +25,14 @@ build-backend = "hatchling.build"
 managed = true
 dev-dependencies = []
 
+[tool.rye.scripts]  # Run as "rye run <command>"
+check = { chain = ["check-lint", "check-fmt" ] }
+"check-lint" = "rye lint"
+"check-fmt" = "rye fmt --check"
+fix = { chain = ["fix-lint", "fix-fmt" ] }
+"fix-lint" = "rye lint --fix"
+"fix-fmt" = "rye fmt"
+
 [tool.hatch.metadata]
 allow-direct-references = true
 
