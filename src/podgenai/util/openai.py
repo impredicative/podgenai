@@ -41,7 +41,7 @@ def get_completion(prompt: str, *, client: Optional[OpenAI] = None) -> ChatCompl
     """Return the completion for the given prompt."""
     if not client:
         client = get_openai_client()
-    print(f"Getting completion for prompt of length {len(prompt)}.")
+    # print(f"Requesting completion for prompt of length {len(prompt)}.")
     completion = client.chat.completions.create(model=MODELS["text"], messages=[{"role": "user", "content": prompt}])
     return completion
 
@@ -65,7 +65,7 @@ def get_multipart_messages(prompt: str, *, max_completions: int = 10, client: Op
 
     messages = [{"role": "user", "content": prompt}]
     for completion_num in range(1, max_completions + 1):
-        print(f"Getting completion {completion_num} for initial prompt of length {len(prompt)}.")
+        # print(f"Requesting completion {completion_num} for initial prompt of length {len(prompt)}.")
         completion = client.chat.completions.create(model=MODELS["text"], messages=messages)
         content = get_content(prompt="", completion=completion)
         messages.append({"role": "assistant", "content": content})
@@ -142,18 +142,21 @@ def get_cached_content(prompt: str, *, strategy: str = "oneshot", cache_key_pref
     assert cache_key_prefix
     assert cache_path.is_dir()
 
-    cache_key_prefix = pathvalidate.sanitize_filepath(cache_key_prefix, platform="auto")
-    assert cache_key_prefix
-    cache_key = f"{cache_key_prefix} ({strategy}) [{crc32(prompt)}].txt"
+    sanitized_cache_key_prefix = pathvalidate.sanitize_filepath(cache_key_prefix, platform="auto")
+    assert sanitized_cache_key_prefix
+    cache_key = f"{sanitized_cache_key_prefix} ({strategy}) [{crc32(prompt)}].txt"
     cache_file_path = cache_path / cache_key
     pathvalidate.validate_filepath(cache_file_path, platform="auto")
 
     if cache_file_path.exists():
         assert cache_file_path.is_file()
         content = cache_file_path.read_text()
+        print(f"Read completion from disk for: {cache_key_prefix}")
     else:
         content_getter = {"oneshot": get_content, "multishot": get_multipart_content}[strategy]
+        print(f"Requesting completion for: {cache_key_prefix}")
         content = content_getter(prompt, **kwargs)
+        print(f"Received completion for: {cache_key_prefix}")
         cache_file_path.write_text(content)
 
     assert content == content.rstrip()
@@ -174,11 +177,12 @@ def write_speech(prompt: str, path: Path, *, voice: str = "default", client: Opt
     mapped_voice = TTS_VOICE_MAP.get(voice, voice)
     voice_str = voice if (voice == mapped_voice) else f"{voice} ({mapped_voice})"
 
-    print(f"Getting speech for input of length {len(prompt)} in {voice_str} voice.")
+    print(f"Requesting speech in {voice_str} voice for: {path.stem}")
     response = client.audio.speech.create(model=MODELS["tts"], voice=mapped_voice, input=prompt)
 
-    relative_path = path.relative_to(Path.cwd())
-    print(f"Writing to: {relative_path}")
+    # relative_path = path.relative_to(Path.cwd())
+    # print(f"Writing speech to: {relative_path}")
     response.stream_to_file(path)
     assert path.exists(), path
-    print(f"Wrote to: {relative_path}")
+    # print(f"Wrote speech to: {relative_path}")
+    print(f"Received speech in {voice_str} voice for: {path.stem}")
