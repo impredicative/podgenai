@@ -7,19 +7,19 @@ def is_topic_valid(topic: str) -> bool:
     A validation error is printed if the topic is false.
     """
     if topic != topic.strip():
-        print_error('Topic must not have leading or trailing whitespace.')
+        print_error("Topic must not have leading or trailing whitespace.")
         return False
     if len(topic) == 0:
-        print_error('No topic was provided.')
+        print_error("No topic was provided.")
         return False
     if len(topic) < 2:
-        print_error('Topic must be at least two characters long.')
+        print_error("Topic must be at least two characters long.")
         return False
     if len(topic.splitlines()) > 1:
-        print_error('Topic must be in a single line.')
+        print_error("Topic must be in a single line.")
         return False
     if (topic[0] == topic[-1] == "'") or (topic[0] == topic[-1] == '"'):
-        print_error('Topic must not be quoted.')
+        print_error("Topic must not be quoted.")
         return False
     return True
 
@@ -28,7 +28,7 @@ def get_topic() -> str:
     """Get topic for podcast from user input."""
     topic = None
     while not topic:
-        topic = input('Specify the topic for which to generate a podcast: ')
+        topic = input("Specify the topic for which to generate a podcast: ")
         topic = topic.strip()
         if not is_topic_valid(topic):
             topic = None

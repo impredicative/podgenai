@@ -27,7 +27,7 @@ def main(topic: Optional[str] = None, path: Optional[Path] = None, confirm: bool
 
         if topic:
             if not is_topic_valid(topic):
-                print_error(f'Failed to generate podcast for topic: {topic}')
+                print_error(f"Failed to generate podcast for topic: {topic}")
                 exit(2)
         else:
             topic = get_topic()
@@ -37,10 +37,10 @@ def main(topic: Optional[str] = None, path: Optional[Path] = None, confirm: bool
         assert isinstance(confirm, bool), confirm
 
         if not generate_media(topic, output_path=path, confirm=confirm):
-            print_error(f'Failed to generate podcast for topic: {topic}')
+            print_error(f"Failed to generate podcast for topic: {topic}")
             exit(3)
     except KeyboardInterrupt:
-        print_error('Interrupted by user.')
+        print_error("Interrupted by user.")
         os._exit(-2)  # Plain `exit` is not used because it may not immediately terminate, with background threads potentially still running.
 
 

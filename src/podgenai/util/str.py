@@ -23,13 +23,13 @@ def split_text_by_paragraphs_and_limit(text: str, limit: int) -> list[str]:
 
     paragraphs = text.split("\n\n")
     for paragraph in paragraphs:
-        assert (len(paragraph) <= limit), (len(paragraph), paragraph)
+        assert len(paragraph) <= limit, (len(paragraph), paragraph)
 
     result = []
     current_part = ""
 
     for paragraph in paragraphs:
-        candidate = f'{current_part}\n\n{paragraph}' if current_part else paragraph
+        candidate = f"{current_part}\n\n{paragraph}" if current_part else paragraph
 
         if len(candidate) > limit:
             result.append(current_part)
