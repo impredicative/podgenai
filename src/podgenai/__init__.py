@@ -1,1 +1,1 @@
-from podgenai.podgenai import generate_media  # noqa: F4X01
+from podgenai.podgenai import generate_media  # noqa: F401
