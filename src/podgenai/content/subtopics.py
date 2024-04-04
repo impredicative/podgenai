@@ -36,10 +36,12 @@ def list_subtopics(topic: str) -> Optional[list[str]]:
     prompt = PROMPTS[prompt_name].format(topic=topic)
     subtopics = get_cached_content(prompt, cache_key_prefix=f'0. {prompt_name}', cache_path=get_topic_work_path(topic))
     assert subtopics, subtopics
+    none_subtopics = ('none', 'none.')
     if subtopics.lower() in ('none', 'none.'):
         print_error(f'No subtopics exist for topic: {topic}')
         return
-    subtopics = [s.strip() for s in subtopics.splitlines() if s]
+    invalid_subtopics = ('', *none_subtopics)
+    subtopics = [s.strip() for s in subtopics.splitlines() if s.strip().lower() not in invalid_subtopics]  # Note: A terminal "None" line has been observed with valid subtopics before it.
     if not is_subtopics_list_valid(subtopics):
         print_error(f'Invalid subtopic exists for topic: {topic}')
         return
