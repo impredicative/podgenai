@@ -25,10 +25,10 @@ def is_topic_valid(topic: str) -> bool:
 
 
 def get_topic() -> str:
-    """Get topic for podcast from user input."""
+    """Get topic for generation from user input."""
     topic = None
     while not topic:
-        topic = input("Specify the topic for which to generate a podcast: ")
+        topic = input("Specify the topic: ")
         topic = topic.strip()
         if not is_topic_valid(topic):
             topic = None
