@@ -38,7 +38,7 @@ These generated mp3 files are available for download. In effect, these also cons
 Usage can be as a command-line application or as a Python library. By default, the generated mp3 file will be written to the repo directory. As of 2024, the estimated cost per generation is under $2 USD and the time taken is under three minutes.
 
 ### Usage tips
-* If a requested topic fails to generate subtopics, try rewording it to be a little broader and/or more factual.
+* If a requested topic fails to generate subtopics, try rewording it, perhaps to be broader or narrower or more factual.
 * For a potentially longer list of covered subtopics, consider appending the "(unabridged)" suffix to the requested topic, e.g. "PyTorch (unabridged)".
 
 ### Usage as application
