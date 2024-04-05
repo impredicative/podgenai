@@ -2,10 +2,10 @@ from pathlib import Path
 from typing import Optional
 
 from podgenai.config import MAX_CONCURRENT_WORKERS
-from podgenai.content.audio import get_output_file_path, merge_speech_parts
-from podgenai.content.subtopics import list_subtopics, get_subtopics_texts
+from podgenai.content.audio import get_output_file_path, merge_speech_paths
+from podgenai.content.subtopics import list_subtopics, get_subtopics_speech_texts
 from podgenai.content.topic import is_topic_valid
-from podgenai.content.tts import get_speech_tasks, get_text_parts, ensure_speech_parts
+from podgenai.content.tts import get_speech_tasks, ensure_speech_audio_files
 from podgenai.content.voice import get_voice
 from podgenai.util.openai import is_openai_key_available, TTS_VOICE_MAP
 from podgenai.util.sys import print_warning
@@ -54,17 +54,16 @@ def generate_media(topic: str, *, output_path: Optional[Path] = None, confirm: b
                     print_warning("User aborted.")
                     return
 
-    subtopics_texts = get_subtopics_texts(topic=topic, subtopics=subtopics_list)
-    assert subtopics_texts
-    text_parts = get_text_parts(subtopics_texts, topic=topic)
-    text = "\n\n".join(text_parts)
-    print(f"\nTEXT:\n{text}\n")
+    subtopics_speech_texts = get_subtopics_speech_texts(topic=topic, subtopics=subtopics_list)
+    assert subtopics_speech_texts
+    speech_text = "\n\n".join(subtopics_speech_texts.values())
+    print(f"\nSPEECH:\n{speech_text}\n")
 
-    speech_tasks = get_speech_tasks(text_parts=text_parts, subtopics=subtopics_list, topic=topic, voice=mapped_voice)
-    ensure_speech_parts(speech_tasks, voice=voice)
+    speech_tasks = get_speech_tasks(subtopics_speech_texts, topic=topic, voice=mapped_voice)
+    ensure_speech_audio_files(speech_tasks, voice=voice)
 
-    speech_parts = list(speech_tasks)
+    speech_paths = list(speech_tasks)
     output_path = get_output_file_path(output_path, topic=topic)
-    merge_speech_parts(speech_parts, topic=topic, output_path=output_path)
+    merge_speech_paths(speech_paths, topic=topic, output_path=output_path)
     print(f"OUTPUT: {output_path}")
     return output_path

@@ -73,14 +73,35 @@ def get_subtopics_texts(*, topic: str, subtopics: Optional[list[str]] = None) ->
     if not subtopics:
         subtopics = list_subtopics(topic)
     if not subtopics:
-        print_error(f"No subtopic texts exist for topic: {topic}")
+        print_error(f"No subtopics exist for topic: {topic}")
         return
 
     if MAX_CONCURRENT_WORKERS == 1:
-        subtopics = {s: get_subtopic(topic=topic, subtopics=subtopics, subtopic=s) for s in subtopics}
+        subtopics_texts = {s: get_subtopic(topic=topic, subtopics=subtopics, subtopic=s) for s in subtopics}
     else:
         assert MAX_CONCURRENT_WORKERS > 1
         with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_CONCURRENT_WORKERS) as executor:
             fn_get_subtopic = lambda subtopic: get_subtopic(topic=topic, subtopics=subtopics, subtopic=subtopic)
-            subtopics = {s: text for s, text in zip(subtopics, executor.map(fn_get_subtopic, subtopics))}
-    return subtopics
+            subtopics_texts = {s: text for s, text in zip(subtopics, executor.map(fn_get_subtopic, subtopics))}
+    return subtopics_texts
+
+
+def get_subtopics_speech_texts(*, topic: str, subtopics: Optional[list[str]] = None) -> Optional[dict[str, str]]:
+    """Return the ordered speech text for all subtopics within the context of the given topic and optional ordered list of subtopics.
+
+    If the list of subtopics is not provided, it is read.
+    """
+    if not subtopics:
+        subtopics = list_subtopics(topic)
+    if not subtopics:
+        print_error(f"No subtopics exist for topic: {topic}")
+        return
+
+    subtopics_texts = get_subtopics_texts(topic=topic, subtopics=subtopics)
+    subtopics_speech_texts = {subtopic_name: f'Section {subtopic_name.replace('.', ':', 1)}:\n\n{subtopic_text} {{pause}}' for subtopic_name, subtopic_text in subtopics_texts.items()}
+    # Note: A pause at the beginning is skipped by the TTS generator, but it is not skipped if at the end, and so it is kept at the end.
+    subtopic1 = subtopics[0]
+    subtopics_speech_texts[subtopic1] = f'"{topic}"\n\n{{pause}}\n{PROMPTS['tts_disclaimer']} {{pause}}\n\n{subtopics_speech_texts[subtopic1]}'
+    # Note: TTS disclaimer about AI generated audio is required by OpenAI as per https://platform.openai.com/docs/guides/text-to-speech/do-i-own-the-outputted-audio-files
+    # Note: It has proven more reliable for the pause to be structured in this way for section 1, rather than be in the leading topic line.
+    return subtopics_speech_texts

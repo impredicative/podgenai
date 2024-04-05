@@ -35,7 +35,7 @@ def get_output_file_path(output_path: Optional[Path], *, topic: str) -> Path:
     return output_path
 
 
-def merge_speech_parts(paths: list[Path], *, topic: str, output_path: Path) -> None:
+def merge_speech_paths(paths: list[Path], *, topic: str, output_path: Path) -> None:
     """Merge the ordered list of preexisting audio file paths for the given topic to a single audio file having the given output file path."""
     work_path = get_topic_work_path(topic)
     ffmpeg_paths = [str(p).replace("'", "'\\''") for p in paths]

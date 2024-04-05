@@ -164,8 +164,8 @@ def get_cached_content(prompt: str, *, strategy: str = "oneshot", cache_key_pref
     return content
 
 
-def write_speech(text: str, path: Path, *, voice: str = "default", client: Optional[OpenAI] = None) -> None:
-    """Write the speech file for the given prompt to the given file path.
+def write_speech_audio(text: str, path: Path, *, voice: str = "default", client: Optional[OpenAI] = None) -> None:
+    """Write the speech audio file for the given prompt to the given file path.
 
     The prompt must not be longer than 4096 characters, as this is the maximum supported length by the client.
 
@@ -178,24 +178,24 @@ def write_speech(text: str, path: Path, *, voice: str = "default", client: Optio
     mapped_voice = TTS_VOICE_MAP.get(voice, voice)
     voice_str = voice if (voice == mapped_voice) else f"{voice} ({mapped_voice})"
 
-    print(f"Requesting speech in {voice_str} voice for: {path.stem}")
+    print(f"Requesting speech audio in {voice_str} voice for: {path.stem}")
     response = client.audio.speech.create(model=MODELS["tts"], voice=mapped_voice, input=text)
     # relative_path = path.relative_to(Path.cwd())
     # print(f"Writing speech to: {relative_path}")
     response.stream_to_file(path)
     assert path.exists(), path
     # print(f"Wrote speech to: {relative_path}")
-    print(f"Received speech in {voice_str} voice for: {path.stem}")
+    print(f"Received speech audio in {voice_str} voice for: {path.stem}")
 
 
-def ensure_speech(text: str, path: Path, **kwargs) -> None:
-    """Ensure the speech file for the given text to the given file path.
+def ensure_speech_audio(text: str, path: Path, **kwargs) -> None:
+    """Ensure the speech audio file for the given text to the given file path.
 
     Additional keyword arguments are forwarded to `write_speech`.
     """
 
     if path.exists():
         assert path.is_file()
-        print(f"Speech file exists on disk for: {path.stem}")
+        print(f"Speech audio file exists on disk for: {path.stem}")
         return
-    write_speech(text, path=path, **kwargs)
+    write_speech_audio(text, path=path, **kwargs)
