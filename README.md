@@ -16,8 +16,8 @@ These generated mp3 files are available for download. In effect, these also cons
 
 | Voice    | Name                                                                                                                                          | Purpose                                                               |
 |----------|-----------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------|
-| Default  | [PyTorch](https://mega.nz/file/kEVRXSqS#J0o9wRpTxGMMH4q7_SmrPkIpUEF0VAYheMzJBTQ0L_0)                                                          | Technical content generation                                          |
-| Default  | [Advanced PyTorch](https://mega.nz/file/QF10lToJ#p-Pnxy8G2sKwcPPU5TTFyelhTOSm7uHxOTlYHN-r2bA)                                                 | Advanced technical content generation                                 |
+| Default  | [PyTorch](https://mega.nz/file/5Ic21CZK#ovayjipDqYeYaSw9HhRTufjIxIuJr5M8lFq3LNvtEQQ)                                                          | Technical content generation                                          |
+| Default  | [Advanced PyTorch](https://mega.nz/file/kFsVxSZQ#LFrQVqH-1T1uLHNtgXrjGZYdgcyiE2FCpEu1ztZx3Ak)                                                 | Advanced technical content generation                                 |
 | Default  | [New York City: present and future](https://mega.nz/file/EBEVDKwJ#eqJ1gDWh2Pr0Tfw-WT1PR2bmCQjlyR_TlJYjvNTibhM)                                | Non-technical content generation                                      |
 | Default  | [Artificial General Intelligence (AGI): Approaches and Algorithms](https://mega.nz/file/wNUn2JiT#-cwrVns0kciaQ3PKE9JW159jEP_6FkE9luyowXYu4kM) | Non-hierarchical flattened single-level subtopic list enforcement     |
 | Female   | [Human circulatory system (unabridged)](https://mega.nz/file/9V9nHJrZ#4lm_hOYrqIUw8N-0VGcaa6zx8dwtuGRLqJLyo8pG_yE)                            | Implicit topic support for unabridged suffix, covering more subtopics |
