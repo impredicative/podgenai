@@ -3,7 +3,7 @@ from typing import Optional
 
 from podgenai.config import MAX_CONCURRENT_WORKERS, PROMPTS
 from podgenai.util.openai import get_cached_content
-from podgenai.util.pathvalidate import get_topic_work_path
+from podgenai.work import get_topic_work_path
 from podgenai.util.sys import print_error
 
 
@@ -66,7 +66,7 @@ def get_subtopic(*, topic: str, subtopics: list[str], subtopic: str, strategy: s
 
 
 def get_subtopics(*, topic: str, subtopics: Optional[list[str]] = None) -> Optional[dict[str, str]]:
-    """Get the full text for all subtopics within the context of the given topic and optional list of subtopics.
+    """Get the ordered full text for all subtopics within the context of the given topic and optional ordered list of subtopics.
 
     If the list of subtopics is not provided, it is read.
     """

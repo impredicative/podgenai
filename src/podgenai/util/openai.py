@@ -7,7 +7,7 @@ import openai
 import pathvalidate
 
 from podgenai.config import PROMPTS
-from podgenai.util.binascii import crc32
+from podgenai.util.binascii import hasher
 from podgenai.util.sys import print_error, print_warning
 
 
@@ -144,7 +144,7 @@ def get_cached_content(prompt: str, *, strategy: str = "oneshot", cache_key_pref
 
     sanitized_cache_key_prefix = pathvalidate.sanitize_filepath(cache_key_prefix, platform="auto")
     assert sanitized_cache_key_prefix
-    cache_key = f"{sanitized_cache_key_prefix} ({strategy}) [{crc32(prompt)}].txt"
+    cache_key = f"{sanitized_cache_key_prefix} ({strategy}) [{hasher(prompt)}].txt"
     cache_file_path = cache_path / cache_key
     pathvalidate.validate_filepath(cache_file_path, platform="auto")
 
@@ -163,8 +163,8 @@ def get_cached_content(prompt: str, *, strategy: str = "oneshot", cache_key_pref
     return content
 
 
-def write_speech(prompt: str, path: Path, *, voice: str = "default", client: Optional[OpenAI] = None) -> None:
-    """Write the speech for the given prompt to the given path.
+def write_speech(text: str, path: Path, *, voice: str = "default", client: Optional[OpenAI] = None) -> None:
+    """Write the speech file for the given prompt to the given file path.
 
     The prompt must not be longer than 4096 characters, as this is the maximum supported length by the client.
 
@@ -178,11 +178,23 @@ def write_speech(prompt: str, path: Path, *, voice: str = "default", client: Opt
     voice_str = voice if (voice == mapped_voice) else f"{voice} ({mapped_voice})"
 
     print(f"Requesting speech in {voice_str} voice for: {path.stem}")
-    response = client.audio.speech.create(model=MODELS["tts"], voice=mapped_voice, input=prompt)
-
+    response = client.audio.speech.create(model=MODELS["tts"], voice=mapped_voice, input=text)
     # relative_path = path.relative_to(Path.cwd())
     # print(f"Writing speech to: {relative_path}")
     response.stream_to_file(path)
     assert path.exists(), path
     # print(f"Wrote speech to: {relative_path}")
     print(f"Received speech in {voice_str} voice for: {path.stem}")
+
+
+def ensure_speech(text: str, path: Path, **kwargs) -> None:
+    """Ensure the speech file for the given text to the given file path.
+
+    Additional keyword arguments are forwarded to `write_speech`.
+    """
+
+    if path.exists():
+        assert path.is_file()
+        print(f"Speech file exists on disk for: {path.stem}")
+        return
+    write_speech(text, path=path, **kwargs)

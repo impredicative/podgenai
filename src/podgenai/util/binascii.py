@@ -8,3 +8,6 @@ def crc32(text: str) -> str:
     crc: str = f"{crc:08x}"
     assert len(crc) == 8
     return crc
+
+
+hasher = crc32
