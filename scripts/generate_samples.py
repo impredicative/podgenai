@@ -1,10 +1,11 @@
 import re
 
 from podgenai.config import REPO_PATH
+from podgenai import generate_media
 
 
-def list_sample_names_from_readme() -> list[str]:
-    """Return the list of names of samples from the "Samples" section in the repository's README.md file.
+def list_sample_topics_from_readme() -> list[str]:
+    """Return the list of topics from the "Samples" section in the repository's README.md file.
 
     This function specifically looks for the "Samples" section in the text.
     It then identifies the markdown table within this section and extracts all entries under the
@@ -39,6 +40,18 @@ def list_sample_names_from_readme() -> list[str]:
     return names
 
 
+def generate_samples(**kwargs) -> None:
+    """Generate the media for sample topics listed in the readme.
+
+    This can be applicable as a step toward updating the samples.
+
+    If a generation fails, all remaining topics are skipped.
+    """
+    topics = list_sample_topics_from_readme()
+    for topic in topics:
+        if not generate_media(topic, **kwargs):
+            break
+
+
 if __name__ == "__main__":
-    for name in list_sample_names_from_readme():
-        print(name)
+    generate_samples(confirm=True)
