@@ -65,8 +65,8 @@ def get_subtopic(*, topic: str, subtopics: list[str], subtopic: str, strategy: s
     return subtopic.rstrip()
 
 
-def get_subtopics(*, topic: str, subtopics: Optional[list[str]] = None) -> Optional[dict[str, str]]:
-    """Get the ordered full text for all subtopics within the context of the given topic and optional ordered list of subtopics.
+def get_subtopics_texts(*, topic: str, subtopics: Optional[list[str]] = None) -> Optional[dict[str, str]]:
+    """Return the ordered full text for all subtopics within the context of the given topic and optional ordered list of subtopics.
 
     If the list of subtopics is not provided, it is read.
     """

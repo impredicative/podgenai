@@ -3,7 +3,7 @@ from typing import Optional
 
 from podgenai.config import MAX_CONCURRENT_WORKERS
 from podgenai.content.audio import get_output_file_path, merge_speech_parts
-from podgenai.content.subtopics import list_subtopics, get_subtopics
+from podgenai.content.subtopics import list_subtopics, get_subtopics_texts
 from podgenai.content.topic import is_topic_valid
 from podgenai.content.tts import get_speech_tasks, get_text_parts, ensure_speech_parts
 from podgenai.content.voice import get_voice
@@ -54,9 +54,9 @@ def generate_media(topic: str, *, output_path: Optional[Path] = None, confirm: b
                     print_warning("User aborted.")
                     return
 
-    subtopics = get_subtopics(topic=topic, subtopics=subtopics_list)
-    assert subtopics
-    text_parts = get_text_parts(subtopics, topic=topic)
+    subtopics_texts = get_subtopics_texts(topic=topic, subtopics=subtopics_list)
+    assert subtopics_texts
+    text_parts = get_text_parts(subtopics_texts, topic=topic)
     text = "\n\n".join(text_parts)
     print(f"\nTEXT:\n{text}\n")
 
