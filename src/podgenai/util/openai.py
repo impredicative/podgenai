@@ -16,6 +16,7 @@ dotenv.load_dotenv()
 ChatCompletion = openai.types.chat.chat_completion.ChatCompletion
 OpenAI = openai.OpenAI
 
+MAX_TTS_INPUT_LEN = 4096
 MODELS = {
     "text": "gpt-4-turbo-preview",  # Note: gpt-4 is not used because it is much older in its training data.
     "tts": "tts-1",  # Note: tts-1-hd is twice as expensive, and has a more limited concurrent usage quota resulting in openai.RateLimitError, thereby making it undesirable.
