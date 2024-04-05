@@ -54,7 +54,6 @@ def generate_media(topic: str, *, output_path: Optional[Path] = None, confirm: b
                     print_warning("User aborted.")
                     return
 
-    assert subtopics_list
     subtopics = get_subtopics(topic=topic, subtopics=subtopics_list)
     assert subtopics
     text_parts = get_text_parts(subtopics, topic=topic)
