@@ -24,7 +24,7 @@ These generated mp3 files are available for download. In effect, these also cons
 | Female   | [Buffy the Vampire Slayer](https://mega.nz/file/AV0hQTiA#apUKjUZHwlzWLafIKZDSnVb5b0mULkqQM74a3zNYDhU)                                         | Female voice selection                                                |
 | Male     | [Bitcoin for nerds](https://mega.nz/file/pZ9GiDQD#5xhPKeR1pFX73p4PJeWmFQbqBVH-dQPstLS1PDtNJV0)                                                | Male voice selection                                                  |
 
-You may choose to subscribe to a related [podcast](https://podcasters.spotify.com/pod/podgenai) to which episodes on additional random topics are manually posted.
+You may choose to subscribe to the related [podcast](https://podcasters.spotify.com/pod/podgenai) to which episodes on additional topics may be manually posted over time.
 
 ## Setup
 * Ensure that [`rye`](https://rye-up.com/) is installed and available.
