@@ -1,18 +1,18 @@
 from pathlib import Path
 from typing import Optional
 
+import podgenai.exceptions
 from podgenai.config import MAX_CONCURRENT_WORKERS
 from podgenai.content.audio import get_output_file_path, merge_speech_paths
 from podgenai.content.subtopics import list_subtopics, get_subtopics_speech_texts
-from podgenai.content.topic import is_topic_valid
+from podgenai.content.topic import ensure_topic_is_valid
 from podgenai.content.tts import get_speech_tasks, ensure_speech_audio_files
 from podgenai.content.voice import get_voice
-from podgenai.util.openai import is_openai_key_available, TTS_VOICE_MAP
-from podgenai.util.sys import print_warning
+from podgenai.util.openai import ensure_openai_key, TTS_VOICE_MAP
 from podgenai.work import get_topic_work_path
 
 
-def generate_media(topic: str, *, output_path: Optional[Path] = None, confirm: bool = False) -> Optional[Path]:
+def generate_media(topic: str, *, output_path: Optional[Path] = None, confirm: bool = False) -> Path:
     """Return the output path after generating and writing an audiobook podcast to file for the given topic.
 
     Params:
@@ -23,11 +23,10 @@ def generate_media(topic: str, *, output_path: Optional[Path] = None, confirm: b
     * `confirm`: Confirm before full-text generation.
         If true, a confirmation is interactively sought after generating and printing the list of subtopics, before generating the full-text. Its default is false.
 
-    If successful, the output path is returned. If failed for a common reason, `None` is returned, and a relevant error is printed.
-    As such, the return value must be checked.
+    If failed, a subclass of the `podgenai.exceptions.Error` exception is raised.
     """
-    assert is_openai_key_available()
-    assert is_topic_valid(topic)
+    ensure_openai_key()
+    ensure_topic_is_valid(topic)
     print(f"TOPIC: {topic}")
 
     work_path = get_topic_work_path(topic)
@@ -38,9 +37,7 @@ def generate_media(topic: str, *, output_path: Optional[Path] = None, confirm: b
     mapped_voice = TTS_VOICE_MAP[voice]
     print(f"VOICE: {voice} ({mapped_voice})")
 
-    subtopics_list = list_subtopics(topic)  # Already validated.
-    if not subtopics_list:
-        return
+    subtopics_list = list_subtopics(topic)
     print(f'SUBTOPICS:\n{'\n'.join(subtopics_list)}')
 
     if confirm:
@@ -51,8 +48,7 @@ def generate_media(topic: str, *, output_path: Optional[Path] = None, confirm: b
                 case "y" | "yes":
                     break
                 case "n" | "no":
-                    print_warning("User aborted.")
-                    return
+                    raise podgenai.exceptions.InputError("User aborted.")
 
     subtopics_speech_texts = get_subtopics_speech_texts(topic=topic, subtopics=subtopics_list)
     assert subtopics_speech_texts

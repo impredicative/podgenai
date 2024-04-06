@@ -1,6 +1,9 @@
 import concurrent.futures
+import contextlib
+import io
 from typing import Optional
 
+import podgenai.exceptions
 from podgenai.config import MAX_CONCURRENT_WORKERS, PROMPTS
 from podgenai.util.openai import get_cached_content
 from podgenai.work import get_topic_work_path
@@ -12,45 +15,67 @@ def is_subtopics_list_valid(subtopics: list[str]) -> bool:
 
     A validation error is printed if a subtopic is invalid.
     """
+    if not subtopics:
+        print_error("No subtopics exist.")
+        return False
+
     seen = set()
     for num, subtopic in enumerate(subtopics, start=1):
-        expected_num_prefix = f"{num}. "
         if subtopic != subtopic.strip():
             print_error(f"Subtopic {num} is invalid because it has leading or trailing whitespace: {subtopic!r}")
             return False
+
+        expected_num_prefix = f"{num}. "
         if not subtopic.startswith(expected_num_prefix):
             print_error(f"Subtopic {num} is invalid because it is not numbered correctly: {subtopic}")
             return False
+
         subtopic_name = subtopic.removeprefix(expected_num_prefix).strip()
         if not subtopic_name:
             print_error(f"Subtopic {num} is invalid because it has no value: {subtopic}")
             return False
-        if subtopic_name in seen:
-            print_error(f"Subtopic {num} is invalid because it is a duplicate: {subtopic}")
+
+        if subtopic_name != subtopic_name.lstrip():
+            print_error(f"Subtopic {num} is invalid because its name has leading whitespace: {subtopic!r}")
             return False
+
+        if subtopic_name in seen:
+            print_error(f"Subtopic {num} is invalid because its name is a duplicate: {subtopic}")
+            return False
+        seen.add(subtopic_name)
+
     return True
 
 
-def list_subtopics(topic: str) -> Optional[list[str]]:
-    """Get the list of subtopics for the given topic."""
+def list_subtopics(topic: str) -> list[str]:
+    """Return the list of subtopics for the given topic.
+
+    `LanguageModelOutputError` is raised if the model output is structurally invalid.
+    """
     prompt_name = "list_subtopics"
     prompt = PROMPTS[prompt_name].format(topic=topic)
     subtopics = get_cached_content(prompt, cache_key_prefix=f"0. {prompt_name}", cache_path=get_topic_work_path(topic))
     assert subtopics, subtopics
+
     none_subtopics = ("none", "none.")
     if subtopics.lower() in ("none", "none."):
-        print_error(f"No subtopics exist for topic: {topic}")
-        return
+        raise podgenai.exceptions.LanguageModelOutputError(f"No subtopics exist for topic: {topic}")
+
     invalid_subtopics = ("", *none_subtopics)
     subtopics = [s.strip() for s in subtopics.splitlines() if s.strip().lower() not in invalid_subtopics]  # Note: A terminal "None" line has been observed with valid subtopics before it.
-    if not is_subtopics_list_valid(subtopics):
-        print_error(f"Invalid subtopic exists for topic: {topic}")
-        return
+
+    error = io.StringIO()
+    with contextlib.redirect_stderr(error):
+        if not is_subtopics_list_valid(subtopics):
+            error = error.getvalue().rstrip().removeprefix("Error: ")
+            raise podgenai.exceptions.LanguageModelOutputError(error)
+
+    assert subtopics
     return subtopics
 
 
 def get_subtopic(*, topic: str, subtopics: list[str], subtopic: str, strategy: str = "oneshot") -> str:
-    """Get the full text for a given subtopic within the context of the given topic and list of subtopics."""
+    """Return the full text for a given subtopic within the context of the given topic and list of subtopics."""
     assert subtopic[0].isdigit()  # Is numbered.
     common_kwargs = {"strategy": strategy, "cache_key_prefix": subtopic, "cache_path": get_topic_work_path(topic)}
     match strategy:
@@ -65,17 +90,13 @@ def get_subtopic(*, topic: str, subtopics: list[str], subtopic: str, strategy: s
     return subtopic.rstrip()
 
 
-def get_subtopics_texts(*, topic: str, subtopics: Optional[list[str]] = None) -> Optional[dict[str, str]]:
+def get_subtopics_texts(*, topic: str, subtopics: Optional[list[str]] = None) -> dict[str, str]:
     """Return the ordered full text for all subtopics within the context of the given topic and optional ordered list of subtopics.
 
     If the list of subtopics is not provided, it is read.
     """
     if not subtopics:
         subtopics = list_subtopics(topic)
-    if not subtopics:
-        print_error(f"No subtopics exist for topic: {topic}")
-        return
-
     if MAX_CONCURRENT_WORKERS == 1:
         subtopics_texts = {s: get_subtopic(topic=topic, subtopics=subtopics, subtopic=s) for s in subtopics}
     else:
@@ -86,17 +107,13 @@ def get_subtopics_texts(*, topic: str, subtopics: Optional[list[str]] = None) ->
     return subtopics_texts
 
 
-def get_subtopics_speech_texts(*, topic: str, subtopics: Optional[list[str]] = None) -> Optional[dict[str, str]]:
+def get_subtopics_speech_texts(*, topic: str, subtopics: Optional[list[str]] = None) -> dict[str, str]:
     """Return the ordered speech text for all subtopics within the context of the given topic and optional ordered list of subtopics.
 
     If the list of subtopics is not provided, it is read.
     """
     if not subtopics:
         subtopics = list_subtopics(topic)
-    if not subtopics:
-        print_error(f"No subtopics exist for topic: {topic}")
-        return
-
     subtopics_texts = get_subtopics_texts(topic=topic, subtopics=subtopics)
 
     subtopics_speech_texts = {subtopic_name: f'Section {subtopic_name.replace('.', ':', 1)}:\n\n{subtopic_text} {{pause}}' for subtopic_name, subtopic_text in subtopics_texts.items()}

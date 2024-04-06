@@ -1,3 +1,7 @@
+import contextlib
+import io
+
+import podgenai.exceptions
 from podgenai.util.sys import print_error
 
 
@@ -25,6 +29,15 @@ def is_topic_valid(topic: str) -> bool:
         print_error("Topic must not be quoted.")
         return False
     return True
+
+
+def ensure_topic_is_valid(topic: str) -> None:
+    """Raise `InputError` if the topic is structurally invalid."""
+    error = io.StringIO()
+    with contextlib.redirect_stderr(error):
+        if not is_topic_valid(topic):
+            error = error.getvalue().rstrip().removeprefix("Error: ")
+            raise podgenai.exceptions.InputError(error)
 
 
 def get_topic() -> str:

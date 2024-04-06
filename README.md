@@ -51,21 +51,23 @@ Usage can be as a command-line application or as a Python library. By default, t
 
 For example, `python -m podgenai "My favorite topic" -p "~/Downloads/" -c`.
 
+A nonzero exitcode exists if there is an error.
+
 ### Usage as library
-This package is not available on PyPI due to its unpolished nature, but it can nevertheless be called as a library. If successful, the output path is returned. If failed for a common reason, `None` is returned, and a relevant error is printed. As such, the return value must be checked. This section is subject to change as per Python best practices.
+This package is not available on PyPI due to its unpolished nature, but it can nevertheless be called as a library. The output file path is returned. If failed, a subclass of the `podgenai.exceptions.Error` exception is raised.
 
 ```python
 from pathlib import Path
 from podgenai import generate_media
 
 # With default output path:
-optional_output_file_path = generate_media("My favorite topic")  # Check return value!
+output_file_path = generate_media("My favorite topic")
 
 # With preexisting output directory path:
-optional_output_file_path = generate_media("My favorite topic", output_path=Path('/tmp'))  # Check return value!
+output_file_path = generate_media("My favorite topic", output_path=Path('/tmp'))
 
 # With output file path:
-status = bool(generate_media("My favorite topic", output_path=Path('~/foo.mp3')))  # Check return value!
+output_file_path = generate_media("My favorite topic", output_path=Path('~/foo.mp3'))
 ```
 
 ## Caching

@@ -6,10 +6,10 @@ import dotenv
 import openai
 import pathvalidate
 
+import podgenai.exceptions
 from podgenai.config import PROMPTS
 from podgenai.util.binascii import hasher
-from podgenai.util.sys import print_error, print_warning
-
+from podgenai.util.sys import print_warning
 
 dotenv.load_dotenv()
 
@@ -24,13 +24,10 @@ MODELS = {
 TTS_VOICE_MAP = {"default": "alloy", "neutral": "echo", "female": "nova", "male": "onyx"}  # Note: An unsolicited 'neutral' response has been observed, and is therefore supported.
 
 
-def is_openai_key_available() -> bool:
-    """Return true if the OPENAI_API_KEY environment value is available, otherwise false."""
-    value = os.environ.get("OPENAI_API_KEY")
-    if not value:
-        print_error("The environment variable OPENAI_API_KEY is unavailable. It can optionally be defined in an .env file.")
-        return False
-    return True
+def ensure_openai_key() -> None:
+    """Raise `EnvError` if the environment variable OPENAI_API_KEY is unavailable."""
+    if not os.environ.get("OPENAI_API_KEY"):
+        raise podgenai.exceptions.EnvError("The environment variable OPENAI_API_KEY is unavailable. It can optionally be defined in an .env file.")
 
 
 def get_openai_client() -> OpenAI:
