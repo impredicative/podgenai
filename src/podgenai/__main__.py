@@ -40,6 +40,7 @@ def main(topic: Optional[str] = None, path: Optional[Path] = None, confirm: bool
             print_error(f"Failed to generate for topic: {topic}")
             exit(3)
     except KeyboardInterrupt:
+        print()  # This separates "^C" from the subsequent error.
         print_error("Interrupted by user.")
         os._exit(-2)  # Plain `exit` is not used because it may not immediately terminate, with background threads potentially still running.
 
