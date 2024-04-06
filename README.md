@@ -18,11 +18,11 @@ These generated mp3 files are available for download. In effect, these also cons
 |----------|-----------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------|
 | Default  | [PyTorch](https://mega.nz/file/5Ic21CZK#ovayjipDqYeYaSw9HhRTufjIxIuJr5M8lFq3LNvtEQQ)                                                          | Technical content generation                                          |
 | Default  | [Advanced PyTorch](https://mega.nz/file/kFsVxSZQ#LFrQVqH-1T1uLHNtgXrjGZYdgcyiE2FCpEu1ztZx3Ak)                                                 | Advanced technical content generation                                 |
-| Default  | [New York City: present and future](https://mega.nz/file/EBEVDKwJ#eqJ1gDWh2Pr0Tfw-WT1PR2bmCQjlyR_TlJYjvNTibhM)                                | Non-technical content generation                                      |
-| Default  | [Artificial General Intelligence (AGI): Approaches and Algorithms](https://mega.nz/file/wNUn2JiT#-cwrVns0kciaQ3PKE9JW159jEP_6FkE9luyowXYu4kM) | Non-hierarchical flattened single-level subtopic list enforcement     |
-| Female   | [Human circulatory system (unabridged)](https://mega.nz/file/9V9nHJrZ#4lm_hOYrqIUw8N-0VGcaa6zx8dwtuGRLqJLyo8pG_yE)                            | Implicit topic support for unabridged suffix, covering more subtopics |
-| Female   | [Buffy the Vampire Slayer](https://mega.nz/file/AV0hQTiA#apUKjUZHwlzWLafIKZDSnVb5b0mULkqQM74a3zNYDhU)                                         | Female voice selection                                                |
-| Male     | [Bitcoin for nerds](https://mega.nz/file/pZ9GiDQD#5xhPKeR1pFX73p4PJeWmFQbqBVH-dQPstLS1PDtNJV0)                                                | Male voice selection                                                  |
+| Default  | [New York City: present and future](https://mega.nz/file/9c0FxCaa#4oCBgys1--x2iJKjwbb-gUFOaMCkXoBNYV6AMo790H0)                                | Non-technical content generation                                      |
+| Default  | [Artificial General Intelligence (AGI): Approaches and Algorithms](https://mega.nz/file/0JkWnDQQ#PSUA5aj0q_yU18T4XsazYZoSG9bqjUi7vCLmjVrY1IA) | Non-hierarchical flattened single-level subtopic list enforcement     |
+| Female   | [Human circulatory system (unabridged)](https://mega.nz/file/UYt2WLDA#4q-UI8cWffzN0PG8ZGiQK_96dudklBJOfFmpE_3for4)                            | Implicit topic support for unabridged suffix, covering more subtopics |
+| Female   | [Buffy the Vampire Slayer](https://mega.nz/file/FddQWRJb#q_3XoTfgsQIvU6oZcJK7Y9or4Tjcx7BK2YLf_whjH4g)                                         | Female voice selection                                                |
+| Male     | [Bitcoin for nerds](https://mega.nz/file/QVNyWYrZ#RqKuAcG6LUwOZi20ZBkygRNin9f7rpLBm1xsoILoAFI)                                                | Male voice selection                                                  |
 
 You may choose to subscribe to the related [podcast](https://podcasters.spotify.com/pod/podgenai) to which episodes on additional topics may be manually posted over time.
 
