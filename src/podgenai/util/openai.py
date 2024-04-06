@@ -151,7 +151,7 @@ def get_cached_content(prompt: str, *, strategy: str = "oneshot", cache_key_pref
 
     if cache_file_path.exists():
         assert cache_file_path.is_file()
-        content = cache_file_path.read_text()
+        content = cache_file_path.read_text().rstrip()  # rstrip is used in case the file is manually modified in an editor which adds a trailing newline.
         print(f"Read completion from disk for: {cache_key_prefix}")
     else:
         content_getter = {"oneshot": get_content, "multishot": get_multipart_content}[strategy]
