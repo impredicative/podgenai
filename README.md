@@ -39,7 +39,7 @@ You may choose to subscribe to the related [podcast](https://podcasters.spotify.
 Usage can be as a command-line application or as a Python library. By default, the generated mp3 file will be written to the repo directory. As of 2024, the estimated cost per generation is under $2 USD and the time taken is under three minutes.
 
 ### Usage tips
-* If a requested topic fails to generate subtopics, try rewording it, perhaps to be broader or narrower or more factual.
+* If a requested topic fails to generate subtopics, try rewording it, perhaps to be broader or narrower or more factual. Alternatively, try deleting its work directory (`<repo>/work/<topic>`) and retrying its generation.
 * For a potentially longer list of covered subtopics, consider appending the "(unabridged)" suffix to the requested topic, e.g. "PyTorch (unabridged)".
 
 ### Usage as application
