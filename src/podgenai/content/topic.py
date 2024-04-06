@@ -6,6 +6,9 @@ def is_topic_valid(topic: str) -> bool:
 
     A validation error is printed if the topic is false.
     """
+    if not isinstance(topic, str):  # Note: This happens if `-t` flag is provided without any value.
+        print_error("Topic must be a string.")
+        return False
     if topic != topic.strip():
         print_error("Topic must not have leading or trailing whitespace.")
         return False
