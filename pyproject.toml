@@ -10,6 +10,7 @@ dependencies = [
     "openai>=1.14.3",
     "pathvalidate>=3.2.0",
     "python-dotenv>=1.0.1",
+    "semantic-text-splitter>=0.9.1",
 ]
 readme = "README.md"
 requires-python = ">= 3.8"

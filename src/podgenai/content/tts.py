@@ -6,7 +6,7 @@ import pathvalidate
 from podgenai.config import MAX_CONCURRENT_WORKERS
 from podgenai.util.binascii import hasher
 from podgenai.util.openai import ensure_speech_audio, MAX_TTS_INPUT_LEN
-from podgenai.util.str import split_text_by_paragraphs_and_limit
+from podgenai.util.semantic_text_splitter import semantic_split
 from podgenai.work import get_topic_work_path
 
 
@@ -23,7 +23,7 @@ def get_speech_tasks(subtopics_speech_texts: dict[str, str], *, topic: str, voic
             pathvalidate.validate_filepath(part_path, platform="auto")
             tts_tasks[part_path] = part
         else:
-            portions = split_text_by_paragraphs_and_limit(part, MAX_TTS_INPUT_LEN)
+            portions = semantic_split(part, MAX_TTS_INPUT_LEN)
             for portion_num, portion in enumerate(portions, start=1):
                 assert len(portion) <= MAX_TTS_INPUT_LEN
                 portion_path = work_path / f"{part_stem} ({portion_num}).mp3"
