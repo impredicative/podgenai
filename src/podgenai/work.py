@@ -12,7 +12,7 @@ def get_topic_work_path(topic: str, create: bool = True) -> Path:
     If `create` is True, the directory is created if it does not already exist.
     """
     ensure_topic_is_valid(topic)
-    work_path = WORK_PATH / pathvalidate.sanitize_filepath(topic, platform="auto")
+    work_path = WORK_PATH / pathvalidate.sanitize_filename(topic, platform="auto")
     pathvalidate.validate_filepath(work_path, platform="auto")
     if create:
         work_path.mkdir(parents=True, exist_ok=True)

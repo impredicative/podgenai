@@ -140,7 +140,7 @@ def get_cached_content(prompt: str, *, strategy: str = "oneshot", cache_key_pref
     assert cache_key_prefix
     assert cache_path.is_dir()
 
-    sanitized_cache_key_prefix = pathvalidate.sanitize_filepath(cache_key_prefix, platform="auto")
+    sanitized_cache_key_prefix = pathvalidate.sanitize_filename(cache_key_prefix, platform="auto")
     assert sanitized_cache_key_prefix
     cache_key = f"{sanitized_cache_key_prefix} ({strategy}) [{hasher(prompt)}].txt"
     cache_file_path = cache_path / cache_key
