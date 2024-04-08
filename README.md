@@ -12,6 +12,8 @@ For a given topic, the high-level reference approach is:
 ## Samples
 These generated mp3 files are available for download. In effect, these also constitute a minimal manual test suite, with the unique purpose of each sample noted. As a reminder, the voice is selected by the LLM.
 
+There is also a related [podcast](https://podcasters.spotify.com/pod/podgenai) to which episodes on additional topics may be manually posted over time.
+
 | Voice    | Name                                                                                                                                          | Purpose                                                               |
 |----------|-----------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------|
 | Default  | [PyTorch](https://mega.nz/file/5Ic21CZK#ovayjipDqYeYaSw9HhRTufjIxIuJr5M8lFq3LNvtEQQ)                                                          | Technical content generation                                          |
@@ -21,8 +23,6 @@ These generated mp3 files are available for download. In effect, these also cons
 | Female   | [Human circulatory system (unabridged)](https://mega.nz/file/UYt2WLDA#4q-UI8cWffzN0PG8ZGiQK_96dudklBJOfFmpE_3for4)                            | Implicit topic support for unabridged suffix, covering more subtopics |
 | Female   | [Buffy the Vampire Slayer](https://mega.nz/file/FddQWRJb#q_3XoTfgsQIvU6oZcJK7Y9or4Tjcx7BK2YLf_whjH4g)                                         | Female voice selection                                                |
 | Male     | [Bitcoin for nerds](https://mega.nz/file/QVNyWYrZ#RqKuAcG6LUwOZi20ZBkygRNin9f7rpLBm1xsoILoAFI)                                                | Male voice selection                                                  |
-
-You may choose to subscribe to the related [podcast](https://podcasters.spotify.com/pod/podgenai) to which episodes on additional topics may be manually posted over time.
 
 ## Setup
 * Ensure that [`rye`](https://rye-up.com/) is installed and available.
