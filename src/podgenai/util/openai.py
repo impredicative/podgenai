@@ -18,7 +18,7 @@ OpenAI = openai.OpenAI
 
 MAX_TTS_INPUT_LEN = 4096
 MODELS = {
-    "text": "gpt-4-turbo-preview",  # Note: gpt-4 is not used because it is much older in its training data.
+    "text": "gpt-4-turbo-preview",  # Note: gpt-4 is not used because it is much older in its training data. gpt-4-turbo is not used because it was not observed to meaningfully show any relative benefit as of 2024-04.
     "tts": "tts-1",  # Note: tts-1-hd is twice as expensive, and has a more limited concurrent usage quota resulting in openai.RateLimitError, thereby making it undesirable.
 }
 TTS_VOICE_MAP = {"default": "alloy", "neutral": "echo", "female": "nova", "male": "onyx"}  # Note: An unsolicited 'neutral' response has been observed, and is therefore supported.
