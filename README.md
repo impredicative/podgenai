@@ -12,7 +12,7 @@ For a given topic, the high-level reference approach is:
 ## Samples
 These generated mp3 files are available for download. In effect, these also constitute a minimal manual test suite, with the unique purpose of each sample noted. As a reminder, the voice is selected by the LLM.
 
-There is also a related [podcast](https://podcasters.spotify.com/pod/podgenai) to which episodes on additional topics may be manually posted over time.
+There is also a related [podcast](https://podcasters.spotify.com/pod/podgenai) ([RSS](https://anchor.fm/s/f4868644/podcast/rss)) to which episodes on additional topics may be manually posted over time.
 
 | Voice    | Name                                                                                                                                          | Purpose                                                               |
 |----------|-----------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------|
