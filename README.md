@@ -9,6 +9,8 @@ The `gpt-4-turbo-preview` and `tts-1` models are used. For a given topic, the hi
 * Concurrently for each subtopic, the corresponding text and speech are generated using the LLM and TTS respectively.
 * The speech files are concatenated using `ffmpeg`.
 
+Although there may exist some semantic repetition of content across subtopics, this has intentionally not been "optimized away" because this repetition of important points helps with learning and memorization. To instead dive deeper into a particular subtopic, one is advised to create a new file just for it.
+
 ## Samples
 These generated mp3 files are available for download. In effect, these also constitute a minimal manual test suite, with the unique purpose of each sample noted. As a reminder, the voice is selected by the LLM.
 
