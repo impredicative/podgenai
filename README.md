@@ -44,12 +44,12 @@ Usage can be as a command-line application or as a Python library. By default, t
 
 ### Usage as application
 * To show help, run `python -m podgenai -h`.
+* To require confirmations along the way, allowing for early cancelation, use `-c`. This is recommended.
 * To run for a specified topic, use `-t "My favorite topic"`. If a topic is not specified, you will interactively be prompted for it. 
 * To specify a preexisting output directory path, use `-p "/my/preexisting/dir"`.
 * To specify an output file path, use `-p "~/something.mp3"`.
-* To require confirmation after the list of subtopics are printed, but before full-text generation, use `-c`.
 
-For example, `python -m podgenai "My favorite topic" -p "~/Downloads/" -c`.
+For example, `python -m podgenai -c -t "My favorite topic" -p "~/Downloads/"`.
 
 A nonzero exitcode exists if there is an error.
 

@@ -1,13 +1,13 @@
 from pathlib import Path
 from typing import Optional
 
-import podgenai.exceptions
 from podgenai.config import MAX_CONCURRENT_WORKERS
 from podgenai.content.audio import get_output_file_path, merge_speech_paths
 from podgenai.content.subtopics import list_subtopics, get_subtopics_speech_texts
 from podgenai.content.topic import ensure_topic_is_valid
 from podgenai.content.tts import get_speech_tasks, ensure_speech_audio_files
 from podgenai.content.voice import get_voice
+from podgenai.util.input import get_confirmation
 from podgenai.util.openai import ensure_openai_key, TTS_VOICE_MAP
 from podgenai.work import get_topic_work_path
 
@@ -41,20 +41,14 @@ def generate_media(topic: str, *, output_path: Optional[Path] = None, confirm: b
     print(f'SUBTOPICS:\n{'\n'.join(subtopics_list)}')
 
     if confirm:
-        while True:
-            response = input("Continue? [y/n]: ")
-            response = response.strip().lower()
-            match response:
-                case "y" | "yes":
-                    break
-                case "n" | "no":
-                    raise podgenai.exceptions.InputError("User aborted.")
-
+        get_confirmation("text generation")
     subtopics_speech_texts = get_subtopics_speech_texts(topic=topic, subtopics=subtopics_list)
     assert subtopics_speech_texts
     speech_text = "\n\n".join(subtopics_speech_texts.values())
     print(f"\nSPEECH:\n{speech_text}\n")
 
+    if confirm:
+        get_confirmation("speech generation")
     speech_tasks = get_speech_tasks(subtopics_speech_texts, topic=topic, voice=mapped_voice)
     ensure_speech_audio_files(speech_tasks, voice=voice)
 
