@@ -33,11 +33,11 @@ def generate_media(topic: str, *, output_path: Optional[Path] = None, confirm: b
     print(f"CACHE: {work_path}")
     print(f"WORKERS: {MAX_CONCURRENT_WORKERS}")
 
+    subtopics_list = list_subtopics(topic)  # Can commonly raise an exception, so it's done before getting voice.
+
     voice = get_voice(topic)
     mapped_voice = TTS_VOICE_MAP[voice]
     print(f"VOICE: {voice} ({mapped_voice})")
-
-    subtopics_list = list_subtopics(topic)
     print(f'SUBTOPICS:\n{'\n'.join(subtopics_list)}')
 
     if confirm:
