@@ -4,8 +4,8 @@
 ## Approach
 The `gpt-4-turbo-preview` and `tts-1` models are used. For a given topic, the high-level reference approach is:
 
-* The voice is selected using the LLM from three choices.
 * A list of applicable subtopics are listed using the LLM. If however the topic is unknown to the LLM, the process is aborted.
+* The voice is selected using the LLM from three choices.
 * Concurrently for each subtopic, the corresponding text and speech are generated using the LLM and TTS respectively.
 * The speech files are concatenated using `ffmpeg`.
 
