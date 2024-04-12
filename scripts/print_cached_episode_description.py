@@ -1,9 +1,6 @@
+from podgenai.config import PROMPTS
 from podgenai.content.topic import get_topic
 from podgenai.work import get_topic_work_path
-
-AFFILIATED_SUFFIXES = {
-    "for dummies",
-}
 
 
 def get_denumbered_subsections(text: str) -> list[str]:
@@ -31,9 +28,7 @@ def get_cached_episode_description_html(topic: str) -> str:
     assert subtopics_list
 
     subtopics_list_html = "\n".join(f"  <li>{s}</li>" for s in subtopics_list)
-    description = f"<p><strong>Sections</strong>:</p>\n<ol>\n{subtopics_list_html}\n</ol>"
-    if topic.endswith(tuple(f" {s}" for s in AFFILIATED_SUFFIXES)):
-        description = f"<p><strong>Disclaimer</strong>: This media is independently created, and is not affiliated with or endorsed by any external organization or entity.</p>\n{description}"
+    description = f"<p><strong>Disclaimer</strong>: <em>{PROMPTS['tts_disclaimer']}</em></p>\n<p><br></p>\n<p><strong>Sections</strong>:</p>\n<ol>\n{subtopics_list_html}\n</ol>"
     return description
 
 
