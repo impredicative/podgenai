@@ -1,6 +1,10 @@
 from podgenai.content.topic import get_topic
 from podgenai.work import get_topic_work_path
 
+AFFILIATED_SUFFIXES = {
+    "for dummies",
+}
+
 
 def get_denumbered_subsections(text: str) -> list[str]:
     lines = text.strip().split("\n")
@@ -28,6 +32,8 @@ def get_cached_episode_description_html(topic: str) -> str:
 
     subtopics_list_html = "\n".join(f"  <li>{s}</li>" for s in subtopics_list)
     description = f"<p><strong>Sections</strong>:</p>\n<ol>\n{subtopics_list_html}\n</ol>"
+    if topic.endswith(tuple(f" {s}" for s in AFFILIATED_SUFFIXES)):
+        description = f"<p><strong>Disclaimer</strong>: This media is independently created, and is not affiliated with or endorsed by any external organization or entity.</p>\n{description}"
     return description
 
 
