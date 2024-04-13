@@ -43,6 +43,7 @@ Usage can be as a command-line application or as a Python library. By default, t
 ### Usage tips
 * If a requested topic fails to generate subtopics, try rewording it, perhaps to be broader or narrower or more factual. Alternatively, try deleting its work directory (`<repo>/work/<topic>`) and retrying its generation.
 * For a potentially longer list of covered subtopics, consider appending the "(unabridged)" suffix to the requested topic, e.g. "PyTorch (unabridged)".
+* If the topic fails to be spoken at the start of a podcast, delete `<repo>/work/<topic>/1.*.mp3` and regenerate the output.
 
 ### Usage as application
 * To show help, run `python -m podgenai -h`.
