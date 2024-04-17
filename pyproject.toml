@@ -1,7 +1,7 @@
 [project]
 name = "podgenai"
 version = "0.1.0"
-description = "GPT4 audio podcast generator"
+description = "GPT-4 based informational audiobook/podcast mp3 generator"
 authors = [
     { name = "Ouroboros Chrysopoeia", email = "impredicative@users.noreply.github.com" }
 ]
