@@ -20,8 +20,8 @@ def generate_media(topic: str, *, output_path: Optional[Path] = None, confirm: b
     * `path`: Output file or directory path.
         If an intended file path, it must have an ".mp3" suffix. If a directory, it must exist, and the file name is auto-determined.
         If not given, the output file is written to the repo directory with an auto-determined file name.
-    * `confirm`: Confirm before full-text generation.
-        If true, a confirmation is interactively sought after generating and printing the list of subtopics, before generating the full-text. Its default is false.
+    * `confirm`: Confirm before full-text and speech generation.
+        If true, a confirmation is interactively sought after generating and printing the list of subtopics, before generating the full-text, and also before generating the speech. Its default is false.
 
     If failed, a subclass of the `podgenai.exceptions.Error` exception is raised.
     """

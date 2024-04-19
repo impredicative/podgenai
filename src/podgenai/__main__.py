@@ -19,8 +19,8 @@ def main(topic: Optional[str] = None, path: Optional[Path] = None, confirm: bool
     * `path (-p)`: Output file or directory path.
         If an intended file path, it must have an ".mp3" suffix. If a directory, it must exist, and the file name is auto-determined.
         If not given, the output file is written to the repo directory with an auto-determined file name.
-    * `confirm` (-c): Confirm before full-text generation.
-        If true, a confirmation is interactively sought after generating and printing the list of subtopics, before generating the full-text. Its default is false.
+    * `confirm`: Confirm before full-text and speech generation.
+        If true, a confirmation is interactively sought after generating and printing the list of subtopics, before generating the full-text, and also before generating the speech. Its default is false.
 
     A nonzero exitcode exists if there is an error.
     """
