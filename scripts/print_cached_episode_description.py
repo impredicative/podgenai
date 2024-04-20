@@ -7,7 +7,7 @@ def _get_denumbered_subsections(lines: list[str]) -> list[str]:
     return [line[line.find(" ") + 1 :] if line.find(".") != -1 else line for line in lines]
 
 
-def get_cached_episode_description_html(topic: str, fmt: str = "plain") -> str:
+def get_cached_episode_description_html(topic: str, fmt: str = "html") -> str:
     work_path = get_topic_work_path(topic, create=False)
     if not work_path.is_dir():
         raise LookupError(f"Work path does not exist for topic: {topic}")
