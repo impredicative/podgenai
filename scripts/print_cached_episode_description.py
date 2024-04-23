@@ -1,6 +1,20 @@
+import re
+
 from podgenai.config import PROMPTS
 from podgenai.content.topic import get_topic
 from podgenai.work import get_topic_work_path
+
+
+def _lstrip_optional_timestamp(topic: str) -> str:
+    """Return the topic after stripping any optional leading timestamp.
+
+    Examples:
+        '2024-04-23T19:31:12 Living a good life' -> 'Living a good life'
+        'Living a good life' -> 'Living a good life'
+    """
+    pattern = r"(?:(?:\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\s+))?(?P<topic>.*)"
+    match = re.fullmatch(pattern, topic)
+    return match.group("topic")
 
 
 def _get_denumbered_subsections(lines: list[str]) -> list[str]:
@@ -8,6 +22,7 @@ def _get_denumbered_subsections(lines: list[str]) -> list[str]:
 
 
 def get_cached_episode_description_html(topic: str, fmt: str = "html") -> str:
+    topic = _lstrip_optional_timestamp(topic)
     work_path = get_topic_work_path(topic, create=False)
     if not work_path.is_dir():
         raise LookupError(f"Work path does not exist for topic: {topic}")
