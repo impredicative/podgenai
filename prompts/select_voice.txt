@@ -1,4 +1,4 @@
-I am making a podcast on a topic. Specify which voice might be better for the topic from one of these three: default, female, male. Provide only a single-word response that is one of these choices. Do not otherwise comment on the task. Do not provide an invalid choice.
+I am making a podcast on a topic. Specify which voice might be better for the topic from one of these four: default, female, male, emotive. Provide only a single-word response that is one of these choices. Do not otherwise comment on the task. Do not provide an invalid choice.
 
 The topic is:
 
