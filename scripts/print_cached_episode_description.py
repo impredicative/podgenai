@@ -45,7 +45,7 @@ def get_cached_episode_description_html(topic: str, fmt: str = "html") -> str:
             denumbered_subtopics_list = _get_denumbered_subsections(subtopics_list)
             subtopics_list_html = "\n".join(f"  <li>{s}</li>" for s in denumbered_subtopics_list)
             description = f"<p><strong>Sections</strong>:</p>\n<ol>\n{subtopics_list_html}\n</ol>\n<p><br></p><p><strong>Disclaimer</strong>: <em>{PROMPTS['tts_disclaimer']}</em></p>"
-        case "plain":
+        case "plain" | "text" | '"txt':
             description = f"Sections:\n\n{subtopics_text}"
         case _:
             assert False, fmt
