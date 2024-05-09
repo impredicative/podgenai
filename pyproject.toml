@@ -33,6 +33,8 @@ check = { chain = ["check-lint", "check-fmt" ] }
 fix = { chain = ["fix-lint", "fix-fmt" ] }
 "fix-lint" = "rye lint --fix"
 "fix-fmt" = "rye fmt"
+lockup = "rye lock --update-all"
+syncup = "rye sync --update-all"
 
 [tool.hatch.metadata]
 allow-direct-references = true
