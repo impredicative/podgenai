@@ -8,7 +8,7 @@ from podgenai.content.topic import ensure_topic_is_valid
 from podgenai.content.tts import get_speech_tasks, ensure_speech_audio_files
 from podgenai.content.voice import get_voice
 from podgenai.util.input import get_confirmation
-from podgenai.util.openai import ensure_openai_key, TTS_VOICE_MAP
+from podgenai.util.openai import ensure_openai_key, MODELS, TTS_VOICE_MAP
 from podgenai.work import get_topic_work_path
 
 
@@ -31,6 +31,7 @@ def generate_media(topic: str, *, output_path: Optional[Path] = None, confirm: b
 
     work_path = get_topic_work_path(topic)
     print(f"CACHE: {work_path}")
+    print(f"MODELS: text={MODELS["text"]}, tts={MODELS["tts"]}")
     print(f"WORKERS: {MAX_CONCURRENT_WORKERS}")
 
     subtopics_list = list_subtopics(topic)  # Can commonly raise an exception, so it's done before getting voice.
