@@ -47,20 +47,29 @@ def is_subtopics_list_valid(subtopics: list[str]) -> bool:
     return True
 
 
-def list_subtopics(topic: str) -> list[str]:
+def list_subtopics(topic: str, max_attempts: int = 2) -> list[str]:
     """Return the list of subtopics for the given topic.
+
+    Params:
+    * `max_attempts`: If greater than 1, and if the first attempt returns no subtopics, subsequent attempt(s) will be made. Only the first attempt tries to read from the disk cache.
 
     `LanguageModelOutputError` is raised if the model output is structurally invalid.
     """
     prompt_name = "list_subtopics"
     prompt = PROMPTS[prompt_name].format(topic=topic)
-    subtopics = get_cached_content(prompt, cache_key_prefix=f"0. {prompt_name}", cache_path=get_topic_work_path(topic))
-    assert subtopics, subtopics
-
     none_subtopics = ("none", "none.")
-    if subtopics.lower() in ("none", "none."):
-        raise podgenai.exceptions.LanguageModelOutputError(f"No subtopics exist for topic: {topic}")
 
+    for num_attempt in range(1, max_attempts + 1):
+        subtopics = get_cached_content(prompt, read_cache=num_attempt == 1, cache_key_prefix=f"0. {prompt_name}", cache_path=get_topic_work_path(topic))
+        assert subtopics, subtopics
+
+        if subtopics.lower() in none_subtopics:
+            if num_attempt == max_attempts:
+                raise podgenai.exceptions.LanguageModelOutputError(f"No subtopics exist after {max_attempts} attempts for topic: {topic}")
+        else:
+            break
+
+    assert subtopics.lower() not in none_subtopics
     invalid_subtopics = ("", *none_subtopics)
     subtopics = [s.strip() for s in subtopics.splitlines() if s.strip().lower() not in invalid_subtopics]  # Note: A terminal "None" line has been observed with valid subtopics before it.
 

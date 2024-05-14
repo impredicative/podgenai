@@ -43,7 +43,7 @@ A playback speed of 1.05x is recommended for most topics.
 Usage can be as a command-line application or as a Python library. By default, the generated mp3 file will be written to the repo directory. As of 2024, the estimated cost per generation is under $2 USD, more specifically under $0.10 USD per subtopic. The time taken is under three minutes.
 
 ### Usage tips
-* If a requested topic fails to generate subtopics, try rewording it, perhaps to be broader or narrower or more factual. Alternatively, try deleting its work directory (`<repo>/work/<topic>`) and retrying its generation.
+* If a requested topic fails to generate subtopics, try rewording it, perhaps to be broader or narrower or more factual. Up to two attempts are made, although the first attempt will use the disk cache if available.
 * For a potentially longer list of covered subtopics, consider appending the "(unabridged)" suffix to the requested topic, e.g. "PyTorch (unabridged)".
 * If the topic fails to be spoken at the start of a podcast, delete `<repo>/work/<topic>/1.*.mp3` and regenerate the output.
 * To optionally generate a cover art image for your topic, [this custom GPT](https://chat.openai.com/g/g-SvmRhBwX1-podcast-episode-cover-art) can be used.
