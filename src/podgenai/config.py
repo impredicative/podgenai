@@ -16,4 +16,3 @@ MAX_CONCURRENT_WORKERS = int(os.environ.get("PODGENAI_OPENAI_MAX_WORKERS", 16)) 
 assert MAX_CONCURRENT_WORKERS >= 1
 PROMPTS: dict[str, str] = {p.stem: p.read_text().strip() for p in (PACKAGE_PATH / "prompts").glob("*.txt")}
 WORK_PATH: Path = REPO_PATH / "work"
-assert WORK_PATH.is_dir()
