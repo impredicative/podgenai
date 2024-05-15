@@ -45,7 +45,7 @@ Usage can be as a command-line application or as a Python library. By default, t
 ### Usage tips
 * If a requested topic fails to generate subtopics, try rewording it, perhaps to be broader or narrower or more factual. Up to two attempts are made, although the first attempt will use the disk cache if available.
 * For a potentially longer list of covered subtopics, consider appending the "(unabridged)" suffix to the requested topic, e.g. "PyTorch (unabridged)".
-* If the topic fails to be spoken at the start of a podcast, delete `<repo>/work/<topic>/1.*.mp3` and regenerate the output.
+* In case the topic fails to be spoken at the start of a podcast, delete `<repo>/work/<topic>/1.*.mp3` and regenerate the output.
 * To optionally generate a cover art image for your topic, [this custom GPT](https://chat.openai.com/g/g-SvmRhBwX1-podcast-episode-cover-art) can be used.
 
 ### Usage as application
@@ -60,7 +60,7 @@ For example, `python -m podgenai -c -t "My favorite topic" -p "~/Downloads/"`.
 A nonzero exitcode exists if there is an error.
 
 ### Usage as library
-This package is not available on PyPI due to its unpolished nature, but it can nevertheless be called as a library. The output file path is returned. If failed, a subclass of the `podgenai.exceptions.Error` exception is raised.
+When called as a function, the output file path is returned. If it fails, a subclass of the `podgenai.exceptions.Error` exception is raised.
 
 ```python
 from pathlib import Path
