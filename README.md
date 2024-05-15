@@ -44,7 +44,7 @@ A playback speed of 1.05x is recommended for most topics.
 
 ### Setup via PyPI
 * Create and activate a Python 3.12 virtual environment.
-* Install via PyPI: `pip install -U podgenai`.
+* Install via [PyPI](https://pypi.org/project/podgenai/): `pip install -U podgenai`.
 
 ## Usage
 Usage can be as a command-line application or as a Python library. By default, the generated mp3 file will be written to the current working directory. As of 2024, the estimated cost per generation is under 2 USD, more specifically under 0.10 USD per subtopic. The time taken is under three minutes.
