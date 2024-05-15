@@ -47,6 +47,8 @@ fix = { chain = ["fix-lint", "fix-fmt" ] }
 lockup = "rye lock --update-all"
 syncup = "rye sync --update-all"
 build = "rye build --clean --verbose"
+publish = "rye publish --verbose"
+release = { chain = ["build", "publish"]}
 
 [tool.hatch.build]
 exclude = [".env", "archive/", "scripts/", "work/"]
