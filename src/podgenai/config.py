@@ -14,6 +14,6 @@ GiB = 1024**3
 # DISKCACHE = diskcache.FanoutCache(directory=str(DISKCACHE_PATH), timeout=1, size_limit=DISKCACHE_SIZE_LIMIT)
 MAX_CONCURRENT_WORKERS = int(os.environ.get("PODGENAI_OPENAI_MAX_WORKERS", 16))  # Note: Default value is documented in readme.
 assert MAX_CONCURRENT_WORKERS >= 1
-PROMPTS: dict[str, str] = {p.stem: p.read_text().strip() for p in (REPO_PATH / "prompts").glob("*.txt")}
+PROMPTS: dict[str, str] = {p.stem: p.read_text().strip() for p in (PACKAGE_PATH / "prompts").glob("*.txt")}
 WORK_PATH: Path = REPO_PATH / "work"
 assert WORK_PATH.is_dir()
