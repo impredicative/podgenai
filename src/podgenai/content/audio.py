@@ -5,7 +5,7 @@ from typing import Optional
 
 import pathvalidate
 
-from podgenai.config import REPO_PATH
+from podgenai.config import CWD
 from podgenai.work import get_topic_work_path
 
 
@@ -21,7 +21,7 @@ def get_output_file_path(output_path: Optional[Path], *, topic: str) -> Path:
     """Return the validated output file path for the given topic."""
     if output_path is None:
         output_filename = get_default_output_filename(topic)
-        output_path = REPO_PATH / output_filename
+        output_path = CWD / output_filename
     else:
         output_path = output_path.expanduser().resolve()
         if output_path.is_dir():
