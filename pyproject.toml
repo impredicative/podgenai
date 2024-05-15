@@ -13,10 +13,21 @@ dependencies = [
     "semantic-text-splitter>=0.13.1",
 ]
 readme = "README.md"
-requires-python = ">= 3.8"
+requires-python = ">= 3.12"
+keywords = ["podcast", "mp3", "audiobook", "GPT-4", "aicast"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Natural Language :: English",
+    "Topic :: Multimedia :: Sound/Audio :: Speech",
+    "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
+    "Programming Language :: Python :: 3.12"
+]
 
 [project.scripts]
 podgenai = "podgenai.__main__:main"
+
+[project.urls]
+Repository = "https://github.com/impredicative/podgenai"
 
 [build-system]
 requires = ["hatchling"]
