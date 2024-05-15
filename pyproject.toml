@@ -51,7 +51,7 @@ publish = "rye publish --verbose"
 release = { chain = ["check", "build", "publish"]}
 
 [tool.hatch.build]
-exclude = [".env", "archive/", "scripts/", "work/"]
+exclude = [".env", "archive/", "docs/", "scripts/", "work/"]
 
 [tool.hatch.metadata]
 allow-direct-references = true
