@@ -48,7 +48,7 @@ lockup = "rye lock --update-all"
 syncup = "rye sync --update-all"
 build = "rye build --clean --verbose"
 publish = "rye publish --verbose"
-release = { chain = ["build", "publish"]}
+release = { chain = ["check", "build", "publish"]}
 
 [tool.hatch.build]
 exclude = [".env", "archive/", "scripts/", "work/"]
