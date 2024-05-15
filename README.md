@@ -31,16 +31,23 @@ A playback speed of 1.05x is recommended for most topics.
 | Male    | [Bitcoin for nerds](https://mega.nz/file/QVNyWYrZ#RqKuAcG6LUwOZi20ZBkygRNin9f7rpLBm1xsoILoAFI)                                                | Male voice selection                                              |
 
 ## Setup
+* In the working directory, create a file named `.env`, with the intended environment variable `OPENAI_API_KEY=<your OpenAI API key>`, or set it in a different way.
+* Optionally set the environment variable `PODGENAI_OPENAI_MAX_WORKERS=32` for faster generation, with its default value being 16.
+* Ensure that `ffmpeg` is available.
+* Continue the setup via GitHub or PyPI as below.
+
+### Setup via GitHub
 * Ensure that [`rye`](https://rye-up.com/) is installed and available.
 * Clone or download this repo.
 * In the repo directory, run `rye sync` or more narrowly just `rye sync --no-lock` if on Linux.
-* In the repo directory, create a file named `.env`, with the intended environment variable `OPENAI_API_KEY=<your OpenAI API key>`, or set it in a different way.
-* Optionally set the environment variable `PODGENAI_OPENAI_MAX_WORKERS=32` for faster generation, with its default value being 16.
-* Ensure that `ffmpeg` is available.
 * If updating the repo, rerun the `rye sync` step.
 
+### Setup via PyPI
+* Create and activate a Python 3.12 virtual environment.
+* Install via PyPI: `pip install -U podgenai`.
+
 ## Usage
-Usage can be as a command-line application or as a Python library. By default, the generated mp3 file will be written to the repo directory. As of 2024, the estimated cost per generation is under $2 USD, more specifically under $0.10 USD per subtopic. The time taken is under three minutes.
+Usage can be as a command-line application or as a Python library. By default, the generated mp3 file will be written to the current working directory. As of 2024, the estimated cost per generation is under $2 USD, more specifically under $0.10 USD per subtopic. The time taken is under three minutes.
 
 ### Usage tips
 * If a requested topic fails to generate subtopics, try rewording it, perhaps to be broader or narrower or more factual. Up to two attempts are made, although the first attempt will use the disk cache if available.
