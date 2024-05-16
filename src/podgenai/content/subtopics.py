@@ -51,7 +51,7 @@ def list_subtopics(topic: str, max_attempts: int = 2) -> list[str]:
     """Return the list of subtopics for the given topic.
 
     Params:
-    * `max_attempts`: If greater than 1, and if the first attempt returns no subtopics, subsequent attempt(s) will be made. Only the first attempt tries to read from the disk cache.
+    * `max_attempts`: If greater than 1, and if the first attempt obtains no subtopics, subsequent attempt(s) will be made. Only the first attempt tries to read from the disk cache.
 
     `LanguageModelOutputError` is raised if the model output is structurally invalid.
     """
