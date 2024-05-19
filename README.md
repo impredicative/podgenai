@@ -40,18 +40,22 @@ A playback speed of 1.05x is recommended for most topics.
 | Male    | [Bitcoin for nerds](https://mega.nz/file/QVNyWYrZ#RqKuAcG6LUwOZi20ZBkygRNin9f7rpLBm1xsoILoAFI)                                                | Male voice selection                                              |
 
 ## Setup
+
+### Common setup
 * In the working directory, create a file named `.env`, with the intended environment variable `OPENAI_API_KEY=<your OpenAI API key>`, or set it in a different way.
 * Optionally set the environment variable `PODGENAI_OPENAI_MAX_WORKERS=32` for faster generation, with its default value being 16.
 * Ensure that `ffmpeg` is available.
 * Continue the setup via GitHub or PyPI as below.
 
 ### Setup via GitHub
+* Continue from the common setup steps.
 * Ensure that [`rye`](https://rye-up.com/) is installed and available.
 * Clone or download this repo.
 * In the repo directory, run `rye sync` or more narrowly just `rye sync --no-lock` if on Linux.
 * If updating the repo, rerun the `rye sync` step.
 
 ### Setup via PyPI
+* Continue from the common setup steps.
 * Create and activate a Python 3.12 virtual environment.
 * Install via [PyPI](https://pypi.org/project/podgenai/): `pip install -U podgenai`.
 
