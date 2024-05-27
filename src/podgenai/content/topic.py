@@ -8,7 +8,7 @@ from podgenai.util.sys import print_error
 def is_topic_valid(topic: str) -> bool:
     """Return true if the topic is structurally valid, otherwise false.
 
-    A validation error is printed if the topic is false.
+    A validation error is printed if the topic is invalid.
     """
     if not isinstance(topic, str):  # Note: This happens if `-t` flag is provided without any value.
         print_error("Topic must be a string.")
