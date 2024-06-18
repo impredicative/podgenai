@@ -25,7 +25,14 @@ MODELS = {
     #   gpt-4 is not used because it is much older in its training data.
     "tts": "tts-1",  # Note: tts-1-hd is twice as expensive, and has a more limited concurrent usage quota resulting in openai.RateLimitError, thereby making it undesirable.
 }
-TTS_VOICE_MAP = {"default": "alloy", "neutral": "alloy", "female": "nova", "male": "onyx", "emotive": "echo"}  # Note: An unsolicited 'neutral' response has been observed, and is therefore supported.
+TTS_VOICE_MAP = {
+    "default": "alloy",
+    "neutral": "alloy",  # Unsolicited but observed.
+    "female": "nova",
+    "male": "onyx",
+    "sensitive": "echo",  # Supported for testing.
+    "emotive": "echo",
+}
 
 
 def ensure_openai_key() -> None:
