@@ -28,6 +28,9 @@ def is_topic_valid(topic: str) -> bool:
     if (topic[0] == topic[-1] == "'") or (topic[0] == topic[-1] == '"'):
         print_error("Topic must not be quoted.")
         return False
+    if topic[-1] == ":":
+        print_error("Topic must not end in a colon.")
+        return False
     return True
 
 
