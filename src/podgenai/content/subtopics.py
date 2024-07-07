@@ -7,7 +7,7 @@ import podgenai.exceptions
 from podgenai.config import MAX_CONCURRENT_WORKERS, PROMPTS
 from podgenai.util.openai import get_cached_content
 from podgenai.work import get_topic_work_path
-from podgenai.util.sys import print_error
+from podgenai.util.sys import print_error, print_warning
 
 
 def is_subtopics_list_valid(subtopics: list[str]) -> bool:
@@ -81,7 +81,7 @@ def list_subtopics(topic: str, max_attempts: int = 2) -> list[str]:
             if num_attempt == max_attempts:
                 raise podgenai.exceptions.LanguageModelOutputError(error)
             else:
-                print_error(f"Fault in attempt {num_attempt} of {max_attempts}: {error}")
+                print_warning(f"Fault in attempt {num_attempt} of {max_attempts}: {error}")
                 # Note: This condition has been observed with the subtopic list not being numbered correctly.
                 continue
 
