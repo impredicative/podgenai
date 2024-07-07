@@ -137,7 +137,7 @@ def get_subtopics_speech_texts(*, topic: str, subtopics: Optional[list[str]] = N
     subtopics_speech_texts = {subtopic_name: f'Section {subtopic_name.replace('.', ':', 1)}:\n\n{subtopic_text} {{pause}}' for subtopic_name, subtopic_text in subtopics_texts.items()}
     # Note: A pause at the beginning is skipped by the TTS generator, but it is not skipped if at the end, and so it is kept at the end.
 
-    subtopics_speech_texts[subtopics[0]] = f'"{topic}"\n\n{{pause}}\n{PROMPTS['tts_disclaimer']} {{pause}}\n\n{subtopics_speech_texts[subtopics[0]]}'
+    subtopics_speech_texts[subtopics[0]] = f'{topic}:\n\n{{pause}}\n{PROMPTS['tts_disclaimer']} {{pause}}\n\n{subtopics_speech_texts[subtopics[0]]}'
     # Note: TTS disclaimer about AI generated audio is required by OpenAI as per https://platform.openai.com/docs/guides/text-to-speech/do-i-own-the-outputted-audio-files
     # Note: It has proven more reliable for the pause to be structured in this way for section 1, rather than be in the leading topic line.
 
