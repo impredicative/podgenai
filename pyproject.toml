@@ -49,7 +49,6 @@ syncup = "rye sync --update-all"
 build = "rye build --clean --verbose"
 publish = "rye publish --verbose"
 release = { chain = ["check", "build", "publish"]}
-create = "python -m podgenai -c"
 describe = "python ./scripts/print_cached_episode_description.py"
 
 [tool.hatch.build]
