@@ -8,6 +8,9 @@
 		"ghcr.io/devcontainers-contrib/features/ffmpeg-apt-get:1": {}
 	},
     "postCreateCommand": "./scripts/setup_rye.sh",
+	"containerEnv": {
+        "UV_LINK_MODE": "copy"  // Prevents "warning: Failed to hardlink files"
+    },
 	"customizations": {
         "vscode": {
             "extensions": [
