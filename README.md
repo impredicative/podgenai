@@ -75,7 +75,7 @@ Usage can be as a command-line application or as a Python library. By default, t
 ### Usage as application
 * To show help, run `python -m podgenai -h`.
 * To run for a specified topic, use `-t "My favorite topic"`. If a topic is not specified, you will interactively be prompted for it.
-* By default, in command-line mode, confirmations are required as the generation progresses, thereby allowing for early cancelation and for tuning the input title. To skip requiring confirmations, use `-c False`.
+* By default, in command-line mode, confirmations are required as the generation progresses, thereby allowing for early cancelation and for tuning the input title. To skip requiring confirmations, use `-nc`.
 * To specify a preexisting output directory path, use `-p "/my/preexisting/dir"`.
 * To specify an output file path, use `-p "~/something.mp3"`.
 
