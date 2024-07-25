@@ -5,3 +5,4 @@ Release steps as done locally:
 3. Run `rye run release`.
 4. Tag the release in GitHub with the new version, also supplying release notes.
 5. Run `git pull`, thereby obtaining the created tag.
+6. Run `git tag`, ensuring that the created tag is listed.
