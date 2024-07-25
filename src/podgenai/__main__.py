@@ -1,8 +1,8 @@
-from typing import Optional
-
-import fire
 import os
 from pathlib import Path
+from typing import Optional
+
+import click
 
 import podgenai.exceptions
 from podgenai.podgenai import generate_media
@@ -11,20 +11,24 @@ from podgenai.util.openai import ensure_openai_key
 from podgenai.util.sys import print_error
 
 
-def main(topic: Optional[str] = None, path: Optional[Path] = None, confirm: bool = True) -> None:
-    """Generate and write an audiobook podcast mp3 file for the given topic to the given output file path.
-
-    Params:
-    * `topic` (-t): Topic. If not given, the user is prompted for it.
-    * `path (-p)`: Output file or directory path.
-        If an intended file path, it must have an ".mp3" suffix. If a directory, it must exist, and the file name is auto-determined.
-        If not given, the output file is written to the repo directory with an auto-determined file name.
-    * `confirm (-c)`: Confirm before full-text and speech generation.
-        If `True`, a confirmation is interactively sought after generating and printing the list of subtopics, before generating the full-text, and also before generating the speech. Its default is `True`.
-        If `False`, the full-text and speech are generated without confirmations.
-
-    A nonzero exitcode exists if there is an error.
-    """
+@click.command(context_settings={"help_option_names": ["-h", "--help"], "max_content_width": 120})
+@click.option("--topic", "-t", type=str, default=None, help="Topic. If not given, the user is prompted for it.")
+@click.option(
+    "--path",
+    "-p",
+    type=Path,
+    default=None,
+    help='Output file or directory path. If an intended file path, it must have an ".mp3" suffix. If a directory, it must exist, and the file name is auto-determined. If not given, the output file is written to the repo directory with an auto-determined file name.',
+)
+@click.option(
+    "--confirm/--no-confirm",
+    "-c/-nc",
+    type=bool,
+    default=True,
+    help="Confirm before full-text and speech generation. If `--confirm`, a confirmation is interactively sought as each step of the workflow progresses, and this is the default. If `--no-confirm`, the full-text and speech are generated without confirmations.",
+)
+def main(topic: Optional[str], path: Optional[Path], confirm: bool) -> None:
+    """Generate and write an audiobook podcast mp3 file for the given topic to the given output file path."""
     try:
         ensure_openai_key()
 
@@ -33,10 +37,8 @@ def main(topic: Optional[str] = None, path: Optional[Path] = None, confirm: bool
         ensure_topic_is_valid(topic)
 
         if path:
-            path = Path(path)
-
-        if not isinstance(confirm, bool):
-            raise podgenai.exceptions.InputError(f"`confirm` (-c) argument has an invalid value {confirm!r} of type {type(confirm)}. Its value, if specified, is required to be a boolean.")
+            assert isinstance(path, Path), (path, type(path))
+        assert isinstance(confirm, bool), (confirm, type(confirm))
 
         generate_media(topic, output_path=path, confirm=confirm)
     except podgenai.exceptions.Error as exc:
@@ -50,4 +52,4 @@ def main(topic: Optional[str] = None, path: Optional[Path] = None, confirm: bool
 
 
 if __name__ == "__main__":
-    fire.Fire(main)
+    main()

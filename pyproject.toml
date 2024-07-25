@@ -6,7 +6,7 @@ authors = [
     { name = "Ouroboros Chrysopoeia", email = "impredicative@users.noreply.github.com" }
 ]
 dependencies = [
-    "fire>=0.6.0",
+    "click>=8.1.7",
     "openai>=1.37.0",
     "pathvalidate>=3.2.0",
     "python-dotenv>=1.0.1",
@@ -61,7 +61,7 @@ allow-direct-references = true
 packages = ["src/podgenai"]
 
 [tool.ruff]
-line-length = 200
+line-length = 320
 
 [tool.ruff.lint]
 ignore = ["E731"]
