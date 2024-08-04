@@ -7,7 +7,7 @@ authors = [
 ]
 dependencies = [
     "click>=8.1.7",
-    "openai>=1.37.0",
+    "openai>=1.38.0",
     "pathvalidate>=3.2.0",
     "python-dotenv>=1.0.1",
     "semantic-text-splitter>=0.14.1",
@@ -36,6 +36,7 @@ build-backend = "hatchling.build"
 [tool.rye]
 managed = true
 dev-dependencies = []
+universal = true
 
 [tool.rye.scripts]  # Run as "rye run <command>"
 check = { chain = ["check-lint", "check-fmt" ] }
