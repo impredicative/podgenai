@@ -27,11 +27,13 @@ MODELS = {
 }
 TTS_VOICE_MAP = {
     "default": "alloy",
+    "default-male": "alloy",  # Supported for experimentation.
     "neutral": "alloy",  # Unsolicited but observed.
     "female": "nova",
     "male": "onyx",
     "sensitive": "echo",  # Supported for testing.
     "emotive": "echo",
+    "emotive-male": "echo",  # Supported for experimentation.
 }
 
 
