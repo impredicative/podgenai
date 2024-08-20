@@ -7,10 +7,10 @@ authors = [
 ]
 dependencies = [
     "click>=8.1.7",
-    "openai>=1.38.0",
+    "openai>=1.41.1",
     "pathvalidate>=3.2.0",
     "python-dotenv>=1.0.1",
-    "semantic-text-splitter>=0.14.1",
+    "semantic-text-splitter>=0.15.0",
 ]
 readme = "README.md"
 requires-python = ">= 3.12"
