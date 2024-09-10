@@ -18,7 +18,7 @@ from podgenai.util.sys import print_error
     "-p",
     type=Path,
     default=None,
-    help='Output file or directory path. If an intended file path, it must have an ".mp3" suffix. If a directory, it must exist, and the file name is auto-determined. If not given, the output file is written to the repo directory with an auto-determined file name.',
+    help='Output file or directory path. If an intended file path, it must have an ".mp3" suffix. If a directory, it must exist, and the file name is auto-determined. If not given, the output file is written to the current working directory with an auto-determined file name.',
 )
 @click.option(
     "--confirm/--no-confirm",
