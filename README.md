@@ -6,7 +6,7 @@
 |-------------|----------------------------------------------------|
 | Repo        | https://github.com/impredicative/podgenai          |
 | Changelog   | https://github.com/impredicative/podgenai/releases |
-| Package     | https://pypi.org/project/podgenai/                 |
+| Package     | https://pypi.org/project/podgenai                  |
 | Podcast     | https://podcasters.spotify.com/pod/podgenai        |
 | Podcast RSS | https://anchor.fm/s/f4868644/podcast/rss           |
 
