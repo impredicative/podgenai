@@ -1,9 +1,9 @@
 import os
 from pathlib import Path
 
-import dotenv
+from podgenai.util.dotenv_ import load_dotenv
 
-dotenv.load_dotenv()
+load_dotenv()
 
 CWD: Path = Path.cwd()
 PACKAGE_PATH: Path = Path(__file__).parent

@@ -2,16 +2,16 @@ import os
 from pathlib import Path
 from typing import Optional
 
-import dotenv
 import openai
 import pathvalidate
 
 import podgenai.exceptions
 from podgenai.config import PROMPTS
+from podgenai.util.dotenv_ import load_dotenv
 from podgenai.util.binascii import hasher
 from podgenai.util.sys import print_warning
 
-dotenv.load_dotenv()
+load_dotenv()
 
 ChatCompletion = openai.types.chat.chat_completion.ChatCompletion
 OpenAI = openai.OpenAI
