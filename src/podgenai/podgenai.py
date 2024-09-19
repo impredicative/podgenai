@@ -12,7 +12,7 @@ from podgenai.util.openai import ensure_openai_key, MODELS, TTS_VOICE_MAP
 from podgenai.work import get_topic_work_path
 
 
-def generate_media(topic: str, *, output_path: Optional[Path] = None, confirm: bool = False) -> Path:
+def generate_media(topic: str, *, output_path: Optional[Path] = None, markers: bool = True, confirm: bool = False) -> Path:
     """Return the output path after generating and writing an audiobook podcast to file for the given topic.
 
     Params:
@@ -20,6 +20,8 @@ def generate_media(topic: str, *, output_path: Optional[Path] = None, confirm: b
     * `path`: Output file or directory path.
         If an intended file path, it must have an ".mp3" suffix. If a directory, it must exist, and the file name is auto-determined.
         If not given, the output file is written to the repo directory with an auto-determined file name.
+    * `markers`: Include markers at the start or end of sections in the generated audio.
+        If true, markers are included. If false, markers are excluded, as can be appropriate for foreign-language generation. Its default is true.
     * `confirm`: Confirm before full-text and speech generation.
         If true, a confirmation is interactively sought after generating and printing the list of subtopics, before generating the full-text, and also before generating the speech. Its default is false.
 
@@ -33,6 +35,7 @@ def generate_media(topic: str, *, output_path: Optional[Path] = None, confirm: b
     print(f"CACHE: {work_path}")
     print(f"MODELS: text={MODELS["text"]}, tts={MODELS["tts"]}")
     print(f"WORKERS: {MAX_CONCURRENT_WORKERS}")
+    print(f"MARKERS: {'enabled' if markers else 'disabled'}")
 
     subtopics_list = list_subtopics(topic)  # Can commonly raise an exception, so it's done before getting voice.
 
@@ -43,7 +46,7 @@ def generate_media(topic: str, *, output_path: Optional[Path] = None, confirm: b
 
     if confirm:
         get_confirmation("text generation")
-    subtopics_speech_texts = get_subtopics_speech_texts(topic=topic, subtopics=subtopics_list)
+    subtopics_speech_texts = get_subtopics_speech_texts(topic=topic, subtopics=subtopics_list, markers=markers)
     assert subtopics_speech_texts
     speech_text = "\n\n".join(subtopics_speech_texts.values())
     print(f"\nSPEECH:\n{speech_text}\n")

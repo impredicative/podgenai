@@ -71,36 +71,71 @@ Usage can be as a command-line application or as a Python library. By default, t
 * For a potentially longer list of covered subtopics, consider appending the "(unabridged)" suffix to the requested topic, e.g. "PyTorch (unabridged)".
 * In case the topic fails to be spoken at the start of a podcast, delete `./work/<topic>/1.*.mp3` and regenerate the output.
 * To optionally generate a cover art image for your topic, [this custom GPT](https://chat.openai.com/g/g-SvmRhBwX1-podcast-episode-cover-art) can be used.
+* To attempt generation in a foreign language, specify the title in the desired language along with a parenthesized prefix of the language name, e.g. "México (español)". If the generation is refused the first time, try again. Also refer to and use the `--no-markers` option.
 
 ### Usage as application
-* To show help, run `python -m podgenai -h`.
-* To run for a specified topic, use `-t "My favorite topic"`. If a topic is not specified, you will interactively be prompted for it.
-* By default, in command-line mode, confirmations are required as the generation progresses, thereby allowing for early cancelation and for tuning the input title. To skip requiring confirmations, use `-nc`.
-* To specify a preexisting output directory path, use `-p "/my/preexisting/dir"`.
-* To specify an output file path, use `-p "~/something.mp3"`.
+Usage help is copied below:
+```
+$ python -m podgenai -h
+Usage: python -m podgenai [OPTIONS]
 
-For example, `python -m podgenai -t "My favorite topic" -p "~/Downloads/"`.
+  Generate and write an audiobook podcast mp3 file for the given topic to the given output file path.
 
-A nonzero exitcode exists if there is an error.
-
-### Usage as library
-When called as a function, the output file path is returned. If it fails, a subclass of the `podgenai.exceptions.Error` exception is raised.
-
-```python
-from pathlib import Path
-from podgenai import generate_media
-
-# With default output path:
-output_file_path = generate_media("My favorite topic")
-
-# With preexisting output directory path:
-output_file_path = generate_media("My favorite topic", output_path=Path('/tmp'))
-
-# With output file path:
-output_file_path = generate_media("My favorite topic", output_path=Path('~/foo.mp3'))
+Options:
+  -t, --topic TEXT                Topic. If not given, the user is prompted for it.
+  -p, --path PATH                 Output file or directory path. If an intended file path, it must have an ".mp3"
+                                  suffix. If a directory, it must exist, and the file name is auto-determined. If not
+                                  given, the output file is written to the current working directory with an auto-
+                                  determined file name.
+  -m, --markers / -nm, --no-markers
+                                  Include markers at the start or end of sections in the generated audio. If
+                                  `--markers`, markers are included, and this is the default. If `--no-markers`,
+                                  markers are excluded, as can be appropriate for foreign-language generation.
+  -c, --confirm / -nc, --no-confirm
+                                  Confirm before full-text and speech generation. If `--confirm`, a confirmation is
+                                  interactively sought as each step of the workflow progresses, and this is the
+                                  default. If `--no-confirm`, the full-text and speech are generated without
+                                  confirmations.
+  -h, --help                      Show this message and exit.
 ```
 
-## Caching
+Usage example:
+
+    $ python -m podgenai -t "My favorite topic"
+
+    $ python -m podgenai -t "My favorite topic" -p ~/Downloads/
+
+    $ python -m podgenai -t "My favorite topic" -p ~/Downloads/topic.mp3 -nc
+
+    $ python -m podgenai -t "L'histoire de Napoléon Bonaparte (français)" -nm
+
+### Usage as library
+```python
+>>> from podgenai import generate_media
+>>> import inspect
+
+>>> print(inspect.signature(generate_media))
+(topic: str, *, output_path: Optional[pathlib.Path] = None, markers: bool = True, confirm: bool = False) -> pathlib.Path
+
+>>> print(inspect.getdoc(generate_media))
+```
+```text
+Return the output path after generating and writing an audiobook podcast to file for the given topic.
+
+Params:
+* `topic`: Topic.
+* `path`: Output file or directory path.
+    If an intended file path, it must have an ".mp3" suffix. If a directory, it must exist, and the file name is auto-determined.
+    If not given, the output file is written to the repo directory with an auto-determined file name.
+* `markers`: Include markers at the start or end of sections in the generated audio.
+    If true, markers are included. If false, markers are excluded, as can be appropriate for foreign-language generation. Its default is true.
+* `confirm`: Confirm before full-text and speech generation.
+    If true, a confirmation is interactively sought after generating and printing the list of subtopics, before generating the full-text, and also before generating the speech. Its default is false.
+
+If failed, a subclass of the `podgenai.exceptions.Error` exception is raised.
+```
+
+## Cache
 Text and speech segments are cached locally on disk in the `./work/<topic>` directory. They can manually be deleted. This deletion is currently not automatic. Moreover, it can currently be necessary to delete one or more applicable cached files if the cache is to be bypassed.
 
 ## Disclaimer

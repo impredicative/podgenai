@@ -21,13 +21,20 @@ from podgenai.util.sys import print_error
     help='Output file or directory path. If an intended file path, it must have an ".mp3" suffix. If a directory, it must exist, and the file name is auto-determined. If not given, the output file is written to the current working directory with an auto-determined file name.',
 )
 @click.option(
+    "--markers/--no-markers",
+    "-m/-nm",
+    type=bool,
+    default=True,
+    help="Include markers at the start or end of sections in the generated audio. If `--markers`, markers are included, and this is the default. If `--no-markers`, markers are excluded, as can be appropriate for foreign-language generation.",
+)
+@click.option(
     "--confirm/--no-confirm",
     "-c/-nc",
     type=bool,
     default=True,
     help="Confirm before full-text and speech generation. If `--confirm`, a confirmation is interactively sought as each step of the workflow progresses, and this is the default. If `--no-confirm`, the full-text and speech are generated without confirmations.",
 )
-def main(topic: Optional[str], path: Optional[Path], confirm: bool) -> None:
+def main(topic: Optional[str], path: Optional[Path], markers: bool, confirm: bool) -> None:
     """Generate and write an audiobook podcast mp3 file for the given topic to the given output file path."""
     try:
         ensure_openai_key()
@@ -38,9 +45,10 @@ def main(topic: Optional[str], path: Optional[Path], confirm: bool) -> None:
 
         if path:
             assert isinstance(path, Path), (path, type(path))
+        assert isinstance(markers, bool), (markers, type(markers))
         assert isinstance(confirm, bool), (confirm, type(confirm))
 
-        generate_media(topic, output_path=path, confirm=confirm)
+        generate_media(topic, output_path=path, markers=markers, confirm=confirm)
     except podgenai.exceptions.Error as exc:
         print_error(str(exc))
         print_error(f"Failed to generate for topic: {topic}")
