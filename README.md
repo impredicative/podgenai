@@ -99,7 +99,7 @@ Options:
   -h, --help                      Show this message and exit.
 ```
 
-Usage example:
+Usage examples:
 
     $ python -m podgenai -t "My favorite topic"
 
