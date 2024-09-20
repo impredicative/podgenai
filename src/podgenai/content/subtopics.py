@@ -87,7 +87,7 @@ def list_subtopics(topic: str, max_attempts: int = 2) -> list[str]:
             if num_attempt == max_attempts:
                 raise podgenai.exceptions.LanguageModelOutputStructureError(error)
             else:
-                print_warning(f"Fault in attempt {num_attempt} of {max_attempts}: {error}")
+                print_warning(f"Fault in attempt {num_attempt} of {max_attempts} while listing subtopics: {error}")
                 # Note: This condition has been observed with the subtopic list not being numbered correctly.
                 continue
 
@@ -98,20 +98,59 @@ def list_subtopics(topic: str, max_attempts: int = 2) -> list[str]:
     return subtopics
 
 
-def get_subtopic(*, topic: str, subtopics: list[str], subtopic: str, strategy: str = "oneshot") -> str:
+def is_subtopic_text_valid(text: str, numbered_name: str) -> bool:
+    """Return true if the subtopic text is structurally valid, otherwise false.
+
+    A validation error is printed if the subtopic text is invalid.
+    """
+    if not text:
+        print_error(f"Subtopic {numbered_name!r} is empty.")
+        return False
+
+    if text != text.rstrip():
+        print_error(f"Subtopic {numbered_name!r} has leading or trailing whitespace.")
+        return False
+
+    if text.startswith("\n```"):
+        print_error(f"Subtopic {numbered_name!r} may contain a code block.")
+        return False
+
+    return True
+
+
+def get_subtopic(*, topic: str, subtopics: list[str], subtopic: str, strategy: str = "oneshot", max_attempts: int = 3) -> str:
     """Return the full text for a given subtopic within the context of the given topic and list of subtopics."""
     assert subtopic[0].isdigit()  # Is numbered.
     common_kwargs = {"strategy": strategy, "cache_key_prefix": subtopic, "cache_path": get_topic_work_path(topic)}
-    match strategy:
-        case "oneshot":
-            prompt = PROMPTS["generate_subtopic"].format(optional_continuation="", topic=topic, subtopics="\n".join(subtopics), numbered_subtopic=subtopic)
-            subtopic = get_cached_content(prompt, **common_kwargs)
-        case "multishot":  # Observed to never really benefit or produce longer content relative to oneshot.
-            prompt = PROMPTS["generate_subtopic"].format(optional_continuation="\n\n" + PROMPTS["continuation_first"], topic=topic, subtopics="\n".join(subtopics), numbered_subtopic=subtopic)
-            subtopic = get_cached_content(prompt, **common_kwargs, max_completions=5, update_prompt=False)
-        case _:
-            assert False, strategy
-    return subtopic.rstrip()
+    subtopics_str = "\n".join(subtopics)
+
+    for num_attempt in range(1, max_attempts + 1):
+        match strategy:
+            case "oneshot":
+                prompt = PROMPTS["generate_subtopic"].format(optional_continuation="", topic=topic, subtopics=subtopics_str, numbered_subtopic=subtopic)
+                text = get_cached_content(prompt, **common_kwargs)
+            case "multishot":  # Observed to never really benefit or produce longer content relative to oneshot.
+                prompt = PROMPTS["generate_subtopic"].format(optional_continuation="\n\n" + PROMPTS["continuation_first"], topic=topic, subtopics=subtopics_str, numbered_subtopic=subtopic)
+                text = get_cached_content(prompt, **common_kwargs, max_completions=5, update_prompt=False)
+            case _:
+                assert ValueError(f"Invalid strategy: {strategy}")
+        text = text.rstrip()
+
+        error = io.StringIO()
+        with contextlib.redirect_stderr(error):
+            subtopic_text_is_valid = is_subtopic_text_valid(text, numbered_name=subtopic)
+        if not subtopic_text_is_valid:
+            error = error.getvalue().rstrip().removeprefix("Error: ")
+            if num_attempt == max_attempts:
+                raise podgenai.exceptions.LanguageModelOutputStructureError(error)
+            else:
+                print_warning(f"Fault in attempt {num_attempt} of {max_attempts} while getting subtopic text: {error}")
+                continue
+
+        break
+
+    assert text
+    return text
 
 
 def get_subtopics_texts(*, topic: str, subtopics: Optional[list[str]] = None) -> dict[str, str]:
