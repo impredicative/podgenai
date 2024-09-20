@@ -53,25 +53,31 @@ def list_subtopics(topic: str, max_attempts: int = 2) -> list[str]:
     Params:
     * `max_attempts`: If greater than 1, and if the first attempt obtains no subtopics, subsequent attempt(s) will be made. Only the first attempt tries to read from the disk cache.
 
-    `LanguageModelOutputError` is raised if the model output is structurally invalid.
+    `LanguageModelOutputError` is raised if the model output has an error.
+    The subclass `LanguageModelOutputRejectionError` is raised if the output is rejected for the given topic.
+    The subclass `LanguageModelOutputStructureError` is raised if the output is structurally invalid.
     """
     prompt_name = "list_subtopics"
     prompt = PROMPTS[prompt_name].format(topic=topic)
     none_subtopics = ("none", "none.")
     invalid_subtopics = ("", *none_subtopics)
+    rejection_error_prefix = "RequestError: "  # Defined in prompt.
 
     for num_attempt in range(1, max_attempts + 1):
-        subtopics = get_cached_content(prompt, read_cache=num_attempt == 1, cache_key_prefix=f"0. {prompt_name}", cache_path=get_topic_work_path(topic))
-        assert subtopics, subtopics
+        response = get_cached_content(prompt, read_cache=num_attempt == 1, cache_key_prefix=f"0. {prompt_name}", cache_path=get_topic_work_path(topic))
+        assert response, response
 
-        if subtopics.lower() in none_subtopics:
+        assert response.lower() not in none_subtopics, response
+        if response.startswith(rejection_error_prefix):
+            rejection_reason = response.removeprefix(rejection_error_prefix).strip()
             if num_attempt == max_attempts:
-                raise podgenai.exceptions.LanguageModelOutputError(f"No subtopics exist after {max_attempts} attempts for topic: {topic}")
+                raise podgenai.exceptions.LanguageModelOutputRejectionError(f"Failed to obtain subtopics after {max_attempts} attempts: {rejection_reason}")
             else:
+                print_warning(f"Fault in attempt {num_attempt} of {max_attempts}: {rejection_reason}")
                 continue
+        assert not response.lower().startswith(rejection_error_prefix.lower()), response
 
-        assert subtopics.lower() not in none_subtopics, subtopics
-        subtopics = [s.strip() for s in subtopics.splitlines() if s.strip().lower() not in invalid_subtopics]  # Note: A terminal "None" line has been observed with valid subtopics before it.
+        subtopics = [s.strip() for s in response.splitlines() if s.strip().lower() not in invalid_subtopics]  # Note: A terminal "None" line has been observed with valid subtopics before it.
 
         error = io.StringIO()
         with contextlib.redirect_stderr(error):
@@ -79,7 +85,7 @@ def list_subtopics(topic: str, max_attempts: int = 2) -> list[str]:
         if not subtopics_list_is_valid:
             error = error.getvalue().rstrip().removeprefix("Error: ")
             if num_attempt == max_attempts:
-                raise podgenai.exceptions.LanguageModelOutputError(error)
+                raise podgenai.exceptions.LanguageModelOutputStructureError(error)
             else:
                 print_warning(f"Fault in attempt {num_attempt} of {max_attempts}: {error}")
                 # Note: This condition has been observed with the subtopic list not being numbered correctly.
