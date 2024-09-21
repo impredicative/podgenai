@@ -128,10 +128,10 @@ def get_subtopic(*, topic: str, subtopics: list[str], subtopic: str, strategy: s
         match strategy:
             case "oneshot":
                 prompt = PROMPTS["generate_subtopic"].format(optional_continuation="", topic=topic, subtopics=subtopics_str, numbered_subtopic=subtopic)
-                text = get_cached_content(prompt, **common_kwargs)
+                text = get_cached_content(prompt, read_cache=num_attempt == 1, **common_kwargs)
             case "multishot":  # Observed to never really benefit or produce longer content relative to oneshot.
                 prompt = PROMPTS["generate_subtopic"].format(optional_continuation="\n\n" + PROMPTS["continuation_first"], topic=topic, subtopics=subtopics_str, numbered_subtopic=subtopic)
-                text = get_cached_content(prompt, **common_kwargs, max_completions=5, update_prompt=False)
+                text = get_cached_content(prompt, read_cache=num_attempt == 1, **common_kwargs, max_completions=5, update_prompt=False)
             case _:
                 assert ValueError(f"Invalid strategy: {strategy}")
         text = text.rstrip()
