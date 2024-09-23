@@ -87,6 +87,9 @@ Options:
                                   suffix. If a directory, it must exist, and the file name is auto-determined. If not
                                   given, the output file is written to the current working directory with an auto-
                                   determined file name.
+  -s, --max-sections INTEGER RANGE
+                                  Maximum number of sections, between 3 and 100. If not given, it is unrestricted.
+                                  [3<=x<=100]
   -m, --markers / -nm, --no-markers
                                   Include markers at the start or end of sections in the generated audio. If
                                   `--markers`, markers are included, and this is the default. If `--no-markers`,
@@ -115,7 +118,7 @@ Usage examples:
 >>> import inspect
 
 >>> print(inspect.signature(generate_media))
-(topic: str, *, output_path: Optional[pathlib.Path] = None, markers: bool = True, confirm: bool = False) -> pathlib.Path
+(topic: str, *, output_path: Optional[pathlib.Path] = None, max_sections: Optional[int] = None, markers: bool = True, confirm: bool = False) -> pathlib.Path
 
 >>> print(inspect.getdoc(generate_media))
 ```
@@ -127,6 +130,7 @@ Params:
 * `path`: Output file or directory path.
     If an intended file path, it must have an ".mp3" suffix. If a directory, it must exist, and the file name is auto-determined.
     If not given, the output file is written to the repo directory with an auto-determined file name.
+* `max_sections`: Maximum number of sections to generate. It is between 3 and 100. It is unrestricted if not given.
 * `markers`: Include markers at the start or end of sections in the generated audio.
     If true, markers are included. If false, markers are excluded, as can be appropriate for foreign-language generation. Its default is true.
 * `confirm`: Confirm before full-text and speech generation.

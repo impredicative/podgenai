@@ -1,0 +1,1 @@
+As a special user request, limit the number of points to a maximum of {max_sections} while still ensuring broad coverage.

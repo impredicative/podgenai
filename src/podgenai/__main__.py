@@ -5,6 +5,7 @@ from typing import Optional
 import click
 
 import podgenai.exceptions
+from podgenai.config import NUM_SECTIONS_MIN, NUM_SECTIONS_MAX
 from podgenai.podgenai import generate_media
 from podgenai.content.topic import get_topic, ensure_topic_is_valid
 from podgenai.util.openai import ensure_openai_key
@@ -20,6 +21,7 @@ from podgenai.util.sys import print_error
     default=None,
     help='Output file or directory path. If an intended file path, it must have an ".mp3" suffix. If a directory, it must exist, and the file name is auto-determined. If not given, the output file is written to the current working directory with an auto-determined file name.',
 )
+@click.option("--max-sections", "-s", default=None, type=click.IntRange(NUM_SECTIONS_MIN, NUM_SECTIONS_MAX), help=f"Maximum number of sections, between {NUM_SECTIONS_MIN} and {NUM_SECTIONS_MAX}. If not given, it is unrestricted.")
 @click.option(
     "--markers/--no-markers",
     "-m/-nm",
@@ -34,7 +36,7 @@ from podgenai.util.sys import print_error
     default=True,
     help="Confirm before full-text and speech generation. If `--confirm`, a confirmation is interactively sought as each step of the workflow progresses, and this is the default. If `--no-confirm`, the full-text and speech are generated without confirmations.",
 )
-def main(topic: Optional[str], path: Optional[Path], markers: bool, confirm: bool) -> None:
+def main(topic: Optional[str], path: Optional[Path], max_sections: Optional[int], markers: bool, confirm: bool) -> None:
     """Generate and write an audiobook podcast mp3 file for the given topic to the given output file path."""
     try:
         ensure_openai_key()
@@ -48,7 +50,7 @@ def main(topic: Optional[str], path: Optional[Path], markers: bool, confirm: boo
         assert isinstance(markers, bool), (markers, type(markers))
         assert isinstance(confirm, bool), (confirm, type(confirm))
 
-        generate_media(topic, output_path=path, markers=markers, confirm=confirm)
+        generate_media(topic, output_path=path, max_sections=max_sections, markers=markers, confirm=confirm)
     except podgenai.exceptions.Error as exc:
         print_error(str(exc))
         print_error(f"Failed to generate for topic: {topic}")

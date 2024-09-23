@@ -4,13 +4,13 @@ import io
 from typing import Optional
 
 import podgenai.exceptions
-from podgenai.config import MAX_CONCURRENT_WORKERS, PROMPTS
+from podgenai.config import MAX_CONCURRENT_WORKERS, PROMPTS, NUM_SECTIONS_MIN, NUM_SECTIONS_MAX
 from podgenai.util.openai import get_cached_content
 from podgenai.work import get_topic_work_path
 from podgenai.util.sys import print_error, print_warning
 
 
-def is_subtopics_list_valid(subtopics: list[str]) -> bool:
+def is_subtopics_list_valid(subtopics: list[str], max_sections: Optional[int]) -> bool:
     """Return true if the subtopics are structurally valid, otherwise false.
 
     A validation error is printed if a subtopic is invalid.
@@ -18,6 +18,11 @@ def is_subtopics_list_valid(subtopics: list[str]) -> bool:
     if not subtopics:
         print_error("No subtopics exist.")
         return False
+
+    if max_sections is not None:
+        if len(subtopics) > max_sections:
+            print_error(f"Up to {max_sections} subtopics are allowed, but {len(subtopics)} exist.")
+            return False
 
     seen = set()
     for num, subtopic in enumerate(subtopics, start=1):
@@ -47,7 +52,7 @@ def is_subtopics_list_valid(subtopics: list[str]) -> bool:
     return True
 
 
-def list_subtopics(topic: str, max_attempts: int = 2) -> list[str]:
+def list_subtopics(topic: str, max_sections: Optional[int] = None, max_attempts: int = 2) -> list[str]:
     """Return the list of subtopics for the given topic.
 
     Params:
@@ -57,8 +62,13 @@ def list_subtopics(topic: str, max_attempts: int = 2) -> list[str]:
     The subclass `LanguageModelOutputRejectionError` is raised if the output is rejected for the given topic.
     The subclass `LanguageModelOutputStructureError` is raised if the output is structurally invalid.
     """
+
+    if max_sections:
+        assert NUM_SECTIONS_MIN <= max_sections <= NUM_SECTIONS_MAX, (max_sections, NUM_SECTIONS_MIN, NUM_SECTIONS_MAX)
+    restriction = ("\n\n" + PROMPTS["list_subtopics_limit"].format(max_sections=max_sections)) if max_sections else ""
+
     prompt_name = "list_subtopics"
-    prompt = PROMPTS[prompt_name].format(topic=topic)
+    prompt = PROMPTS[prompt_name].format(topic=topic, optional_restriction=restriction)
     none_subtopics = ("none", "none.")
     invalid_subtopics = ("", *none_subtopics)
     rejection_error_prefix = "RequestError: "  # Defined in prompt.
@@ -81,7 +91,7 @@ def list_subtopics(topic: str, max_attempts: int = 2) -> list[str]:
 
         error = io.StringIO()
         with contextlib.redirect_stderr(error):
-            subtopics_list_is_valid = is_subtopics_list_valid(subtopics)
+            subtopics_list_is_valid = is_subtopics_list_valid(subtopics, max_sections)
         if not subtopics_list_is_valid:
             error = error.getvalue().rstrip().removeprefix("Error: ")
             if num_attempt == max_attempts:
@@ -94,7 +104,6 @@ def list_subtopics(topic: str, max_attempts: int = 2) -> list[str]:
         break
 
     assert subtopics
-    assert is_subtopics_list_valid(subtopics)
     return subtopics
 
 
