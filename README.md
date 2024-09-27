@@ -25,7 +25,7 @@ These generated mp3 files are available for download. In effect, these also cons
 
 There is also a related [podcast](https://podcasters.spotify.com/pod/podgenai) ([RSS](https://anchor.fm/s/f4868644/podcast/rss)) to which episodes on additional topics may be manually posted over time.
 
-A playback speed of 1.05x is recommended for most topics.
+A playback speed of 1.05x is recommended for non-technical topics, 1.0x for technical topics, and 0.95x for foreign language topics.
 
 | Voice   | Name                                                                                                                                          | Purpose                                                           |
 |---------|-----------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------|
