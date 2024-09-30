@@ -11,7 +11,7 @@
 | Podcast RSS | https://anchor.fm/s/f4868644/podcast/rss           |
 
 ## Approach
-The `gpt-4-0125-preview` and `tts-1` models are used. For a given topic, the high-level reference approach is:
+The `gpt-4o-2024-08-06` and `tts-1` models are used. For a given topic, the high-level reference approach is:
 
 * Applicable subtopics are listed using the LLM. If however the topic is unknown to the LLM, the process is aborted.
 * The voice is selected using the LLM from four choices.
