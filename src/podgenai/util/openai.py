@@ -56,6 +56,12 @@ def get_completion(prompt: str, *, client: Optional[OpenAI] = None) -> ChatCompl
     # print(f"Requesting completion for prompt of length {len(prompt)}.")
     completion = client.chat.completions.create(model=MODELS["text"], messages=[{"role": "user", "content": prompt}])
     # Note: Specifying max_tokens=4096 with gpt-4-turbo-preview did not benefit in increasing output length, and a higher value is disallowed. Ref: https://platform.openai.com/docs/api-reference/chat/create
+
+    if (num_cached_prompt_tokens := completion.usage.prompt_tokens_details.cached_tokens) > 0:
+        num_prompt_tokens = completion.usage.prompt_tokens
+        pct_cached_prompt_tokens = num_cached_prompt_tokens / num_prompt_tokens
+        print(f"Completion for prompt of {num_prompt_tokens} tokens used {num_cached_prompt_tokens} ({pct_cached_prompt_tokens:.0%}) cached tokens.")
+    
     return completion
 
 
