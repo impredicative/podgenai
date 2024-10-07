@@ -205,8 +205,8 @@ def get_subtopics_speech_texts(*, topic: str, subtopics: Optional[list[str]] = N
     # Note: If markers are disabled, such as for foreign language use, the disclaimer is skipped from the beginning of the first section (to the end of the last section)
     #       because otherwise the disclaimer can risk conditioning the TTS to speak "1" in English instead of in the foreign language.
 
-    subtopics_speech_texts[subtopics[-1]] = f"{subtopics_speech_texts[subtopics[-1]]}{mark('\n\n[The end.]')}{demark(f'\n\n{{pause}}\n{PROMPTS['tts_disclaimer']}')}"
+    subtopics_speech_texts[subtopics[-1]] = f"{subtopics_speech_texts[subtopics[-1]]}{mark('\n\nThe end.')}{demark(f'\n\n{{pause}}\n{PROMPTS['tts_disclaimer']}')}"
     # Note: "The end." sounds better with the paragraph break before it.
-    # Note: Square brackets around "The end." are an attempt to coax the TTS to speak it more softly.
+    # Note: Square brackets around "The end." caused the TTS to skip the enclosed text at times.
 
     return subtopics_speech_texts
