@@ -64,7 +64,7 @@ A playback speed of 1.05x is recommended for non-technical topics, 1.0x for tech
 * Install via [PyPI](https://pypi.org/project/podgenai): `pip install -U podgenai`.
 
 ## Usage
-Usage can be as a command-line application or as a Python library. By default, the generated mp3 file will be written to the current working directory. As of 2024, the typical cost per generation is 1 to 3 USD, more specifically under 0.10 USD per subtopic. The time taken is under three minutes.
+Usage can be as a command-line application or as a Python library. By default, the generated mp3 file will be written to the current working directory. As of 2024, the typical cost per generation is 1 to 2 USD, more specifically under 0.10 USD per subtopic. The time taken is under three minutes.
 
 ### Usage tips
 * If a requested topic fails to generate subtopics due to a refusal, retry up to a few times, as it may succeed with several attempts. If it doesn't, try rewording it, perhaps to be broader or narrower or more factual. Up to two attempts are made per run, although the first attempt will reuse the disk cache if available.
