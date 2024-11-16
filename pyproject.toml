@@ -7,7 +7,7 @@ authors = [
 ]
 dependencies = [
     "click>=8.1.7",
-    "openai>=1.53.0",  # https://github.com/openai/openai-python/releases
+    "openai>=1.54.4",  # https://github.com/openai/openai-python/releases
     "pathvalidate>=3.2.1",  # https://github.com/thombashi/pathvalidate/releases
     "python-dotenv>=1.0.1",
     "semantic-text-splitter>=0.18.1",  # https://github.com/benbrandt/text-splitter/releases
