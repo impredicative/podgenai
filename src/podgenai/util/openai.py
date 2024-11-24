@@ -18,8 +18,9 @@ OpenAI = openai.OpenAI
 
 MAX_TTS_INPUT_LEN = 4096
 MODELS = {
-    "text": "gpt-4o-2024-08-06",
+    "text": "gpt-4o-2024-11-20",
     # Notes:
+    #   As of 2024-11, gpt-4o-2024-11-20 is used because it seems to be even better at instruction-following than gpt-4o-2024-08-06.
     #   As of 2024-09, gpt-4o-2024-08-06 is used because it has information about newer topics, e.g. AWS Bedrock, that the older gpt-4-0125-preview model does not.
     #   As of 2024-05, gpt-4o-2024-05-13 is not used because it was observed to hallucinate significantly, whereas gpt-4-0125-preview doesn't.
     #   As of 2024-04, gpt-4-turbo-2024-04-09 is not used because it was observed to produce slightly lesser content than gpt-4-0125-preview.
