@@ -51,6 +51,7 @@ build = "rye build --clean --verbose"
 publish = "rye publish --verbose"
 release = { chain = ["check", "build", "publish"]}
 describe = "python ./scripts/print_cached_episode_description.py"
+serve = "python -m http.server 8000"  # For downloading generated mp3 from GitHub Codespace.
 
 [tool.hatch.build]
 exclude = [".env", "archive/", "docs/", "scripts/", "work/"]
