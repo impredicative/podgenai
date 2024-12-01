@@ -120,8 +120,12 @@ def is_subtopic_text_valid(text: str, numbered_name: str) -> bool:
         print_error(f"Subtopic {numbered_name!r} has leading or trailing whitespace.")
         return False
 
-    if text.startswith("\n```"):
+    if "\n```" in text:
         print_error(f"Subtopic {numbered_name!r} may contain a code block.")
+        return False
+
+    if ("\n## " in text) or ("\n### " in text):
+        print_error(f"Subtopic {numbered_name!r} may contain a markdown section header.")
         return False
 
     return True
