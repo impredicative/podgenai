@@ -120,11 +120,11 @@ def is_subtopic_text_valid(text: str, numbered_name: str) -> bool:
         print_error(f"Subtopic {numbered_name!r} has leading or trailing whitespace.")
         return False
 
-    if "\n```" in text:
+    checked_text = "\n" + text
+    if "\n```" in checked_text:
         print_error(f"Subtopic {numbered_name!r} may contain a code block.")
         return False
-
-    if ("\n## " in text) or ("\n### " in text):
+    if ("\n## " in checked_text) or ("\n### " in checked_text):
         print_error(f"Subtopic {numbered_name!r} may contain a markdown section header.")
         return False
 
