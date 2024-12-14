@@ -3,6 +3,7 @@
         "audiobook",
         "cancelation",
         "devcontainer",
+        "duplicative",
         "podgenai"
     ],
     "terminal.integrated.scrollback": 10000
