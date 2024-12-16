@@ -30,7 +30,7 @@ podgenai = "podgenai.__main__:main"
 Repository = "https://github.com/impredicative/podgenai"
 
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling==1.26.3"]  # Without a version spec, hatchling==1.27.0 is used which fails to publish. Ref: https://github.com/astral-sh/rye/issues/1446#issuecomment-2545154562
 build-backend = "hatchling.build"
 
 [tool.rye]
