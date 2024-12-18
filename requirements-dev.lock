@@ -36,13 +36,13 @@ idna==3.10
     # via httpx
 jiter==0.8.2
     # via openai
-openai==1.57.4
+openai==1.58.1
     # via podgenai
 pathvalidate==3.2.1
     # via podgenai
-pydantic==2.10.3
+pydantic==2.10.4
     # via openai
-pydantic-core==2.27.1
+pydantic-core==2.27.2
     # via pydantic
 python-dotenv==1.0.1
     # via podgenai
