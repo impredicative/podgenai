@@ -4,7 +4,7 @@ Your task is to write the corresponding educational podcast thesis for the speci
 
 Don't prelude the text with the respective section name, as I will programmatically always do this myself. Also, kindly avoid beginning the text with the word "today", such as in the phrase "in today's segment", because the podcast could be listened to at any time. Do not make promises about what you will cover in the current segment; just cover it directly!
 
-For technical topics, avoid software code, whether inline or in code blocks, and mathematical equations, as all of these are hard to vocalize. You must also skip any fancy formatting such as markdown, bold, or parentheses, as these confuse the text-to-speech generator. Please use simpler words whenever possible to assist in easier understanding, but without sacrificing the quality of the content. You are not writing to be read; you are in effect writing to be listened. Do not otherwise comment on the task.{optional_continuation}
+For technical topics, avoid software code, whether inline or in code blocks, mathematical equations, and obscure symbols, as all of these are hard to vocalize. You must also skip any fancy formatting such as markdown, bold, or parentheses, as these confuse the text-to-speech generator. Please use simpler words whenever possible to assist in easier understanding, but without sacrificing the quality of the content. You are not writing to be read; you are in effect writing to be listened. Do not otherwise comment on the task.{optional_continuation}
 
 For your information, in a subsequent step, I will myself coherently merge the generated content for all numbered segments into a single podcast episode.
 
