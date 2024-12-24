@@ -18,7 +18,7 @@ anyio==4.7.0
 certifi==2024.12.14
     # via httpcore
     # via httpx
-click==8.1.7
+click==8.1.8
     # via podgenai
 colorama==0.4.6 ; platform_system == 'Windows'
     # via click

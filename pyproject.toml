@@ -6,7 +6,7 @@ authors = [
     { name = "Ouroboros Chrysopoeia", email = "impredicative@users.noreply.github.com" }
 ]
 dependencies = [
-    "click>=8.1.7",
+    "click>=8.1.8",  # https://github.com/pallets/click/releases
     "openai>=1.58.1",  # https://github.com/openai/openai-python/releases
     "pathvalidate>=3.2.1",  # https://github.com/thombashi/pathvalidate/releases
     "python-dotenv>=1.0.1",
