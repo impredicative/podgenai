@@ -18,7 +18,7 @@ OpenAI = openai.OpenAI
 
 MAX_TTS_INPUT_LEN = 4096
 MODELS = {
-    "text": "gpt-4o-2024-11-20",
+    "text": ["gpt-4o-2024-11-20", "gpt-4.5-preview-2025-02-27"][0],
     # Notes:
     #   As of 2024-11, gpt-4o-2024-11-20 is used because it seems to be even better at instruction-following than gpt-4o-2024-08-06.
     #   As of 2024-09, gpt-4o-2024-08-06 is used because it has information about newer topics, e.g. AWS Bedrock, that the older gpt-4-0125-preview model does not.
@@ -30,8 +30,10 @@ MODELS = {
 TTS_VOICE_MAP = {
     "default": "alloy",
     "default-male": "alloy",  # Supported for experimentation.
+    "narrative": "ash",
     "neutral": "alloy",  # Unsolicited but observed.
     "female": "nova",
+    "intrigue": "sage",
     "male": "onyx",
     "sensitive": "echo",  # Supported for testing.
     "emotive": "echo",
@@ -55,8 +57,8 @@ def get_completion(prompt: str, *, client: Optional[OpenAI] = None) -> ChatCompl
     if not client:
         client = get_openai_client()
     # print(f"Requesting completion for prompt of length {len(prompt)}.")
-    completion = client.chat.completions.create(model=MODELS["text"], messages=[{"role": "user", "content": prompt}])
-    # Note: Specifying max_tokens=4096 with gpt-4-turbo-preview did not benefit in increasing output length, and a higher value is disallowed. Ref: https://platform.openai.com/docs/api-reference/chat/create
+    completion = client.chat.completions.create(model=MODELS["text"], messages=[{"role": "user", "content": prompt}], max_completion_tokens=16_384)  #  Ref: https://platform.openai.com/docs/api-reference/chat/create
+    # Note: Specifying max_tokens=4096 with gpt-4-turbo-preview did not benefit in increasing output length.
 
     if completion.usage and completion.usage.prompt_tokens_details and ((num_cached_prompt_tokens := completion.usage.prompt_tokens_details.cached_tokens) > 0):
         num_prompt_tokens = completion.usage.prompt_tokens
