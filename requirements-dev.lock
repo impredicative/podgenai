@@ -20,7 +20,7 @@ certifi==2025.1.31
     # via httpx
 click==8.1.8
     # via podgenai
-colorama==0.4.6 ; platform_system == 'Windows'
+colorama==0.4.6 ; sys_platform == 'win32'
     # via click
     # via tqdm
 distro==1.9.0
@@ -36,7 +36,7 @@ idna==3.10
     # via httpx
 jiter==0.8.2
     # via openai
-openai==1.63.2
+openai==1.65.1
     # via podgenai
 pathvalidate==3.2.3
     # via podgenai
