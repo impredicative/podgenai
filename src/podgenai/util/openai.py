@@ -165,7 +165,7 @@ def get_cached_content(prompt: str, *, strategy: str = "oneshot", read_cache: bo
 
     sanitized_cache_key_prefix = pathvalidate.sanitize_filename(cache_key_prefix, platform="auto")
     assert sanitized_cache_key_prefix
-    cache_key = f"{sanitized_cache_key_prefix} ({MODELS["text"]}) ({strategy}) [{hasher(prompt)}].txt"
+    cache_key = f"{sanitized_cache_key_prefix} ({MODELS['text']}) ({strategy}) [{hasher(prompt)}].txt"
     cache_file_path = cache_path / cache_key
     pathvalidate.validate_filepath(cache_file_path, platform="auto")
 

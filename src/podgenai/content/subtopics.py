@@ -200,16 +200,16 @@ def get_subtopics_speech_texts(*, topic: str, subtopics: Optional[list[str]] = N
     process_subtopic_name = (lambda subtopic_name: subtopic_name.replace(".", ":", 1)) if markers else (lambda subtopic_name: subtopic_name.partition(". ")[2])
     # Note: The section number is removed altogether from the subtopic name if markers are disabled. This is because the number risks not being correctly spoken in an intended foreign language, especially so for non-Latin languages.
 
-    subtopics_speech_texts = {subtopic_name: f'{mark('Section ')}{process_subtopic_name(subtopic_name)}:\n\n{subtopic_text} {{pause}}' for subtopic_name, subtopic_text in subtopics_texts.items()}
+    subtopics_speech_texts = {subtopic_name: f"{mark('Section ')}{process_subtopic_name(subtopic_name)}:\n\n{subtopic_text} {{pause}}" for subtopic_name, subtopic_text in subtopics_texts.items()}
     # Note: A pause at the beginning is skipped by the TTS generator, but it is not skipped if at the end, and so it is kept at the end.
 
-    subtopics_speech_texts[subtopics[0]] = f'{topic}:\n\n{{pause}}\n{mark(f'{PROMPTS['tts_disclaimer']} {{pause}}\n\n')}{subtopics_speech_texts[subtopics[0]]}'
+    subtopics_speech_texts[subtopics[0]] = f"{topic}:\n\n{{pause}}\n{mark(f'{PROMPTS["tts_disclaimer"]} {{pause}}\n\n')}{subtopics_speech_texts[subtopics[0]]}"
     # Note: TTS disclaimer about AI generated audio is required by OpenAI as per https://platform.openai.com/docs/guides/text-to-speech/do-i-own-the-outputted-audio-files
     # Note: It has proven more reliable for the pause to be structured in this way for section 1, rather than be in the leading topic line.
     # Note: If markers are disabled, such as for foreign language use, the disclaimer is skipped from the beginning of the first section (to the end of the last section)
     #       because otherwise the disclaimer can risk conditioning the TTS to speak "1" in English instead of in the foreign language.
 
-    subtopics_speech_texts[subtopics[-1]] = f"{subtopics_speech_texts[subtopics[-1]]}{mark('\n\nThe end.')}{demark(f'\n\n{{pause}}\n{PROMPTS['tts_disclaimer']}')}"
+    subtopics_speech_texts[subtopics[-1]] = f"{subtopics_speech_texts[subtopics[-1]]}{mark('\n\nThe end.')}{demark(f'\n\n{{pause}}\n{PROMPTS["tts_disclaimer"]}')}"
     # Note: "The end." sounds better with the paragraph break before it.
     # Note: Square brackets around "The end." caused the TTS to skip the enclosed text at times.
 

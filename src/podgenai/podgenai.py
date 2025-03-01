@@ -35,7 +35,7 @@ def generate_media(topic: str, *, output_path: Optional[Path] = None, max_sectio
 
     work_path = get_topic_work_path(topic)
     print(f"CACHE: {work_path}")
-    print(f"MODELS: text={MODELS["text"]}, tts={MODELS["tts"]}")
+    print(f"MODELS: text={MODELS['text']}, tts={MODELS['tts']}")
     print(f"WORKERS: {MAX_CONCURRENT_WORKERS}")
     if max_sections is not None:
         if not (NUM_SECTIONS_MIN <= max_sections <= NUM_SECTIONS_MAX):
@@ -48,7 +48,7 @@ def generate_media(topic: str, *, output_path: Optional[Path] = None, max_sectio
     voice = get_voice(topic)
     mapped_voice = TTS_VOICE_MAP[voice]
     print(f"VOICE: {voice} ({mapped_voice})")
-    print(f'SUBTOPICS:\n{'\n'.join(subtopics_list)}')
+    print(f"SUBTOPICS:\n{'\n'.join(subtopics_list)}")
 
     if confirm:
         get_confirmation("text generation")
