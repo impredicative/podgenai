@@ -21,23 +21,19 @@ The `gpt-4o` and `tts-1` models are used. For a given topic, the high-level refe
 Although there may sometimes exist some semantic repetition of content across subtopics, this has intentionally not been "optimized away" because this repetition of important points can help with learning and memorization. To dive deeper into a particular subtopic, one can try to create a new file just for it.
 
 ## Samples
-These generated mp3 files are available for download. In effect, these also constitute a minimal manual test suite, with the unique purpose of each sample noted. As a reminder, the voice is selected by the LLM.
+These generated mp3 files are available for download, one for each voice. As a reminder, the voice is selected by the LLM.
 
 There is also a related [podcast](https://podcasters.spotify.com/pod/podgenai) ([RSS](https://anchor.fm/s/f4868644/podcast/rss)) to which episodes on additional topics may be manually posted over time.
 
 A playback speed of 1.05x is recommended for non-technical topics, 1.0x for technical topics, and 0.95x for foreign language topics.
 
-| Voice   | Name                                                                                                                                          | Purpose                                                           |
-|---------|-----------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------|
-| Default | [PyTorch](https://mega.nz/file/5Ic21CZK#ovayjipDqYeYaSw9HhRTufjIxIuJr5M8lFq3LNvtEQQ)                                                          | Technical content generation                                      |
-| Default | [Advanced PyTorch](https://mega.nz/file/kFsVxSZQ#LFrQVqH-1T1uLHNtgXrjGZYdgcyiE2FCpEu1ztZx3Ak)                                                 | Advanced technical content generation                             |
-| Default | [Software engineer job interview tips](https://mega.nz/file/RYtUHboC#Vf6qT_nU3ncXSymHkfmbg4jcg0CHvj020ixmS5pYlxY)                             | Default voice selection                                           |
-| Emotive | [New York City: present and future](https://mega.nz/file/gEcBERqL#LCdkwFMCt2L1PdQLpD-6-BZ8VrvalTlZwqrSzNEw5Cc)                                | Non-technical content generation                                  |
-| Emotive | [Living a good life](https://mega.nz/file/NNMUFTJT#8ga2REaZaT79-zf83KqBT2tUW8Q8j5sT0WAuxQUEpQ8)                                               | Emotive voice selection                                           |
-| Default | [Artificial General Intelligence (AGI): Approaches and Algorithms](https://mega.nz/file/0JkWnDQQ#PSUA5aj0q_yU18T4XsazYZoSG9bqjUi7vCLmjVrY1IA) | Non-hierarchical flattened single-level subtopic list enforcement |
-| Female  | [Human circulatory system (unabridged)](https://mega.nz/file/UYt2WLDA#4q-UI8cWffzN0PG8ZGiQK_96dudklBJOfFmpE_3for4)                            | Implicit topic support for unabridged suffix                      |
-| Female  | [Buffy the Vampire Slayer](https://mega.nz/file/FddQWRJb#q_3XoTfgsQIvU6oZcJK7Y9or4Tjcx7BK2YLf_whjH4g)                                         | Female voice selection                                            |
-| Male    | [Bitcoin for nerds](https://mega.nz/file/QVNyWYrZ#RqKuAcG6LUwOZi20ZBkygRNin9f7rpLBm1xsoILoAFI)                                                | Male voice selection                                              |
+| Voice    | Name                                                                                                                                          |
+|----------|-----------------------------------------------------------------------------------------------------------------------------------------------|
+| Default  | [Artificial General Intelligence (AGI): Approaches and Algorithms](https://mega.nz/file/0JkWnDQQ#PSUA5aj0q_yU18T4XsazYZoSG9bqjUi7vCLmjVrY1IA)
+| Emotive  | [Living a good life](https://mega.nz/file/NNMUFTJT#8ga2REaZaT79-zf83KqBT2tUW8Q8j5sT0WAuxQUEpQ8)
+| Female   | [Human circulatory system (unabridged)](https://mega.nz/file/UYt2WLDA#4q-UI8cWffzN0PG8ZGiQK_96dudklBJOfFmpE_3for4)
+| Male     | [Bitcoin for nerds](https://mega.nz/file/QVNyWYrZ#RqKuAcG6LUwOZi20ZBkygRNin9f7rpLBm1xsoILoAFI)
+| Intrigue | [Monero](https://mega.nz/file/gF1Syaqb#NlzFP0KABKsAa8NdTaVTrsV-ERheULeHHJvAdb73Dt4)
 
 ## Setup
 
