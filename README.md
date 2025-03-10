@@ -32,8 +32,9 @@ A playback speed of 1.05x is recommended for non-technical topics, 1.0x for tech
 | Default  | [Artificial General Intelligence (AGI): Approaches and Algorithms](https://mega.nz/file/0JkWnDQQ#PSUA5aj0q_yU18T4XsazYZoSG9bqjUi7vCLmjVrY1IA)
 | Emotive  | [Living a good life](https://mega.nz/file/NNMUFTJT#8ga2REaZaT79-zf83KqBT2tUW8Q8j5sT0WAuxQUEpQ8)
 | Female   | [Human circulatory system (unabridged)](https://mega.nz/file/UYt2WLDA#4q-UI8cWffzN0PG8ZGiQK_96dudklBJOfFmpE_3for4)
-| Male     | [Bitcoin for nerds](https://mega.nz/file/QVNyWYrZ#RqKuAcG6LUwOZi20ZBkygRNin9f7rpLBm1xsoILoAFI)
 | Intrigue | [Monero](https://mega.nz/file/gF1Syaqb#NlzFP0KABKsAa8NdTaVTrsV-ERheULeHHJvAdb73Dt4)
+| Male     | [Bitcoin for nerds](https://mega.nz/file/QVNyWYrZ#RqKuAcG6LUwOZi20ZBkygRNin9f7rpLBm1xsoILoAFI)
+| Narrative | [History of Neural Networks](https://mega.nz/file/QNVw0TBC#ui8RfOL8ET33Swjt-DEsYSuek_NbQPoTla2FnfVvtj8)
 
 ## Setup
 
