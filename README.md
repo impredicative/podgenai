@@ -29,12 +29,12 @@ A playback speed of 1.05x is recommended for non-technical topics, 1.0x for tech
 
 | Voice    | Name |
 |----------|------|
-| default-male   | [Artificial General Intelligence (AGI): Approaches and Algorithms](https://mega.nz/file/0JkWnDQQ#PSUA5aj0q_yU18T4XsazYZoSG9bqjUi7vCLmjVrY1IA)
-| emotive-male   | [Living a good life](https://mega.nz/file/NNMUFTJT#8ga2REaZaT79-zf83KqBT2tUW8Q8j5sT0WAuxQUEpQ8)
-| narrative-male | [History of Neural Networks](https://mega.nz/file/QNVw0TBC#ui8RfOL8ET33Swjt-DEsYSuek_NbQPoTla2FnfVvtj8)
+| analytical-male   | [Artificial General Intelligence (AGI): Approaches and Algorithms](https://mega.nz/file/0JkWnDQQ#PSUA5aj0q_yU18T4XsazYZoSG9bqjUi7vCLmjVrY1IA)
+| elegant-female   | [Monero](https://mega.nz/file/gF1Syaqb#NlzFP0KABKsAa8NdTaVTrsV-ERheULeHHJvAdb73Dt4)
+| expository-male | [History of Neural Networks](https://mega.nz/file/QNVw0TBC#ui8RfOL8ET33Swjt-DEsYSuek_NbQPoTla2FnfVvtj8)
+| motivating-male   | [Living a good life](https://mega.nz/file/NNMUFTJT#8ga2REaZaT79-zf83KqBT2tUW8Q8j5sT0WAuxQUEpQ8)
 | serene-female  | [Human circulatory system (unabridged)](https://mega.nz/file/UYt2WLDA#4q-UI8cWffzN0PG8ZGiQK_96dudklBJOfFmpE_3for4)
 | stoic-male     | [Bitcoin for nerds](https://mega.nz/file/QVNyWYrZ#RqKuAcG6LUwOZi20ZBkygRNin9f7rpLBm1xsoILoAFI)
-| vivid-female   | [Monero](https://mega.nz/file/gF1Syaqb#NlzFP0KABKsAa8NdTaVTrsV-ERheULeHHJvAdb73Dt4)
 
 ## Setup
 

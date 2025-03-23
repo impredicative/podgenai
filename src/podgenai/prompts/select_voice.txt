@@ -1,4 +1,13 @@
-I am making a lengthy audiobook podcast episode on a topic. Specify which voice might be better for the topic from one of these six: default-male (alloy), emotive-male (echo), narrative-male (ash), serene-female (nova), stoic-male (onyx), vivid-female (sage). Exhibit a slight bias toward diversified voices. Provide only a single name that is one of these choices. Do not otherwise comment on the task. Do not provide an invalid choice.
+I am making a lengthy audiobook podcast episode on a topic. Specify which voice might be better for the topic from the ones I list below. Provide only a single name that is one of these choices. On occasion, exhibit a trifle bias toward diversified voices. Do not otherwise comment on the task. Do not provide an invalid choice. Your response will be forwarded to the TTS (text-to-speech) engine.
+
+Here are the available voices in alphabetical order by name:
+
+    analytical-male (alloy)
+    elegant-female (sage)
+    expository-male (ash)
+    motivating-male (echo)
+    serene-female (nova)
+    stoic-male (onyx)
 
 The topic is:
 

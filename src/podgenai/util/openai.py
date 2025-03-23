@@ -27,13 +27,13 @@ MODELS = {
     #   gpt-4 is not used because it is much older in its training data.
     "tts": "tts-1",  # Note: tts-1-hd is twice as expensive, and has a more limited concurrent usage quota resulting in openai.RateLimitError, thereby making it undesirable.
 }
-TTS_VOICE_MAP = {
-    "default-male": "alloy",
-    "emotive-male": "echo",
-    "narrative-male": "ash",
+TTS_VOICE_MAP = {  # Note: Before adding any name, ensure that *all* names are still selectable in practice by testing various topics.
+    "analytical-male": "alloy",
+    "elegant-female": "sage",
+    "expository-male": "ash",
+    "motivating-male": "echo",
     "serene-female": "nova",
     "stoic-male": "onyx",
-    "vivid-female": "sage",
 }
 
 
