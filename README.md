@@ -124,7 +124,7 @@ Return the output path after generating and writing an audiobook podcast to file
 
 Params:
 * `topic`: Topic.
-* `path`: Output file or directory path.
+* `output_path`: Output file or directory path.
     If an intended file path, it must have an ".mp3" suffix. If a directory, it must exist, and the file name is auto-determined.
     If not given, the output file is written to the repo directory with an auto-determined file name.
 * `max_sections`: Maximum number of sections to generate. It is between 3 and 100. It is unrestricted if not given.
