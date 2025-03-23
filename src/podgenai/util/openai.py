@@ -28,12 +28,12 @@ MODELS = {
     "tts": "tts-1",  # Note: tts-1-hd is twice as expensive, and has a more limited concurrent usage quota resulting in openai.RateLimitError, thereby making it undesirable.
 }
 TTS_VOICE_MAP = {
-    "default": "alloy",
-    "narrative": "ash",
-    "neutral": "alloy",  # Unsolicited but observed.
-    "female": "nova",
-    "intrigue": "sage",
-    "male": "onyx",
+    "default-male": "alloy",
+    "emotive-male": "echo",
+    "narrative-male": "ash",
+    "serene-female": "nova",
+    "stoic-male": "onyx",
+    "vivid-female": "sage",
 }
 
 
