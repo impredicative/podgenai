@@ -182,7 +182,7 @@ def get_cached_content(prompt: str, *, strategy: str = "oneshot", read_cache: bo
     return content
 
 
-def write_speech_audio(text: str, path: Path, *, voice: str = "default", client: Optional[OpenAI] = None) -> None:
+def write_speech_audio(text: str, path: Path, *, voice: str = next(iter(TTS_VOICE_MAP)), client: Optional[OpenAI] = None) -> None:
     """Write the speech audio file for the given prompt to the given file path.
 
     The prompt must not be longer than 4096 characters, as this is the maximum supported length by the client.
