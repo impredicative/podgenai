@@ -15,36 +15,36 @@ annotated-types==0.7.0
 anyio==4.9.0
     # via httpx
     # via openai
-certifi==2025.1.31
+certifi==2025.6.15
     # via httpcore
     # via httpx
-click==8.1.8
+click==8.2.1
     # via podgenai
 colorama==0.4.6 ; sys_platform == 'win32'
     # via click
     # via tqdm
 distro==1.9.0
     # via openai
-h11==0.14.0
+h11==0.16.0
     # via httpcore
-httpcore==1.0.7
+httpcore==1.0.9
     # via httpx
 httpx==0.28.1
     # via openai
 idna==3.10
     # via anyio
     # via httpx
-jiter==0.9.0
+jiter==0.10.0
     # via openai
-openai==1.68.2
+openai==1.92.2
     # via podgenai
-pathvalidate==3.2.3
+pathvalidate==3.3.1
     # via podgenai
-pydantic==2.10.6
+pydantic==2.11.7
     # via openai
-pydantic-core==2.27.2
+pydantic-core==2.33.2
     # via pydantic
-python-dotenv==1.0.1
+python-dotenv==1.1.1
     # via podgenai
 semantic-text-splitter==0.22.0
     # via podgenai
@@ -53,8 +53,11 @@ sniffio==1.3.1
     # via openai
 tqdm==4.67.1
     # via openai
-typing-extensions==4.12.2
+typing-extensions==4.14.0
     # via anyio
     # via openai
     # via pydantic
     # via pydantic-core
+    # via typing-inspection
+typing-inspection==0.4.1
+    # via pydantic
