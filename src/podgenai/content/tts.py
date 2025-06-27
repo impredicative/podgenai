@@ -5,7 +5,7 @@ import pathvalidate
 
 from podgenai.config import MAX_CONCURRENT_WORKERS
 from podgenai.util.binascii import hasher
-from podgenai.util.openai import ensure_speech_audio, MAX_TTS_INPUT_LEN
+from podgenai.util.openai import MODELS, ensure_speech_audio, MAX_TTS_INPUT_LEN
 from podgenai.util.semantic_text_splitter import semantic_split
 from podgenai.work import get_topic_work_path
 
@@ -16,7 +16,7 @@ def get_speech_tasks(subtopics_speech_texts: dict[str, str], *, topic: str, voic
     tts_tasks = {}
     for part_idx, (part_title, part) in enumerate(subtopics_speech_texts.items()):
         part_dedup_hash = hasher(part)
-        part_stem = f"{part_title} ({voice}) [{part_dedup_hash}]"
+        part_stem = f"{part_title} ({MODELS['tts']}) ({voice}) [{part_dedup_hash}]"
         part_stem = pathvalidate.sanitize_filename(part_stem, platform="auto")
         if len(part) <= MAX_TTS_INPUT_LEN:
             part_path = work_path / f"{part_stem}.mp3"
