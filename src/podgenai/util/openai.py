@@ -18,13 +18,13 @@ OpenAI = openai.OpenAI
 
 MAX_TTS_INPUT_LEN = 4096
 MODELS = {
-    "text": ["gpt-4o-2024-11-20", "gpt-4.5-preview-2025-02-27"][0],
+    "text": ["gpt-4o-2024-11-20", "gpt-4.1-2025-04-14"][1],  # Ref: https://platform.openai.com/docs/models
     # Notes:
+    #   As of 2025-06, gpt-4.1-2025-04-14 is used because it is less likely to reject broad valid topics than gpt-4o-2024-11-20.
     #   As of 2024-11, gpt-4o-2024-11-20 is used because it seems to be even better at instruction-following than gpt-4o-2024-08-06.
-    #   As of 2024-09, gpt-4o-2024-08-06 is used because it has information about newer topics, e.g. AWS Bedrock, that the older gpt-4-0125-preview model does not.
+    #   As of 2024-09, gpt-4o-2024-08-06 is used because it has information about newer topics that the older gpt-4-0125-preview model does not.
     #   As of 2024-05, gpt-4o-2024-05-13 is not used because it was observed to hallucinate significantly, whereas gpt-4-0125-preview doesn't.
     #   As of 2024-04, gpt-4-turbo-2024-04-09 is not used because it was observed to produce slightly lesser content than gpt-4-0125-preview.
-    #   gpt-4 is not used because it is much older in its training data.
     "tts": "tts-1",  # Note: tts-1-hd is twice as expensive, and has a more limited concurrent usage quota resulting in openai.RateLimitError, thereby making it undesirable.
 }
 TTS_VOICE_MAP = {  # Note: Before adding any name, ensure that *all* names are still selectable in practice by testing various topics.
@@ -34,7 +34,7 @@ TTS_VOICE_MAP = {  # Note: Before adding any name, ensure that *all* names are s
     "motivating-male": "echo",
     "serene-female": "nova",
     "stoic-male": "onyx",
-}
+}  # Ref: https://platform.openai.com/docs/guides/text-to-speech#voice-options
 
 
 def ensure_openai_key() -> None:
@@ -53,7 +53,9 @@ def get_completion(prompt: str, *, client: Optional[OpenAI] = None) -> ChatCompl
     if not client:
         client = get_openai_client()
     # print(f"Requesting completion for prompt of length {len(prompt)}.")
-    completion = client.chat.completions.create(model=MODELS["text"], messages=[{"role": "user", "content": prompt}], max_completion_tokens=16_384)  #  Ref: https://platform.openai.com/docs/api-reference/chat/create
+    model = MODELS["text"]
+    max_completion_tokens = {model.startswith("gpt-4o-"): 16_384, model.startswith("gpt-4.1-"): 32_768}[True]
+    completion = client.chat.completions.create(model=model, messages=[{"role": "user", "content": prompt}], max_completion_tokens=max_completion_tokens)  #  Ref: https://platform.openai.com/docs/api-reference/chat/create
     # Note: Specifying max_tokens=4096 with gpt-4-turbo-preview did not benefit in increasing output length.
 
     if completion.usage and completion.usage.prompt_tokens_details and ((num_cached_prompt_tokens := completion.usage.prompt_tokens_details.cached_tokens) > 0):
