@@ -30,10 +30,10 @@ MODELS = {
 TTS_VOICE_MAP = {  # Note: Before adding any name, ensure that *all* names are still selectable in practice by testing various topics.
     "analytical-male": "alloy",
     "elegant-female": "sage",
+    "emotive-male": "echo",
     "expository-male": "ash",
-    "motivating-male": "echo",
+    "informative-male": "onyx",
     "serene-female": "nova",
-    "stoic-male": "onyx",
 }  # Ref: https://platform.openai.com/docs/guides/text-to-speech#voice-options
 
 

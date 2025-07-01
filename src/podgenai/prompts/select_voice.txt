@@ -4,10 +4,10 @@ Here are the available voices in alphabetical order by name:
 
     analytical-male (alloy)
     elegant-female (sage)
+    emotive-male (echo)
     expository-male (ash)
-    motivating-male (echo)
+    informative-male (onyx)
     serene-female (nova)
-    stoic-male (onyx)
 
 The topic is:
 
