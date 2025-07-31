@@ -20,14 +20,20 @@
 				"streetsidesoftware.code-spell-checker",
 				"tamasfe.even-better-toml"
 			],
-            "portsAttributes": {
-                "*": {
-                    "onAutoForward": "ignore"
-                }
+			"settings": {
+				"remote.autoForwardPorts": false
+			}
             }
+		},
+    "forwardPorts": [],
+	"portsAttributes": {
+		"*": {
+		"onAutoForward": "ignore"
 		}
 	},
-    "forwardPorts": []
+	"otherPortsAttributes": {
+		"onAutoForward": "ignore"
+	}
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
 
