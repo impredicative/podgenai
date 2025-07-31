@@ -19,10 +19,15 @@
 				"ms-python.python",
 				"streetsidesoftware.code-spell-checker",
 				"tamasfe.even-better-toml"
-			]
+			],
+            "portsAttributes": {
+                "*": {
+                    "onAutoForward": "ignore"
+                }
+            }
 		}
-	}
-	
+	},
+    "forwardPorts": []
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
 
