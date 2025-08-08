@@ -18,8 +18,10 @@ OpenAI = openai.OpenAI
 
 MAX_TTS_INPUT_LEN = 4096
 MODELS = {
-    "text": ["gpt-4o-2024-11-20", "gpt-4.1-2025-04-14", "gpt-5-2025-08-07", "gpt-5-chat-latest"][2],  # Ref: https://platform.openai.com/docs/models
+    "text": ["gpt-4o-2024-11-20", "gpt-4.1-2025-04-14", "gpt-5-2025-08-07", "gpt-5-chat-latest"][1],  # Ref: https://platform.openai.com/docs/models
     # Notes:
+    #   As of 2025-08, gpt-5-chat-latest is experimentally used, mostly approximating gpt-4.1 in behavior. 
+    #   As of 2025-08, gpt-5-2025-08-07 is not used because it was observed to be impractically slow and verbose, although it was detailed.
     #   As of 2025-06, gpt-4.1-2025-04-14 is used because it is less likely to reject broad valid topics than gpt-4o-2024-11-20.
     #   As of 2024-11, gpt-4o-2024-11-20 is used because it seems to be even better at instruction-following than gpt-4o-2024-08-06.
     #   As of 2024-09, gpt-4o-2024-08-06 is used because it has information about newer topics that the older gpt-4-0125-preview model does not.
@@ -35,12 +37,20 @@ TTS_VOICE_MAP = {  # Note: Before adding any name, ensure that *all* names are s
     "informative-male": "onyx",
     "serene-female": "nova",
 }  # Ref: https://platform.openai.com/docs/guides/text-to-speech#voice-options
+
+EXTRA_TEXT_MODEL_PREFIX_KWARGS = {
+    "gpt-4o-": {"max_completion_tokens": 16_384, "temperature": 0.7},
+    "gpt-4.1-": {"max_completion_tokens": 32_768, "temperature": 0.7},
+    "gpt-5-": {"max_completion_tokens": 128_000},  # Note: Temperature is not supported.
+    "gpt-5-chat-": {"max_completion_tokens": 16_384},  # Note: Prefix has order dependency.
+}
 UNSUPPORTED_TEXT_MODEL_PREFIX_KWARGS = {
     "gpt-4o-": ("reasoning_effort", "verbosity"),
     "gpt-4.1-": ("reasoning_effort", "verbosity"),
     "gpt-5-": ("temperature",),
-    "gpt-5-chat-": ("verbosity",)
+    "gpt-5-chat-": ("reasoning_effort", "verbosity",),
 }
+extra_text_model_kwargs = {kw: v for prefix, kws in EXTRA_TEXT_MODEL_PREFIX_KWARGS.items() if MODELS["text"].startswith(prefix) for kw, v in kws.items()}
 unsupported_text_model_kwargs = {kw for prefix, kws in UNSUPPORTED_TEXT_MODEL_PREFIX_KWARGS.items() if MODELS["text"].startswith(prefix) for kw in kws}
 
 
@@ -65,17 +75,7 @@ def get_completion(prompt: str, *, client: Optional[OpenAI] = None, **kwargs) ->
     # print(f"Requesting completion for prompt of length {len(prompt)}.")
 
     model = MODELS["text"]
-    model_kwargs = {  # Ref: https://platform.openai.com/docs/api-reference/completions/create
-        model.startswith("gpt-4o-"): {"max_completion_tokens": 16_384, "temperature": 0.7},
-        model.startswith("gpt-4.1-"): {"max_completion_tokens": 32_768, "temperature": 0.7},
-        model.startswith("gpt-5-"): {"max_completion_tokens": 128_000},  # Note: Temperature variation is not supported for gpt-5 models.
-    }[True]
-
-    valid_kwargs = {k: v for k, v in kwargs.items() if k not in unsupported_text_model_kwargs}
-    all_kwargs = {**model_kwargs, **valid_kwargs}
-    # print(all_kwargs)
-
-    completion = client.chat.completions.create(model=model, messages=[{"role": "user", "content": prompt}], safety_identifier=PACKAGE_NAME, **all_kwargs)  #  Ref: https://platform.openai.com/docs/api-reference/chat/create
+    completion = client.chat.completions.create(model=model, messages=[{"role": "user", "content": prompt}], safety_identifier=PACKAGE_NAME, **kwargs)  #  Ref: https://platform.openai.com/docs/api-reference/chat/create
 
     if completion.usage and completion.usage.prompt_tokens_details and ((num_cached_prompt_tokens := completion.usage.prompt_tokens_details.cached_tokens) > 0):
         num_prompt_tokens = completion.usage.prompt_tokens
@@ -106,7 +106,7 @@ def get_cached_content(prompt: str, *, read_cache: bool = True, cache_key_prefix
     * `cache_key_prefix`: Friendly identifying name of request, used in filename in cache directory. Deduplication by prompt is done by this function; it does not have to be done externally.
     * `cache_path`: Cache directory.
 
-    Additional keyword arguments are forwarded to `get_content`.
+    Additional keyword arguments, if valid for the model, are forwarded to `get_content` along with model's default keyword arguments.
     """
     cache_key_prefix = cache_key_prefix.strip()
     assert cache_key_prefix
@@ -123,6 +123,8 @@ def get_cached_content(prompt: str, *, read_cache: bool = True, cache_key_prefix
         content = cache_file_path.read_text().rstrip()  # rstrip is used in case the file is manually modified in an editor which adds a trailing newline.
         print(f"Read completion from disk for: {cache_key_prefix}")
     else:
+        kwargs = {k: v for k, v in kwargs.items() if k not in unsupported_text_model_kwargs}
+        kwargs = {**extra_text_model_kwargs, **kwargs}  # Note: Order of inclusion is relevant.
         kwargs_str = (" with " + " ".join(f"{k}={v}" for k, v in kwargs.items())) if kwargs else ""
         print(f"Requesting completion{kwargs_str} for: {cache_key_prefix}")
         content = get_content(prompt, **kwargs)
