@@ -56,7 +56,7 @@ def get_completion(prompt: str, *, client: Optional[OpenAI] = None) -> ChatCompl
     model = MODELS["text"]
     model_kwargs = {  # Ref: https://platform.openai.com/docs/guides/chat/completions#model-parameters
         model.startswith("gpt-4o-"): {"max_completion_tokens": 16_384, "temperature": 0.7},
-        model.startswith("gpt-4.1-"): {"max_completion_tokens": 32_768, "temperature": 0.7}, 
+        model.startswith("gpt-4.1-"): {"max_completion_tokens": 32_768, "temperature": 0.7},
         model.startswith("gpt-5-"): {"max_completion_tokens": 128_000},  # Note: Temperature variation is not supported for gpt-5 models.
     }[True]
     completion = client.chat.completions.create(model=model, messages=[{"role": "user", "content": prompt}], safety_identifier=PACKAGE_NAME, **model_kwargs)  #  Ref: https://platform.openai.com/docs/api-reference/chat/create
