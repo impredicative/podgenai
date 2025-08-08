@@ -56,13 +56,19 @@ def get_completion(prompt: str, *, client: Optional[OpenAI] = None, **kwargs) ->
     if not client:
         client = get_openai_client()
     # print(f"Requesting completion for prompt of length {len(prompt)}.")
+
     model = MODELS["text"]
-    model_kwargs = {  # Ref: https://platform.openai.com/docs/guides/chat/completions#model-parameters
+    model_kwargs = {  # Ref: https://platform.openai.com/docs/api-reference/completions/create
         model.startswith("gpt-4o-"): {"max_completion_tokens": 16_384, "temperature": 0.7},
         model.startswith("gpt-4.1-"): {"max_completion_tokens": 32_768, "temperature": 0.7},
         model.startswith("gpt-5-"): {"max_completion_tokens": 128_000},  # Note: Temperature variation is not supported for gpt-5 models.
     }[True]
-    kwargs = {**model_kwargs, **kwargs}
+    if model.startswith(("gpt-4o-", "gpt-4.1-")):
+        valid_kwargs = {k: v for k, v in kwargs.items() if not k in ("reasoning_effort", "verbosity")}
+    if model.startswith("gpt-5-"):
+        valid_kwargs = {k: v for k, v in kwargs.items() if not k != "temperature"}
+    kwargs = {**model_kwargs, **valid_kwargs}
+
     completion = client.chat.completions.create(model=model, messages=[{"role": "user", "content": prompt}], safety_identifier=PACKAGE_NAME, **kwargs)  #  Ref: https://platform.openai.com/docs/api-reference/chat/create
 
     if completion.usage and completion.usage.prompt_tokens_details and ((num_cached_prompt_tokens := completion.usage.prompt_tokens_details.cached_tokens) > 0):
