@@ -127,6 +127,9 @@ def is_subtopic_text_valid(text: str, numbered_name: str) -> bool:
     if ("\n## " in checked_text) or ("\n### " in checked_text):
         print_error(f"Subtopic {numbered_name!r} may contain a markdown section header.")
         return False
+    if ("\n* " in checked_text) or ("\n- " in checked_text) or ("\n• " in checked_text):
+        print_error(f"Subtopic {numbered_name!r} may contain a markdown list item.")
+        return False
 
     return True
 
