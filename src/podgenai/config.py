@@ -7,6 +7,7 @@ load_dotenv()
 
 CWD: Path = Path.cwd()
 PACKAGE_PATH: Path = Path(__file__).parent
+PACKAGE_NAME: str = PACKAGE_PATH.name
 REPO_PATH: Path = PACKAGE_PATH.parent.parent
 
 GiB = 1024**3
