@@ -131,22 +131,15 @@ def is_subtopic_text_valid(text: str, numbered_name: str) -> bool:
     return True
 
 
-def get_subtopic(*, topic: str, subtopics: list[str], subtopic: str, strategy: str = "oneshot", max_attempts: int = 3) -> str:
+def get_subtopic(*, topic: str, subtopics: list[str], subtopic: str, max_attempts: int = 3) -> str:
     """Return the full text for a given subtopic within the context of the given topic and list of subtopics."""
     assert subtopic[0].isdigit()  # Is numbered.
-    common_kwargs = {"strategy": strategy, "cache_key_prefix": subtopic, "cache_path": get_topic_work_path(topic)}
+    common_kwargs = {"cache_key_prefix": subtopic, "cache_path": get_topic_work_path(topic)}
     subtopics_str = "\n".join(subtopics)
 
     for num_attempt in range(1, max_attempts + 1):
-        match strategy:
-            case "oneshot":
-                prompt = PROMPTS["generate_subtopic"].format(optional_continuation="", topic=topic, subtopics=subtopics_str, numbered_subtopic=subtopic)
-                text = get_cached_content(prompt, read_cache=num_attempt == 1, **common_kwargs)
-            case "multishot":  # Observed to never really benefit or produce longer content relative to oneshot.
-                prompt = PROMPTS["generate_subtopic"].format(optional_continuation="\n\n" + PROMPTS["continuation_first"], topic=topic, subtopics=subtopics_str, numbered_subtopic=subtopic)
-                text = get_cached_content(prompt, read_cache=num_attempt == 1, **common_kwargs, max_completions=5, update_prompt=False)
-            case _:
-                assert ValueError(f"Invalid strategy: {strategy}")
+        prompt = PROMPTS["generate_subtopic"].format(optional_continuation="", topic=topic, subtopics=subtopics_str, numbered_subtopic=subtopic)
+        text = get_cached_content(prompt, read_cache=num_attempt == 1, **common_kwargs)
         text = text.rstrip()
 
         error = io.StringIO()

@@ -69,48 +69,6 @@ def get_completion(prompt: str, *, client: Optional[OpenAI] = None) -> ChatCompl
     return completion
 
 
-def get_multipart_messages(prompt: str, *, max_completions: int = 10, client: Optional[OpenAI] = None, update_prompt: bool = False, continuation: str = PROMPTS["continuation_next"]) -> list[dict]:
-    """Return the multipart completion messages for the given initial prompt.
-
-    After the initial completion, continuation prompts are subsequently given, either until the assistant is done, or until a maximum of `max_completions` are received, whichever is first.
-
-    If `update_prompt` is True, the initial prompt is appended a default note that continuation prompts will subsequently be sent.
-    If `update_prompt` is False, the initial prompt can be provided with an included continuation note.
-
-    If `continuation` is specified, it is used iteratively as the continuation prompt, otherwise a default continuation prompt is used.
-    """
-    if update_prompt:
-        prompt = prompt + "\n\n" + PROMPTS["continuation_first"]
-    endings = ("Done", "Done.", "done", "done.")
-
-    if not client:
-        client = get_openai_client()
-
-    messages = [{"role": "user", "content": prompt}]
-    for completion_num in range(1, max_completions + 1):
-        # print(f"Requesting completion {completion_num} for initial prompt of length {len(prompt)}.")
-        completion = client.chat.completions.create(model=MODELS["text"], messages=messages)
-        content = get_content(prompt="", completion=completion)
-        messages.append({"role": "assistant", "content": content})
-
-        if content in endings:
-            print(f"Completion {completion_num} is an ending.")
-            return messages
-        else:
-            for ending in endings:
-                if content.endswith((f" {ending}", f"\n{ending}")):
-                    print(f"Completion {completion_num} has an ending.")
-                    return messages
-
-        if completion_num == max_completions:
-            print_warning(f"The quota of a maximum of {max_completions} completions is exhausted for initial prompt of length {len(prompt)}.")
-            return messages
-
-        messages.append({"role": "user", "content": continuation})
-
-    assert False
-
-
 def get_content(prompt: str, *, client: Optional[OpenAI] = None, completion: Optional[ChatCompletion] = None) -> str:
     """Return the content for the given prompt."""
     if not completion:
@@ -149,18 +107,15 @@ def get_multipart_content(prompt: str, **kwargs) -> str:
     return "\n\n".join(completions).strip()
 
 
-def get_cached_content(prompt: str, *, strategy: str = "oneshot", read_cache: bool = True, cache_key_prefix: str, cache_path: Path, **kwargs) -> str:
+def get_cached_content(prompt: str, *, read_cache: bool = True, cache_key_prefix: str, cache_path: Path, **kwargs) -> str:
     """Return the content for the given prompt using the disk cache if available, otherwise normally.
 
     Params:
-    * `strategy`:
-        If `strategy` is 'oneshot', the assistant is requested only one output, which is usually sufficient.
-        If `strategy` is 'multishot', the assistant is permitted multiple outputs up to a limit.
     * `read_cache`: If `True`, the disk cache is read if available. If `False`, the disk cache is not read, and it will be written or overwritten.
     * `cache_key_prefix`: Friendly identifying name of request, used in filename in cache directory. Deduplication by prompt is done by this function; it does not have to be done externally.
     * `cache_path`: Cache directory.
 
-    Additional keyword arguments are forwarded to the respective underlying function, namely `get_content` for 'oneshot', and `get_multipart_content` for 'multishot'.
+    Additional keyword arguments are forwarded to `get_content`.
     """
     cache_key_prefix = cache_key_prefix.strip()
     assert cache_key_prefix
@@ -168,7 +123,7 @@ def get_cached_content(prompt: str, *, strategy: str = "oneshot", read_cache: bo
 
     sanitized_cache_key_prefix = pathvalidate.sanitize_filename(cache_key_prefix, platform="auto")
     assert sanitized_cache_key_prefix
-    cache_key = f"{sanitized_cache_key_prefix} ({MODELS['text']}) ({strategy}) [{hasher(prompt)}].txt"
+    cache_key = f"{sanitized_cache_key_prefix} ({MODELS['text']}) [{hasher(prompt)}].txt"
     cache_file_path = cache_path / cache_key
     pathvalidate.validate_filepath(cache_file_path, platform="auto")
 
@@ -177,9 +132,8 @@ def get_cached_content(prompt: str, *, strategy: str = "oneshot", read_cache: bo
         content = cache_file_path.read_text().rstrip()  # rstrip is used in case the file is manually modified in an editor which adds a trailing newline.
         print(f"Read completion from disk for: {cache_key_prefix}")
     else:
-        content_getter = {"oneshot": get_content, "multishot": get_multipart_content}[strategy]
         print(f"Requesting completion for: {cache_key_prefix}")
-        content = content_getter(prompt, **kwargs)
+        content = get_content(prompt, **kwargs)
         print(f"Received completion for: {cache_key_prefix}")
         cache_file_path.write_text(content)
 
