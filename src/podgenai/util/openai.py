@@ -18,7 +18,7 @@ OpenAI = openai.OpenAI
 
 MAX_TTS_INPUT_LEN = 4096
 MODELS = {
-    "text": ["gpt-4o-2024-11-20", "gpt-4.1-2025-04-14", "gpt-5-2025-08-07"][1],  # Ref: https://platform.openai.com/docs/models
+    "text": ["gpt-4o-2024-11-20", "gpt-4.1-2025-04-14", "gpt-5-2025-08-07"][2],  # Ref: https://platform.openai.com/docs/models
     # Notes:
     #   As of 2025-06, gpt-4.1-2025-04-14 is used because it is less likely to reject broad valid topics than gpt-4o-2024-11-20.
     #   As of 2024-11, gpt-4o-2024-11-20 is used because it seems to be even better at instruction-following than gpt-4o-2024-08-06.

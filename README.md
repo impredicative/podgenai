@@ -1,5 +1,5 @@
 # podgenai
-**podgenai** is a Python 3.12 application to generate an informational single-speaker audiobook/podcast mp3 file on a given topic using the GPT-4 LLM. The loosely targeted duration of the generated file is an hour, although the generated duration varies. A funded [OpenAI API key](https://platform.openai.com/api-keys) is required.
+**podgenai** is a Python 3.12 application to generate an informational single-speaker audiobook/podcast mp3 file on a given topic using the OpenAI GPT-5 LLM. The loosely targeted duration of the generated file is an hour, although the generated duration varies. A funded [OpenAI API key](https://platform.openai.com/api-keys) is required.
 
 ## Links
 | Caption     | Link                                                 |
@@ -11,7 +11,7 @@
 | Podcast RSS | https://anchor.fm/s/f4868644/podcast/rss             |
 
 ## Approach
-The `gpt-4.1` and `tts-1` models are used. For a given topic, the high-level reference approach is:
+The `gpt-5` and `tts-1` models are used. For a given topic, the high-level reference approach is:
 
 * Applicable subtopics are listed using the LLM. If however the topic is unknown to the LLM, the process is aborted.
 * The voice is selected using the LLM from four choices.
