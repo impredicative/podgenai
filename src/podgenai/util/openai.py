@@ -18,7 +18,7 @@ OpenAI = openai.OpenAI
 
 MAX_TTS_INPUT_LEN = 4096
 MODELS = {
-    "text": ["gpt-4o-2024-11-20", "gpt-4.1-2025-04-14", "gpt-5-2025-08-07"][2],  # Ref: https://platform.openai.com/docs/models
+    "text": ["gpt-4o-2024-11-20", "gpt-4.1-2025-04-14", "gpt-5-2025-08-07", "gpt-5-chat-latest"][2],  # Ref: https://platform.openai.com/docs/models
     # Notes:
     #   As of 2025-06, gpt-4.1-2025-04-14 is used because it is less likely to reject broad valid topics than gpt-4o-2024-11-20.
     #   As of 2024-11, gpt-4o-2024-11-20 is used because it seems to be even better at instruction-following than gpt-4o-2024-08-06.
@@ -35,6 +35,13 @@ TTS_VOICE_MAP = {  # Note: Before adding any name, ensure that *all* names are s
     "informative-male": "onyx",
     "serene-female": "nova",
 }  # Ref: https://platform.openai.com/docs/guides/text-to-speech#voice-options
+UNSUPPORTED_TEXT_MODEL_PREFIX_KWARGS = {
+    "gpt-4o-": ("reasoning_effort", "verbosity"),
+    "gpt-4.1-": ("reasoning_effort", "verbosity"),
+    "gpt-5-": ("temperature",),
+    "gpt-5-chat-": ("verbosity",)
+}
+unsupported_text_model_kwargs = {kw for prefix, kws in UNSUPPORTED_TEXT_MODEL_PREFIX_KWARGS.items() if MODELS["text"].startswith(prefix) for kw in kws}
 
 
 def ensure_openai_key() -> None:
@@ -63,10 +70,8 @@ def get_completion(prompt: str, *, client: Optional[OpenAI] = None, **kwargs) ->
         model.startswith("gpt-4.1-"): {"max_completion_tokens": 32_768, "temperature": 0.7},
         model.startswith("gpt-5-"): {"max_completion_tokens": 128_000},  # Note: Temperature variation is not supported for gpt-5 models.
     }[True]
-    if model.startswith(("gpt-4o-", "gpt-4.1-")):
-        valid_kwargs = {k: v for k, v in kwargs.items() if k not in ("reasoning_effort", "verbosity")}
-    if model.startswith("gpt-5-"):
-        valid_kwargs = {k: v for k, v in kwargs.items() if k != "temperature"}
+
+    valid_kwargs = {k: v for k, v in kwargs.items() if k not in unsupported_text_model_kwargs}
     all_kwargs = {**model_kwargs, **valid_kwargs}
     # print(all_kwargs)
 
