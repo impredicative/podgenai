@@ -74,7 +74,7 @@ def list_subtopics(topic: str, max_sections: Optional[int] = None, max_attempts:
     rejection_error_prefix = "RequestError: "  # Defined in prompt.
 
     for num_attempt in range(1, max_attempts + 1):
-        response = get_cached_content(prompt, read_cache=num_attempt == 1, cache_key_prefix=f"0. {prompt_name}", cache_path=get_topic_work_path(topic), reasoning_effort="high", verbosity="medium")
+        response = get_cached_content(prompt, read_cache=num_attempt == 1, cache_key_prefix=f"0. {prompt_name}", cache_path=get_topic_work_path(topic), reasoning_effort="high")  # Default verbosity is preferred here.
         assert response, response
 
         assert response.lower() not in none_subtopics, response
@@ -137,7 +137,7 @@ def is_subtopic_text_valid(text: str, numbered_name: str) -> bool:
 def get_subtopic(*, topic: str, subtopics: list[str], subtopic: str, max_attempts: int = 3) -> str:
     """Return the full text for a given subtopic within the context of the given topic and list of subtopics."""
     assert subtopic[0].isdigit()  # Is numbered.
-    common_kwargs = {"cache_key_prefix": subtopic, "cache_path": get_topic_work_path(topic), "verbosity": "high"}
+    common_kwargs = {"cache_key_prefix": subtopic, "cache_path": get_topic_work_path(topic)}  # Default reasoning_effort and verbosity are preferred here.
     subtopics_str = "\n".join(subtopics)
 
     for num_attempt in range(1, max_attempts + 1):
