@@ -75,7 +75,7 @@ def get_completion(prompt: str, *, client: Optional[OpenAI] = None, **kwargs) ->
     if completion.usage and completion.usage.prompt_tokens_details and ((num_cached_prompt_tokens := completion.usage.prompt_tokens_details.cached_tokens) > 0):
         num_prompt_tokens = completion.usage.prompt_tokens
         pct_cached_prompt_tokens = num_cached_prompt_tokens / num_prompt_tokens
-        print(f"Completion for prompt of {num_prompt_tokens} tokens used {num_cached_prompt_tokens} ({pct_cached_prompt_tokens:.0%}) cached tokens.")
+        print(f"Completion for prompt of {num_prompt_tokens} tokens used {num_cached_prompt_tokens} ({pct_cached_prompt_tokens:.0%}) cached input tokens.")
 
     return completion
 
