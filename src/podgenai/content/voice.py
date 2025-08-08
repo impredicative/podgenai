@@ -19,7 +19,7 @@ def get_voice(topic: str, max_attempts: int = 3) -> str:
     prompt = PROMPTS[prompt_name].format(topic=topic)
 
     for num_attempt in range(1, max_attempts + 1):
-        raw_voice = get_cached_content(prompt, read_cache=num_attempt == 1, cache_key_prefix=f"0. {prompt_name}", cache_path=get_topic_work_path(topic))
+        raw_voice = get_cached_content(prompt, read_cache=num_attempt == 1, cache_key_prefix=f"0. {prompt_name}", cache_path=get_topic_work_path(topic), reasoning_effort="minimal", verbosity="low")
         voice = raw_voice.strip().rstrip(".").lower()
         if voice in TTS_VOICE_MAP:
             break
