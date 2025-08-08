@@ -118,9 +118,10 @@ def get_cached_content(prompt: str, *, read_cache: bool = True, cache_key_prefix
         content = cache_file_path.read_text().rstrip()  # rstrip is used in case the file is manually modified in an editor which adds a trailing newline.
         print(f"Read completion from disk for: {cache_key_prefix}")
     else:
-        print(f"Requesting completion for: {cache_key_prefix}")
+        kwargs_str = (" with " + " ".join(f"{k}={v}" for k, v in kwargs.items())) if kwargs else ""
+        print(f"Requesting completion{kwargs_str} for: {cache_key_prefix}")
         content = get_content(prompt, **kwargs)
-        print(f"Received completion for: {cache_key_prefix}")
+        print(f"Received completion{kwargs_str} for: {cache_key_prefix}")
         cache_file_path.write_text(content)
 
     assert content == content.rstrip()
