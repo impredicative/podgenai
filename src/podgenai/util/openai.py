@@ -6,10 +6,9 @@ import openai
 import pathvalidate
 
 import podgenai.exceptions
-from podgenai.config import PACKAGE_NAME, PROMPTS
+from podgenai.config import PACKAGE_NAME
 from podgenai.util.dotenv_ import load_dotenv
 from podgenai.util.binascii import hasher
-from podgenai.util.sys import print_warning
 
 load_dotenv()
 
@@ -20,7 +19,7 @@ MAX_TTS_INPUT_LEN = 4096
 MODELS = {
     "text": ["gpt-4o-2024-11-20", "gpt-4.1-2025-04-14", "gpt-5-2025-08-07", "gpt-5-chat-latest"][1],  # Ref: https://platform.openai.com/docs/models
     # Notes:
-    #   As of 2025-08, gpt-5-chat-latest is experimentally used, mostly approximating gpt-4.1 in behavior. 
+    #   As of 2025-08, gpt-5-chat-latest is experimentally used, mostly approximating gpt-4.1 in behavior.
     #   As of 2025-08, gpt-5-2025-08-07 is not used because it was observed to be impractically slow and verbose, although it was detailed.
     #   As of 2025-06, gpt-4.1-2025-04-14 is used because it is less likely to reject broad valid topics than gpt-4o-2024-11-20.
     #   As of 2024-11, gpt-4o-2024-11-20 is used because it seems to be even better at instruction-following than gpt-4o-2024-08-06.
@@ -48,7 +47,7 @@ UNSUPPORTED_TEXT_MODEL_PREFIX_KWARGS = {
     "gpt-4o-": ("reasoning_effort", "verbosity"),
     "gpt-4.1-": ("reasoning_effort", "verbosity"),
     "gpt-5-": ("temperature",),
-    "gpt-5-chat-": ("reasoning_effort", "verbosity",),
+    "gpt-5-chat-": ("reasoning_effort", "verbosity"),
 }
 extra_text_model_kwargs = {kw: v for prefix, kws in EXTRA_TEXT_MODEL_PREFIX_KWARGS.items() if MODELS["text"].startswith(prefix) for kw, v in kws.items()}
 unsupported_text_model_kwargs = {kw for prefix, kws in UNSUPPORTED_TEXT_MODEL_PREFIX_KWARGS.items() if MODELS["text"].startswith(prefix) for kw in kws}
@@ -87,7 +86,7 @@ def get_completion(prompt: str, *, client: Optional[OpenAI] = None, **kwargs) ->
 
 def get_content(prompt: str, *, client: Optional[OpenAI] = None, completion: Optional[ChatCompletion] = None, **kwargs) -> str:
     """Return the content for the given prompt.
-    
+
     Additional keyword arguments are forwarded to `get_completion`.
     """
     if not completion:
