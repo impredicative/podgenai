@@ -141,7 +141,7 @@ def get_subtopic(*, topic: str, subtopics: list[str], subtopic: str, max_attempt
     subtopics_str = "\n".join(subtopics)
 
     for num_attempt in range(1, max_attempts + 1):
-        prompt = PROMPTS["generate_subtopic"].format(optional_continuation="", topic=topic, subtopics=subtopics_str, numbered_subtopic=subtopic)
+        prompt = PROMPTS["generate_subtopic"].format(topic=topic, subtopics=subtopics_str, numbered_subtopic=subtopic)
         text = get_cached_content(prompt, read_cache=num_attempt == 1, **common_kwargs)
         text = text.rstrip()
 
