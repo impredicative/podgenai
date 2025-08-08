@@ -48,8 +48,11 @@ def get_openai_client() -> OpenAI:
     return OpenAI()
 
 
-def get_completion(prompt: str, *, client: Optional[OpenAI] = None) -> ChatCompletion:
-    """Return the completion for the given prompt."""
+def get_completion(prompt: str, *, client: Optional[OpenAI] = None, **kwargs) -> ChatCompletion:
+    """Return the completion for the given prompt.
+
+    Additional keyword arguments are forwarded to the OpenAI API client's `chat.completions.create` method.
+    """
     if not client:
         client = get_openai_client()
     # print(f"Requesting completion for prompt of length {len(prompt)}.")
@@ -59,7 +62,8 @@ def get_completion(prompt: str, *, client: Optional[OpenAI] = None) -> ChatCompl
         model.startswith("gpt-4.1-"): {"max_completion_tokens": 32_768, "temperature": 0.7},
         model.startswith("gpt-5-"): {"max_completion_tokens": 128_000},  # Note: Temperature variation is not supported for gpt-5 models.
     }[True]
-    completion = client.chat.completions.create(model=model, messages=[{"role": "user", "content": prompt}], safety_identifier=PACKAGE_NAME, **model_kwargs)  #  Ref: https://platform.openai.com/docs/api-reference/chat/create
+    kwargs = {**model_kwargs, **kwargs}
+    completion = client.chat.completions.create(model=model, messages=[{"role": "user", "content": prompt}], safety_identifier=PACKAGE_NAME, **kwargs)  #  Ref: https://platform.openai.com/docs/api-reference/chat/create
 
     if completion.usage and completion.usage.prompt_tokens_details and ((num_cached_prompt_tokens := completion.usage.prompt_tokens_details.cached_tokens) > 0):
         num_prompt_tokens = completion.usage.prompt_tokens
@@ -69,10 +73,13 @@ def get_completion(prompt: str, *, client: Optional[OpenAI] = None) -> ChatCompl
     return completion
 
 
-def get_content(prompt: str, *, client: Optional[OpenAI] = None, completion: Optional[ChatCompletion] = None) -> str:
-    """Return the content for the given prompt."""
+def get_content(prompt: str, *, client: Optional[OpenAI] = None, completion: Optional[ChatCompletion] = None, **kwargs) -> str:
+    """Return the content for the given prompt.
+    
+    Additional keyword arguments are forwarded to `get_completion`.
+    """
     if not completion:
-        completion = get_completion(prompt, client=client)
+        completion = get_completion(prompt, client=client, **kwargs)
     content = completion.choices[0].message.content
     content = content.strip()
     assert content
