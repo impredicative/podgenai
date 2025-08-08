@@ -79,34 +79,6 @@ def get_content(prompt: str, *, client: Optional[OpenAI] = None, completion: Opt
     return content
 
 
-def get_multipart_content(prompt: str, **kwargs) -> str:
-    """Return the multipart completion content for the given initial prompt.
-
-    Additional keyword arguments are forwarded to `get_multipart_messages`.
-
-    The completions are joined using paragraph breaks (double line breaks).
-    """
-    endings = ("Done", "Done.", "done", "done.")
-    messages = get_multipart_messages(prompt, **kwargs)
-
-    completions = []
-    for message_count, message in enumerate(messages, start=1):
-        if message["role"] != "assistant":
-            continue
-        completion = message["content"]
-        assert completion == completion.strip()
-        if completion in endings:
-            assert message_count == len(messages), {"prompt": prompt, "messages": messages, "message_count": message_count, "completion": completion}
-            break
-        for ending in endings:
-            if completion.endswith((f" {ending}", f"\n{ending}")):
-                completion = completion.removesuffix(ending).rstrip()
-                break
-        completions.append(completion)
-
-    return "\n\n".join(completions).strip()
-
-
 def get_cached_content(prompt: str, *, read_cache: bool = True, cache_key_prefix: str, cache_path: Path, **kwargs) -> str:
     """Return the content for the given prompt using the disk cache if available, otherwise normally.
 
