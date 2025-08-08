@@ -17,7 +17,7 @@ OpenAI = openai.OpenAI
 
 MAX_TTS_INPUT_LEN = 4096
 MODELS = {
-    "text": ["gpt-4o-2024-11-20", "gpt-4.1-2025-04-14", "gpt-5-2025-08-07", "gpt-5-chat-latest"][1],  # Ref: https://platform.openai.com/docs/models
+    "text": ["gpt-4o-2024-11-20", "gpt-4.1-2025-04-14", "gpt-5-2025-08-07", "gpt-5-chat-latest"][3],  # Ref: https://platform.openai.com/docs/models
     # Notes:
     #   As of 2025-08, gpt-5-chat-latest is experimentally used, mostly approximating gpt-4.1 in behavior.
     #   As of 2025-08, gpt-5-2025-08-07 is not used because it was observed to be impractically slow and verbose, although it was detailed.
