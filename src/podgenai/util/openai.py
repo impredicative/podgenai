@@ -6,7 +6,7 @@ import openai
 import pathvalidate
 
 import podgenai.exceptions
-from podgenai.config import PROMPTS
+from podgenai.config import PACKAGE_NAME, PROMPTS
 from podgenai.util.dotenv_ import load_dotenv
 from podgenai.util.binascii import hasher
 from podgenai.util.sys import print_warning
@@ -18,7 +18,7 @@ OpenAI = openai.OpenAI
 
 MAX_TTS_INPUT_LEN = 4096
 MODELS = {
-    "text": ["gpt-4o-2024-11-20", "gpt-4.1-2025-04-14"][1],  # Ref: https://platform.openai.com/docs/models
+    "text": ["gpt-4o-2024-11-20", "gpt-4.1-2025-04-14", "gpt-5-2025-08-07"][1],  # Ref: https://platform.openai.com/docs/models
     # Notes:
     #   As of 2025-06, gpt-4.1-2025-04-14 is used because it is less likely to reject broad valid topics than gpt-4o-2024-11-20.
     #   As of 2024-11, gpt-4o-2024-11-20 is used because it seems to be even better at instruction-following than gpt-4o-2024-08-06.
@@ -54,9 +54,12 @@ def get_completion(prompt: str, *, client: Optional[OpenAI] = None) -> ChatCompl
         client = get_openai_client()
     # print(f"Requesting completion for prompt of length {len(prompt)}.")
     model = MODELS["text"]
-    max_completion_tokens = {model.startswith("gpt-4o-"): 16_384, model.startswith("gpt-4.1-"): 32_768}[True]
-    completion = client.chat.completions.create(model=model, messages=[{"role": "user", "content": prompt}], max_completion_tokens=max_completion_tokens, temperature=0.7)  #  Ref: https://platform.openai.com/docs/api-reference/chat/create
-    # Note: Specifying max_tokens=4096 with gpt-4-turbo-preview did not benefit in increasing output length.
+    model_kwargs = {  # Ref: https://platform.openai.com/docs/guides/chat/completions#model-parameters
+        model.startswith("gpt-4o-"): {"max_completion_tokens": 16_384, "temperature": 0.7},
+        model.startswith("gpt-4.1-"): {"max_completion_tokens": 32_768, "temperature": 0.7}, 
+        model.startswith("gpt-5-"): {"max_completion_tokens": 128_000},  # Note: Temperature variation is not supported for gpt-5 models.
+    }[True]
+    completion = client.chat.completions.create(model=model, messages=[{"role": "user", "content": prompt}], safety_identifier=PACKAGE_NAME, **model_kwargs)  #  Ref: https://platform.openai.com/docs/api-reference/chat/create
 
     if completion.usage and completion.usage.prompt_tokens_details and ((num_cached_prompt_tokens := completion.usage.prompt_tokens_details.cached_tokens) > 0):
         num_prompt_tokens = completion.usage.prompt_tokens
