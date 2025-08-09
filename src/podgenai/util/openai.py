@@ -40,13 +40,13 @@ TTS_VOICE_MAP = {  # Note: Before adding any name, ensure that *all* names are s
 EXTRA_TEXT_MODEL_PREFIX_KWARGS = {
     "gpt-4o-": {"max_completion_tokens": 16_384, "temperature": 0.7},
     "gpt-4.1-": {"max_completion_tokens": 32_768, "temperature": 0.7},
-    "gpt-5-2": {"max_completion_tokens": 128_000},  # Note: Temperature is not supported. Suffix of `2` allows separation from `gpt-5-chat`.
+    "gpt-5-2": {"max_completion_tokens": 128_000},  # Note: Temperature is not supported. Suffix of `2` (short for 2025) allows disambiguation from `gpt-5-chat`.
     "gpt-5-chat-": {"max_completion_tokens": 16_384, "temperature": 0.7},
 }
 UNSUPPORTED_TEXT_MODEL_PREFIX_KWARGS = {
     "gpt-4o-": ("reasoning_effort", "verbosity"),
     "gpt-4.1-": ("reasoning_effort", "verbosity"),
-    "gpt-5-2": ("temperature",),  # Note: Suffix of `2` allows separation from `gpt-5-chat`.
+    "gpt-5-2": ("temperature",),  # Note: Suffix of `2` (short for 2025) allows disambiguation from `gpt-5-chat`.
     "gpt-5-chat-": ("reasoning_effort", "verbosity"),
 }
 extra_text_model_kwargs = {kw: v for prefix, kws in EXTRA_TEXT_MODEL_PREFIX_KWARGS.items() if MODELS["text"].startswith(prefix) for kw, v in kws.items()}
