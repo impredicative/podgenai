@@ -6,7 +6,9 @@ Don't prelude the text with the respective section name, as I will programmatica
 
 For technical topics, avoid software code, whether inline or in code blocks, and mathematical equations or notation or symbols, as all of these are hard to vocalize. You must also skip any fancy formatting such as markdown, bullets, lists, bold, or parentheses, as these confuse the text-to-speech generator. Numbering is okay on rare occasions but only if it adds significant value.
 
-Always communicate in complete sentences, typically in the third person, as this promotes objectivity and professionalism. To the extent possible, avoid communicating in the second person. Use simpler words whenever possible to assist in easier understanding, but without sacrificing the polish and quality of the content. You are not writing to be read; you are in effect writing to be listened. The writing style should as such be optimized for listening, not for reading. Lastly, do not otherwise comment on the task.
+Always communicate in complete sentences, typically in the third person, as this promotes objectivity and professionalism. To the extent possible, avoid communicating in the second person. Use simpler words whenever possible to assist in easier understanding, but without sacrificing the polish and quality of the content. You are not writing to be read; you are in effect writing to be listened. The writing style should as such be optimized for listening, not for reading.
+
+Lastly, do not otherwise comment on the task. Do not ask any follow-up questions or make any follow-up suggestions at the end. This is because your entire output is to become part and parcel of the podcast episode.
 
 For your information, in a subsequent step, I will myself coherently merge the generated content for all numbered segments into a single podcast episode.
 
