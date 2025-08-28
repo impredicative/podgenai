@@ -39,9 +39,9 @@ TTS_VOICE_MAP = {  # Note: Before adding any name, ensure that *all* names are s
 
 EXTRA_TEXT_MODEL_PREFIX_KWARGS = {
     "gpt-4o-": {"max_completion_tokens": 16_384, "temperature": 0.7},
-    "gpt-4.1-": {"max_completion_tokens": 32_768, "temperature": 0.7},
+    "gpt-4.1-": {"max_completion_tokens": 32_768, "temperature": 0.5},
     "gpt-5-2": {"max_completion_tokens": 128_000},  # Note: Temperature is not supported. Suffix of `2` (short for 2025) allows disambiguation from `gpt-5-chat`.
-    "gpt-5-chat-": {"max_completion_tokens": 16_384, "temperature": 0.7},
+    "gpt-5-chat-": {"max_completion_tokens": 16_384, "temperature": 0.3},
 }
 UNSUPPORTED_TEXT_MODEL_PREFIX_KWARGS = {
     "gpt-4o-": ("reasoning_effort", "verbosity"),
