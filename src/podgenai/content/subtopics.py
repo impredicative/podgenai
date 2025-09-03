@@ -74,7 +74,7 @@ def list_subtopics(topic: str, max_sections: Optional[int] = None, max_attempts:
     rejection_error_prefix = "RequestError: "  # Defined in prompt.
 
     for num_attempt in range(1, max_attempts + 1):
-        response = get_cached_content(prompt, read_cache=num_attempt == 1, cache_key_prefix=f"0. {prompt_name}", cache_path=get_topic_work_path(topic), reasoning_effort="high")  # Default verbosity is preferred here.
+        response = get_cached_content(prompt, read_cache=num_attempt == 1, cache_key_prefix=f"0. {prompt_name}", cache_path=get_topic_work_path(topic), reasoning_effort="high", temperature=0.5)  # Default verbosity is preferred here.
         assert response, response
 
         assert response.lower() not in none_subtopics, response
