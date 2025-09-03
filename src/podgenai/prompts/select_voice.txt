@@ -1,4 +1,4 @@
-I am making a lengthy audiobook podcast episode on a topic. Specify which voice might be better for the topic from the ones I list below. Provide only a single name that is one of these choices. On occasion, exhibit a random bias while preserving a connection to the topic. Do not otherwise comment on the task. Do not provide an invalid choice. Your response will be forwarded to the TTS (text-to-speech) engine.
+I am making a lengthy audiobook podcast episode on a topic. Specify which voice might be better for the topic from the ones I list below. Provide only a single name that is one of these choices. Exhibit a bias for slightly diversified voices while preserving a connection to the topic. Try to mix it up a bit. Do not otherwise comment on the task. Do not provide an invalid choice. Your response will be forwarded to the TTS (text-to-speech) engine.
 
 Here are the available voices in alphabetical order by name:
 
