@@ -1,20 +1,20 @@
 [project]
 name = "podgenai"
 version = "0.15.2"
-description = "GPT-4 based informational audiobook/podcast mp3 generator"
+description = "OpenAI GPT based informational audiobook/podcast mp3 generator"
 authors = [
     { name = "Ouroboros Chrysopoeia", email = "impredicative@users.noreply.github.com" }
 ]
 dependencies = [
-    "click>=8.2.1",  # https://github.com/pallets/click/releases
-    "openai>=1.104.2",  # https://github.com/openai/openai-python/releases
+    "click>=8.3.1",  # https://github.com/pallets/click/releases
+    "openai>=2.8.1",  # https://github.com/openai/openai-python/releases
     "pathvalidate>=3.3.1",  # https://github.com/thombashi/pathvalidate/releases
-    "python-dotenv>=1.1.1",  # https://github.com/theskumar/python-dotenv/releases
+    "python-dotenv>=1.2.1",  # https://github.com/theskumar/python-dotenv/releases
     "semantic-text-splitter>=0.22.0,<0.23.0",  # https://github.com/benbrandt/text-splitter/releases https://github.com/benbrandt/text-splitter/issues/605
 ]
 readme = "README.md"
 requires-python = ">= 3.12"
-keywords = ["podcast", "mp3", "audiobook", "gpt-4o", "aicast"]
+keywords = ["podcast", "mp3", "audiobook", "openai", "aicast"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Natural Language :: English",
