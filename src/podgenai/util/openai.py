@@ -51,7 +51,7 @@ EXTRA_TEXT_MODEL_PREFIX_KWARGS = {
     "gpt-4.1-": {"max_completion_tokens": 32_768, "temperature": 0.5},
     "gpt-5-2": {"max_completion_tokens": 128_000},  # Note: Temperature is not supported. Suffix of `2` (short for 2025) allows disambiguation from `gpt-5-chat`.
     "gpt-5-chat-": {"max_completion_tokens": 16_384, "temperature": 0.5},  # Reasoning effort is not supported. Hallucinations were observed with temperature of 0.7.
-    "gpt-5.1-chat-": {"max_completion_tokens": 16_384,},  # Temperature and reasoning effort are not supported.
+    "gpt-5.1-chat-": {"max_completion_tokens": 16_384},  # Temperature and reasoning effort are not supported.
     "gpt-5.1-2": {"max_completion_tokens": 128_000, "reasoning_effort": "none", "temperature": 0.5},  # Note: Suffix of `2` (short for 2025) allows disambiguation from `gpt-5.1-chat`.
 }
 UNSUPPORTED_TEXT_MODEL_PREFIX_KWARGS = {
