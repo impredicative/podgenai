@@ -1,0 +1,24 @@
+I am producing a lengthy 1-hour long audiobook podcast episode. Included below are the name of the topic, its list of numbered points (segments), the current point's name, and the current point's draft content.
+
+Your task is strictly only to remove only false, misleading, or hallucinated information from the draft content for the current point, while preserving all correct information. Do not add any new information that is not already present in the draft content. Be very careful not to inadvertently introduce new errors or inconsistencies. The output should be the corrected draft content for the current point. Fully maintain the original writing's formatting, style and tone.
+
+It is entirely possible that the draft content is already fully accurate and requires no changes. In this case, simply return the original draft content as is. Generally, aim to make as few changes as necessary while ensuring all information is accurate.
+
+Lastly, do not otherwise comment on the task. Do not ask any follow-up questions or make any follow-up suggestions at the end. Do not enclose your output in any marker tags. This is because your entire output is to become part and parcel of the podcast episode as subsequently stitched together by the workflow software.
+
+The topic for the podcast is: {topic}
+
+For your reference, the full list of intended numbered points (segments) for the podcast is:
+
+{subtopics}
+
+
+The current specific segment which you are to edit is:
+
+{numbered_subtopic}
+
+The current draft content for this segment is:
+
+--- BEGIN DRAFT CONTENT ---
+{subtopic_text}
+--- END DRAFT CONTENT ---

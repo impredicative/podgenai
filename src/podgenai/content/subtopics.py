@@ -7,6 +7,8 @@ import podgenai.exceptions
 from podgenai.config import MAX_CONCURRENT_WORKERS, PROMPTS, NUM_SECTIONS_MIN, NUM_SECTIONS_MAX
 from podgenai.util.openai import get_cached_content
 from podgenai.work import get_topic_work_path
+from podgenai.util.difflib import diff_texts_inline
+from podgenai.util.threading import safe_print
 from podgenai.util.sys import print_error, print_warning
 
 
@@ -134,10 +136,10 @@ def is_subtopic_text_valid(text: str, numbered_name: str) -> bool:
     return True
 
 
-def get_subtopic(*, topic: str, subtopics: list[str], subtopic: str, max_attempts: int = 3) -> str:
-    """Return the full text for a given subtopic within the context of the given topic and list of subtopics."""
+def get_draft_subtopic(*, topic: str, subtopics: list[str], subtopic: str, max_attempts: int = 3) -> str:
+    """Return the draft full text for a given subtopic within the context of the given topic and list of subtopics."""
     assert subtopic[0].isdigit()  # Is numbered.
-    common_kwargs = {"cache_key_prefix": subtopic, "cache_path": get_topic_work_path(topic)}  # Default reasoning_effort and verbosity are preferred here.
+    common_kwargs = {"cache_key_prefix": f"{subtopic} (draft)", "cache_path": get_topic_work_path(topic)}  # Default reasoning_effort and verbosity are preferred here.
     subtopics_str = "\n".join(subtopics)
 
     for num_attempt in range(1, max_attempts + 1):
@@ -160,6 +162,45 @@ def get_subtopic(*, topic: str, subtopics: list[str], subtopic: str, max_attempt
 
     assert text
     return text
+
+
+def get_final_subtopic(*, topic: str, subtopics: list[str], subtopic: str, subtopic_text: str, max_attempts: int = 3) -> str:
+    """Return the final full text for a given subtopic within the context of the given topic and list of subtopics."""
+    assert subtopic[0].isdigit()  # Is numbered.
+    common_kwargs = {"cache_key_prefix": f"{subtopic} (final)", "cache_path": get_topic_work_path(topic)}  # Default reasoning_effort and verbosity are preferred here.
+    subtopics_str = "\n".join(subtopics)
+
+    for num_attempt in range(1, max_attempts + 1):
+        prompt = PROMPTS["refine_subtopic"].format(topic=topic, subtopics=subtopics_str, numbered_subtopic=subtopic, subtopic_text=subtopic_text)
+        final_text = get_cached_content(prompt, read_cache=num_attempt == 1, **common_kwargs)
+        final_text = final_text.rstrip()
+
+        error = io.StringIO()
+        with contextlib.redirect_stderr(error):
+            subtopic_text_is_valid = is_subtopic_text_valid(final_text, numbered_name=subtopic)
+        if not subtopic_text_is_valid:
+            error = error.getvalue().rstrip().removeprefix("Error: ")
+            if num_attempt == max_attempts:
+                raise podgenai.exceptions.LanguageModelOutputStructureError(error)
+            else:
+                print_warning(f"Fault in attempt {num_attempt} of {max_attempts} while getting final subtopic text: {error}")
+                continue
+
+        break
+
+    assert final_text
+    return final_text
+
+
+def get_subtopic(*, topic: str, subtopics: list[str], subtopic: str) -> str:
+    """Return the full text for a given subtopic within the context of the given topic and list of subtopics."""
+    draft_text = get_draft_subtopic(topic=topic, subtopics=subtopics, subtopic=subtopic)
+    # final_text = get_final_subtopic(topic=topic, subtopics=subtopics, subtopic=subtopic, subtopic_text=draft_text)
+    # if draft_text != final_text:
+    #     diff_text = diff_texts_inline(draft_text, final_text)
+    #     safe_print(f"\nRefinement diff for: {subtopic}:\n{diff_text}\n")
+    # return final_text
+    return draft_text
 
 
 def get_subtopics_texts(*, topic: str, subtopics: Optional[list[str]] = None) -> dict[str, str]:
