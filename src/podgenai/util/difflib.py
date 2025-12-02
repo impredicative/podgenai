@@ -28,11 +28,11 @@ def _split_marked_spans_by_paragraphs(
     """
     Ensure that spans marked with 'marker' do not cross paragraph boundaries.
 
-    If we have something like:
+    Example transformation:
 
         [-First paragraph text.\n\nSecond paragraph text.-]
 
-    this becomes:
+    becomes:
 
         [-First paragraph text.-]\n\n[-Second paragraph text.-]
 
@@ -89,63 +89,84 @@ def _replace_unchanged_paragraphs_with_marker(
 ) -> str:
     """
     Replace contiguous runs of paragraphs that contain no diff markers with a
-    single placeholder paragraph containing `omission_marker`.
+    single placeholder line containing `omission_marker`.
 
-    Paragraph separators are handled so that redundant sequential paragraph
-    breaks are avoided (no extra blank lines appear solely due to omission).
+    The placeholder appears on its own line with no completely blank line
+    before or after it. Conceptually, sequences like:
+
+        <changed paragraph>
+
+        <unchanged paragraph(s)>
+
+        <changed paragraph>
+
+    become:
+
+        <changed paragraph>
+        [...]
+        <changed paragraph>
     """
     del_start, _ = deletion_marker
     ins_start, _ = insertion_marker
 
     pieces = _PARAGRAPH_SEP_RE.split(text)
+    n_segments = (len(pieces) + 1) // 2
+
+    segments = [pieces[2 * i] for i in range(n_segments)]
+    seps = [pieces[2 * i + 1] if 2 * i + 1 < len(pieces) else "" for i in range(n_segments)]
+    changed = [(del_start in seg) or (ins_start in seg) for seg in segments]
+
+    # Find first and last changed indices
+    changed_indices = [i for i, c in enumerate(changed) if c]
+    if not changed_indices:
+        return text
+
+    first_changed = changed_indices[0]
+    last_changed = changed_indices[-1]
+
     result_parts: List[str] = []
 
-    omitted_running = False
-    omitted_sep: str = ""
-
-    for i in range(0, len(pieces), 2):
-        segment = pieces[i]
-        separator = pieces[i + 1] if i + 1 < len(pieces) else ""
-
-        has_change = (del_start in segment) or (ins_start in segment)
-
-        if has_change:
-            # If we have just skipped one or more unchanged paragraphs,
-            # insert a single omission paragraph before this changed one.
-            if omitted_running:
-                # Avoid adding an extra blank line if we already end with a separator.
-                if result_parts:
-                    last = result_parts[-1]
-                    if not _PARAGRAPH_SEP_RE.fullmatch(last):
-                        result_parts.append("\n\n")
-                # Omission placeholder itself.
-                result_parts.append(omission_marker)
-                # Separator following the placeholder (if any omitted paragraph had one).
-                if omitted_sep or separator:
-                    result_parts.append("\n\n")
-                omitted_running = False
-                omitted_sep = ""
-
-            # Emit the changed paragraph as-is.
-            result_parts.append(segment)
-            if separator:
-                result_parts.append(separator)
-        else:
-            # Unchanged paragraph: mark as part of an omitted run.
-            if segment or separator:
-                omitted_running = True
-                # Track the most recent separator within the omitted run.
-                if separator:
-                    omitted_sep = separator
-
-    # If the text ends with one or more omitted paragraphs, add a placeholder at the end.
-    if omitted_running:
-        if result_parts:
-            last = result_parts[-1]
-            if not _PARAGRAPH_SEP_RE.fullmatch(last):
-                result_parts.append("\n\n")
+    # Leading unchanged run before first_changed
+    if first_changed > 0:
         result_parts.append(omission_marker)
-        # No extra trailing separator after the final placeholder.
+        if first_changed <= last_changed:
+            result_parts.append("\n")
+
+    i = first_changed
+    while i <= last_changed:
+        if not changed[i]:
+            i += 1
+            continue
+
+        # Append current changed segment
+        result_parts.append(segments[i])
+
+        # Determine range of following unchanged run (within [0, n_segments))
+        j = i + 1
+        while j < n_segments and not changed[j] and j <= last_changed:
+            j += 1
+
+        if j == i + 1:
+            # No unchanged run immediately after within the processed range:
+            # keep original separator.
+            result_parts.append(seps[i])
+            i += 1
+        else:
+            # There is an unchanged run i+1..j-1 we omit.
+            if j <= last_changed:
+                # Another changed paragraph after the omitted run:
+                #   segment[i] + "\n" + marker + "\n" + segment[j]
+                if not result_parts[-1].endswith("\n"):
+                    result_parts.append("\n")
+                result_parts.append(omission_marker)
+                result_parts.append("\n")
+            else:
+                # Omitted run goes through or beyond last_changed (no more changed
+                # paragraphs to emit).
+                if not result_parts[-1].endswith("\n"):
+                    result_parts.append("\n")
+                result_parts.append(omission_marker)
+            i = j
 
     return "".join(result_parts)
 
@@ -166,26 +187,17 @@ def _drop_unchanged_paragraphs(
 
     pieces = _PARAGRAPH_SEP_RE.split(text)
     result_parts: List[str] = []
-    first_output = True
 
     for i in range(0, len(pieces), 2):
         segment = pieces[i]
         separator = pieces[i + 1] if i + 1 < len(pieces) else ""
-
         has_change = (del_start in segment) or (ins_start in segment)
 
         if has_change:
-            # Keep changed paragraph and its separator.
             result_parts.append(segment)
             if separator:
                 result_parts.append(separator)
-            first_output = False
-        else:
-            # Drop unchanged paragraph and its following separator entirely.
-            continue
 
-    # If everything was unchanged, this should not be used (we guard earlier),
-    # but if it happens, return the original text unchanged.
     if not result_parts:
         return text
 
@@ -224,9 +236,8 @@ def diff_texts_inline(
 
         * omission_marker is a non-empty string (e.g. "[...]"):
             Contiguous runs of unchanged paragraphs are replaced by a
-            single placeholder paragraph containing `omission_marker`.
-            Redundant sequential paragraph breaks around this placeholder
-            are avoided.
+            single placeholder line containing `omission_marker`, with
+            no completely blank line before or after the placeholder.
 
     Parameters
     ----------
@@ -299,7 +310,7 @@ def diff_texts_inline(
             insertion_marker=insertion_marker,
         )
     else:
-        # Replace runs of unchanged paragraphs with a placeholder paragraph.
+        # Replace runs of unchanged paragraphs with a placeholder line.
         return _replace_unchanged_paragraphs_with_marker(
             diff_text,
             deletion_marker=deletion_marker,
