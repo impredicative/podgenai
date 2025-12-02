@@ -9,6 +9,7 @@ import podgenai.exceptions
 from podgenai.config import PACKAGE_NAME
 from podgenai.util.dotenv_ import load_dotenv
 from podgenai.util.binascii import hasher
+from podgenai.util.threading import safe_print
 
 load_dotenv()
 
@@ -83,7 +84,7 @@ def get_completion(prompt: str, *, client: Optional[OpenAI] = None, **kwargs) ->
     """
     if not client:
         client = get_openai_client()
-    # print(f"Requesting completion for prompt of length {len(prompt)}.")
+    # safe_print(f"Requesting completion for prompt of length {len(prompt)}.")
 
     model = MODELS["text"]
     completion = client.chat.completions.create(model=model, messages=[{"role": "user", "content": prompt}], safety_identifier=PACKAGE_NAME, **kwargs)  #  Ref: https://platform.openai.com/docs/api-reference/chat/create
@@ -91,7 +92,7 @@ def get_completion(prompt: str, *, client: Optional[OpenAI] = None, **kwargs) ->
     if completion.usage and completion.usage.prompt_tokens_details and ((num_cached_prompt_tokens := completion.usage.prompt_tokens_details.cached_tokens) > 0):
         num_prompt_tokens = completion.usage.prompt_tokens
         pct_cached_prompt_tokens = num_cached_prompt_tokens / num_prompt_tokens
-        print(f"Completion for prompt of {num_prompt_tokens} tokens used {num_cached_prompt_tokens} ({pct_cached_prompt_tokens:.0%}) cached input tokens.")
+        safe_print(f"Completion for prompt of {num_prompt_tokens} tokens used {num_cached_prompt_tokens} ({pct_cached_prompt_tokens:.0%}) cached input tokens.")
 
     return completion
 
@@ -132,14 +133,14 @@ def get_cached_content(prompt: str, *, read_cache: bool = True, cache_key_prefix
     if read_cache and cache_file_path.exists():
         assert cache_file_path.is_file()
         content = cache_file_path.read_text().rstrip()  # rstrip is used in case the file is manually modified in an editor which adds a trailing newline.
-        print(f"Read completion from disk for: {cache_key_prefix}")
+        safe_print(f"Read completion from disk for: {cache_key_prefix}")
     else:
         kwargs = {k: v for k, v in kwargs.items() if k not in unsupported_text_model_kwargs}
         kwargs = {**extra_text_model_kwargs, **kwargs}  # Note: Order of inclusion is relevant.
         kwargs_str = (" with " + " ".join(f"{k}={v}" for k, v in kwargs.items())) if kwargs else ""
-        print(f"Requesting completion{kwargs_str} for: {cache_key_prefix}")
+        safe_print(f"Requesting completion{kwargs_str} for: {cache_key_prefix}")
         content = get_content(prompt, **kwargs)
-        print(f"Received completion{kwargs_str} for: {cache_key_prefix}")
+        safe_print(f"Received completion{kwargs_str} for: {cache_key_prefix}")
         cache_file_path.write_text(content)
 
     assert content == content.rstrip()
@@ -160,14 +161,14 @@ def write_speech_audio(text: str, path: Path, *, voice: str = next(iter(TTS_VOIC
     mapped_voice = TTS_VOICE_MAP.get(voice, voice)
     voice_str = voice if (voice == mapped_voice) else f"{voice} ({mapped_voice})"
 
-    print(f"Requesting speech audio in {voice_str} voice for: {path.stem}")
+    safe_print(f"Requesting speech audio in {voice_str} voice for: {path.stem}")
     response = client.audio.speech.create(model=MODELS["tts"], voice=mapped_voice, input=text)
     # relative_path = path.relative_to(Path.cwd())
-    # print(f"Writing speech to: {relative_path}")
+    # safe_print(f"Writing speech to: {relative_path}")
     response.stream_to_file(path)
     assert path.exists(), path
-    # print(f"Wrote speech to: {relative_path}")
-    print(f"Received speech audio in {voice_str} voice for: {path.stem}")
+    # safe_print(f"Wrote speech to: {relative_path}")
+    safe_print(f"Received speech audio in {voice_str} voice for: {path.stem}")
 
 
 def ensure_speech_audio(text: str, path: Path, **kwargs) -> None:
@@ -178,6 +179,6 @@ def ensure_speech_audio(text: str, path: Path, **kwargs) -> None:
 
     if path.exists():
         assert path.is_file()
-        print(f"Speech audio file exists on disk for: {path.stem}")
+        safe_print(f"Speech audio file exists on disk for: {path.stem}")
         return
     write_speech_audio(text, path=path, **kwargs)
