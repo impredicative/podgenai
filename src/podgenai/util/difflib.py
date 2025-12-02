@@ -92,19 +92,7 @@ def _replace_unchanged_paragraphs_with_marker(
     single placeholder line containing `omission_marker`.
 
     The placeholder appears on its own line with no completely blank line
-    before or after it. Conceptually, sequences like:
-
-        <changed paragraph>
-
-        <unchanged paragraph(s)>
-
-        <changed paragraph>
-
-    become:
-
-        <changed paragraph>
-        [...]
-        <changed paragraph>
+    before or after it.
     """
     del_start, _ = deletion_marker
     ins_start, _ = insertion_marker
@@ -116,7 +104,6 @@ def _replace_unchanged_paragraphs_with_marker(
     seps = [pieces[2 * i + 1] if 2 * i + 1 < len(pieces) else "" for i in range(n_segments)]
     changed = [(del_start in seg) or (ins_start in seg) for seg in segments]
 
-    # Find first and last changed indices
     changed_indices = [i for i, c in enumerate(changed) if c]
     if not changed_indices:
         return text
@@ -204,6 +191,24 @@ def _drop_unchanged_paragraphs(
     return "".join(result_parts)
 
 
+def _normalize_diff_output(text: str, omission_marker: Optional[str]) -> str:
+    """
+    Post-process the diff output to:
+      - remove redundant blank lines around the omission marker (if used),
+      - and remove trailing empty lines altogether.
+    """
+    if omission_marker:
+        om_esc = re.escape(omission_marker)
+        # Collapse multiple blank lines before the marker to a single newline.
+        text = re.sub(r'(\n\s*)+\n(' + om_esc + r')', r'\n\2', text)
+        # Collapse multiple blank lines after the marker to a single newline.
+        text = re.sub(r'(' + om_esc + r')\n(\n\s*)+', r'\1\n', text)
+
+    # Remove trailing completely blank lines (one or more).
+    text = re.sub(r'(\n[ \t]*)+\Z', "", text)
+    return text
+
+
 def diff_texts_inline(
     original: str,
     modified: str,
@@ -257,7 +262,8 @@ def diff_texts_inline(
     -------
     str
         A diff string with inline markers, preserving original whitespace
-        within paragraphs and paragraph breaks, subject to omission behavior.
+        within paragraphs and paragraph breaks, subject to omission behavior,
+        and with no trailing empty lines.
     """
     orig_tokens: List[str] = _tokenize_with_whitespace(original)
     mod_tokens: List[str] = _tokenize_with_whitespace(modified)
@@ -300,23 +306,25 @@ def diff_texts_inline(
 
     # Handle unchanged paragraphs according to omission_marker.
     if omission_marker is None:
-        # Keep all paragraphs as-is.
-        return diff_text
+        # Keep all paragraphs as-is, then normalize trailing empties.
+        return _normalize_diff_output(diff_text, omission_marker)
     elif omission_marker == "":
         # Drop unchanged paragraphs and their following separators.
-        return _drop_unchanged_paragraphs(
+        text = _drop_unchanged_paragraphs(
             diff_text,
             deletion_marker=deletion_marker,
             insertion_marker=insertion_marker,
         )
+        return _normalize_diff_output(text, omission_marker)
     else:
         # Replace runs of unchanged paragraphs with a placeholder line.
-        return _replace_unchanged_paragraphs_with_marker(
+        text = _replace_unchanged_paragraphs_with_marker(
             diff_text,
             deletion_marker=deletion_marker,
             insertion_marker=insertion_marker,
             omission_marker=omission_marker,
         )
+        return _normalize_diff_output(text, omission_marker)
 
 
 if __name__ == "__main__":
