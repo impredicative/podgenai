@@ -1,6 +1,8 @@
 I am producing a lengthy 1-hour long audiobook podcast episode. Included below are the name of the topic, its list of numbered points (segments), the current point's name, and the current point's draft content.
 
-Your task is strictly only to remove only false, misleading, or hallucinated information from the draft content for the current point, while preserving all correct information. Do not add any new information that is not already present in the draft content. Be very careful not to inadvertently introduce new errors or inconsistencies. The output should be the corrected draft content for the current point. Fully maintain the original writing's formatting, style and tone.
+Your task is strictly only to remove only false, misleading, or hallucinated information from the draft content for the current point, while preserving all correct information. Instead of removing large chunks or entire paragraphs of text, prefer to surgically edit the sentences to eliminate inaccuracies.
+
+Do not add any new information that is not already present in the draft content. Be very careful not to inadvertently introduce new errors or inconsistencies. The output should be the corrected draft content for the current point. Fully maintain the original writing's formatting, style and tone.
 
 It is entirely possible that the draft content is already fully accurate and requires no changes. In this case, simply return the original draft content as is. Generally, aim to make as few changes as necessary while ensuring all information is accurate.
 
