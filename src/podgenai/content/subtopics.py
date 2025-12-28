@@ -7,8 +7,9 @@ import podgenai.exceptions
 from podgenai.config import MAX_CONCURRENT_WORKERS, PROMPTS, NUM_SECTIONS_MIN, NUM_SECTIONS_MAX
 from podgenai.util.openai import get_cached_content
 from podgenai.work import get_topic_work_path
-from podgenai.util.difflib import diff_texts_inline
-from podgenai.util.threading import safe_print
+
+# from podgenai.util.difflib import diff_texts_inline
+# from podgenai.util.threading import safe_print
 from podgenai.util.sys import print_error, print_warning
 
 

@@ -200,12 +200,12 @@ def _normalize_diff_output(text: str, omission_marker: Optional[str]) -> str:
     if omission_marker:
         om_esc = re.escape(omission_marker)
         # Collapse multiple blank lines before the marker to a single newline.
-        text = re.sub(r'(\n\s*)+\n(' + om_esc + r')', r'\n\2', text)
+        text = re.sub(r"(\n\s*)+\n(" + om_esc + r")", r"\n\2", text)
         # Collapse multiple blank lines after the marker to a single newline.
-        text = re.sub(r'(' + om_esc + r')\n(\n\s*)+', r'\1\n', text)
+        text = re.sub(r"(" + om_esc + r")\n(\n\s*)+", r"\1\n", text)
 
     # Remove trailing completely blank lines (one or more).
-    text = re.sub(r'(\n[ \t]*)+\Z', "", text)
+    text = re.sub(r"(\n[ \t]*)+\Z", "", text)
     return text
 
 
@@ -328,23 +328,8 @@ def diff_texts_inline(
 
 
 if __name__ == "__main__":
-    v1 = (
-        "This is a very long paragraph that contains several sentences. "
-        "This sentence stays unchanged. "
-        "Some of the sentences will change slightly.\n\n"
-        "Here is another paragraph that stays mostly the same.\n\n"
-        "This paragraph stays entirely unchanged.\n\n"
-        "This sentence will add something new.\n\n"
-        "This one will be deleted."
-    )
+    v1 = "This is a very long paragraph that contains several sentences. This sentence stays unchanged. Some of the sentences will change slightly.\n\nHere is another paragraph that stays mostly the same.\n\nThis paragraph stays entirely unchanged.\n\nThis sentence will add something new.\n\nThis one will be deleted."
 
-    v2 = (
-        "This is a very long paragraph that contains many sentences. "
-        "This sentence stays unchanged. "
-        "Some of these sentences will change slightly.\n\n"
-        "Here is another paragraph that stays almost the same.\n\n"
-        "This paragraph stays entirely unchanged.\n\n"
-        "This sentence will add something new..."
-    )
+    v2 = "This is a very long paragraph that contains many sentences. This sentence stays unchanged. Some of these sentences will change slightly.\n\nHere is another paragraph that stays almost the same.\n\nThis paragraph stays entirely unchanged.\n\nThis sentence will add something new..."
 
     print(diff_texts_inline(v1, v2))
