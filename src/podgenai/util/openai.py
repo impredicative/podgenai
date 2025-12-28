@@ -23,12 +23,11 @@ MODELS = {
         "gpt-4.1-2025-04-14",
         "gpt-5-2025-08-07",
         "gpt-5-chat-latest",
-        "gpt-5.1-2025-11-13",
-        "gpt-5.1-chat-latest",
+        "gpt-5.2-2025-12-11",
+        "gpt-5.2-chat-latest",
     ][-1],  # Ref: https://platform.openai.com/docs/models
     # Notes:
-    #   As of 2025-12, gpt-5.1-chat-latest is experimentally used because it is less verbose and detailed than gpt-5.1-2025-11-13.
-    #   As of 2025-12, gpt-5.1-2025-11-13 is not used because it was too detailed for a 1-hour episode, although it can be relevant for longer episodes.
+    #   As of 2025-12, gpt-5.2-chat-latest is experimentally used because it has output that is slightly more suitable for the intended length than gpt-5.2-2025-12-11 which has longer output.
     #   As of 2025-08, gpt-5-chat-latest is experimentally used, mostly approximating gpt-4.1 in behavior.
     #   As of 2025-08, gpt-5-2025-08-07 is not used because it was observed to be impractically slow and verbose, although it was detailed.
     #   As of 2025-06, gpt-4.1-2025-04-14 is used because it is less likely to reject broad valid topics than gpt-4o-2024-11-20.
@@ -52,15 +51,15 @@ EXTRA_TEXT_MODEL_PREFIX_KWARGS = {
     "gpt-4.1-": {"max_completion_tokens": 32_768, "temperature": 0.5},
     "gpt-5-2": {"max_completion_tokens": 128_000},  # Note: Temperature is not supported. Suffix of `2` (short for 2025) allows disambiguation from `gpt-5-chat`.
     "gpt-5-chat-": {"max_completion_tokens": 16_384, "temperature": 0.5},  # Reasoning effort is not supported. Hallucinations were observed with temperature of 0.7.
-    "gpt-5.1-chat-": {"max_completion_tokens": 16_384},  # Temperature and reasoning effort are not supported.
-    "gpt-5.1-2": {"max_completion_tokens": 128_000, "reasoning_effort": "none", "temperature": 0.5},  # Note: Suffix of `2` (short for 2025) allows disambiguation from `gpt-5.1-chat`.
+    "gpt-5.2-chat-": {"max_completion_tokens": 16_384},  # Temperature and reasoning effort are not supported.
+    "gpt-5.2-2": {"max_completion_tokens": 128_000, "reasoning_effort": "none", "temperature": 0.5},  # Note: Suffix of `2` (short for 2025) allows disambiguation from `gpt-5.1-chat`.
 }
 UNSUPPORTED_TEXT_MODEL_PREFIX_KWARGS = {
     "gpt-4o-": ("reasoning_effort", "verbosity"),
     "gpt-4.1-": ("reasoning_effort", "verbosity"),
     "gpt-5-2": ("temperature",),  # Note: Suffix of `2` (short for 2025) allows disambiguation from `gpt-5-chat`.
     "gpt-5-chat-": ("reasoning_effort", "verbosity"),
-    "gpt-5.1-chat-": ("temperature",),
+    "gpt-5.2-chat-": ("temperature",),
 }
 extra_text_model_kwargs = {kw: v for prefix, kws in EXTRA_TEXT_MODEL_PREFIX_KWARGS.items() if MODELS["text"].startswith(prefix) for kw, v in kws.items()}
 unsupported_text_model_kwargs = {kw for prefix, kws in UNSUPPORTED_TEXT_MODEL_PREFIX_KWARGS.items() if MODELS["text"].startswith(prefix) for kw in kws}
