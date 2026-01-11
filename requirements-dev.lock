@@ -12,10 +12,10 @@
 -e file:.
 annotated-types==0.7.0
     # via pydantic
-anyio==4.12.0
+anyio==4.12.1
     # via httpx
     # via openai
-certifi==2025.11.12
+certifi==2026.1.4
     # via httpcore
     # via httpx
 click==8.3.1
@@ -36,7 +36,7 @@ idna==3.11
     # via httpx
 jiter==0.12.0
     # via openai
-openai==2.14.0
+openai==2.15.0
     # via podgenai
 pathvalidate==3.3.1
     # via podgenai
