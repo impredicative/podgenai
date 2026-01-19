@@ -14,16 +14,16 @@
 The `gpt-5.x-chat` and `tts-1` models are used. For a given topic, the high-level reference approach is:
 
 * Applicable subtopics are listed using the LLM. If however the topic is unknown to the LLM, the process is aborted.
-* The voice is selected using the LLM from four choices.
+* The voice is selected using the LLM from the available choices.
 * Concurrently for each subtopic, the corresponding text and speech are generated using the LLM and TTS respectively.
 * The speech files are concatenated using `ffmpeg`.
 
-Although there may sometimes exist some semantic repetition of content across subtopics, this has intentionally not been "optimized away" because this repetition of important points can help with learning and memorization. To dive deeper into a particular subtopic, one can try to create a new file just for it.
+Although there may sometimes exist some semantic repetition of content across subtopics, this has intentionally not been optimized away because this repetition of important points can help with learning and memorization.
 
 ## Samples
 These generated mp3 files are available for download, one for each voice. As a reminder, the voice is selected by the LLM.
 
-There is also a related [podcast](https://podcasters.spotify.com/pod/podgenai) ([RSS](https://anchor.fm/s/f4868644/podcast/rss)) to which episodes on additional topics may be manually posted over time.
+There also is a related [podcast](https://podcasters.spotify.com/pod/podgenai) ([RSS](https://anchor.fm/s/f4868644/podcast/rss)) to which episodes may be posted over time.
 
 A playback speed of 1.05x is recommended for non-technical topics, 1.0x for technical topics, and 0.95x for foreign language topics.
 
