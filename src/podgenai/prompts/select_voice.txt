@@ -11,6 +11,7 @@ Here are the available voices in alphabetical order by name:
 
 Note that these voices are overselected, which is not to say that they should never be selected:
 
+    analytical-male (alloy)
     expository-male (ash)
     serene-female (nova)
 
