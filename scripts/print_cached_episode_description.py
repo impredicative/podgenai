@@ -21,7 +21,7 @@ def _get_denumbered_subsections(lines: list[str]) -> list[str]:
     return [line[line.find(" ") + 1 :] if line.find(".") != -1 else line for line in lines]
 
 
-def get_cached_episode_description_html(topic: str, fmt: str = "html") -> str:
+def get_cached_episode_description(topic: str, fmt: str) -> str:
     topic = _lstrip_optional_timestamp(topic)
     work_path = get_topic_work_path(topic, create=False)
     if not work_path.is_dir():
@@ -57,8 +57,8 @@ def get_cached_episode_description_html(topic: str, fmt: str = "html") -> str:
             description = f"<p><strong>Sections</strong>:</p>\n<ol>\n{subtopics_list_html}\n</ol>\n<p><br></p><p><strong>Disclaimer</strong>: <em>{PROMPTS['tts_disclaimer']}</em></p>"
         case "plain" | "text" | "txt":
             description = f"Sections:\n\n{subtopics_text}"
-        case "llm" | "gpt":
-            description = f"{topic}\n\nSections:\n{subtopics_text}"
+        case "llm":
+            description = f"{topic}:\n\nSections:\n{subtopics_text}"
         case _:
             assert False, fmt
 
@@ -67,9 +67,12 @@ def get_cached_episode_description_html(topic: str, fmt: str = "html") -> str:
 
 def main():
     topic = get_topic()
-    description = get_cached_episode_description_html(topic)
-    print(f"\n{description}")
 
+    description = get_cached_episode_description(topic, fmt="llm")
+    print(f"\nLLM:\n{description}")
+
+    description = get_cached_episode_description(topic, fmt="html")
+    print(f"\nHTML:\n{description}")
 
 if __name__ == "__main__":
     main()
