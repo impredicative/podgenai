@@ -58,7 +58,7 @@ def get_cached_episode_description(topic: str, fmt: str) -> str:
         case "plain" | "text" | "txt":
             description = f"Sections:\n\n{subtopics_text}"
         case "llm" | "chat":
-            description = f"{topic}:\n\nSections:\n{subtopics_text}"
+            description = f"{topic}\n\nSections:\n{subtopics_text}"
         case _:
             assert False, fmt
 
