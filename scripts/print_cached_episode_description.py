@@ -38,6 +38,8 @@ def get_cached_episode_description(topic: str, fmt: str) -> str:
     subtopics_list_file = subtopics_list_files[0]
     subtopics_text = subtopics_list_file.read_text().strip()
     subtopics_list = subtopics_text.split("\n")
+    subtopics_list = [s.strip() for s in subtopics_list if s.strip()]
+    subtopics_text_stripped = "\n".join(subtopics_list)
     assert subtopics_list
 
     match fmt:
@@ -56,9 +58,9 @@ def get_cached_episode_description(topic: str, fmt: str) -> str:
             subtopics_list_html = "\n".join(f"  <li>{s}</li>" for s in denumbered_subtopics_list)
             description = f"<p><strong>Sections</strong>:</p>\n<ol>\n{subtopics_list_html}\n</ol>\n<p><br></p><p><strong>Disclaimer</strong>: <em>{PROMPTS['tts_disclaimer']}</em></p>"
         case "plain" | "text" | "txt":
-            description = f"Sections:\n\n{subtopics_text}"
+            description = f"Sections:\n\n{subtopics_text_stripped}"
         case "llm" | "chat":
-            description = f"{topic}\n\nSections:\n{subtopics_text}"
+            description = f"{topic}\n\nSections:\n{subtopics_text_stripped}"
         case _:
             assert False, fmt
 
