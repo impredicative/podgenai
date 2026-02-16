@@ -35,7 +35,10 @@ MODELS = {
     #   As of 2024-09, gpt-4o-2024-08-06 is used because it has information about newer topics that the older gpt-4-0125-preview model does not.
     #   As of 2024-05, gpt-4o-2024-05-13 is not used because it was observed to hallucinate significantly, whereas gpt-4-0125-preview doesn't.
     #   As of 2024-04, gpt-4-turbo-2024-04-09 is not used because it was observed to produce slightly lesser content than gpt-4-0125-preview.
-    "tts": "tts-1",  # Note: tts-1-hd is twice as expensive, and has a more limited concurrent usage quota resulting in openai.RateLimitError, thereby making it undesirable.
+    "tts": [  # Demo: https://platform.openai.com/audio/tts
+        "tts-1",  # Note: tts-1-hd is twice as expensive, and was observed to have a more limited concurrent usage quota resulting in openai.RateLimitError.
+        "gpt-4o-mini-tts-2025-12-15",  # Ref: https://developers.openai.com/api/docs/models/gpt-4o-mini-tts.
+        ][0],
 }
 TTS_VOICE_MAP = {  # Note: Before adding any name, ensure that *all* names are still selectable in practice by testing various topics.
     "analytical-male": "alloy",
@@ -146,14 +149,21 @@ def get_cached_content(prompt: str, *, read_cache: bool = True, cache_key_prefix
     return content
 
 
-def write_speech_audio(text: str, path: Path, *, voice: str = next(iter(TTS_VOICE_MAP)), client: Optional[OpenAI] = None) -> None:
+def write_speech_audio(text: str, path: str | Path, *, voice: str = next(iter(TTS_VOICE_MAP)), client: Optional[OpenAI] = None, **kwargs) -> None:
     """Write the speech audio file for the given prompt to the given file path.
 
-    The prompt must not be longer than 4096 characters, as this is the maximum supported length by the client.
+    Text maximum length constraints by model:
+    * tts-1: 4096 characters
+    * gpt-4o-mini-tts:  2000 tokens
 
     `voice` can be one of the keys or values in TTS_VOICE_MAP, or one of the other supported voices.
+
+    Additional keyword arguments are forwarded to `create`.
     """
+    if isinstance(path, str):
+        path = Path(path)
     assert path.suffix == ".mp3"
+
     if not client:
         client = get_openai_client()
 
@@ -161,7 +171,8 @@ def write_speech_audio(text: str, path: Path, *, voice: str = next(iter(TTS_VOIC
     voice_str = voice if (voice == mapped_voice) else f"{voice} ({mapped_voice})"
 
     safe_print(f"Requesting speech audio in {voice_str} voice for: {path.stem}")
-    response = client.audio.speech.create(model=MODELS["tts"], voice=mapped_voice, input=text)
+    # Ref: https://developers.openai.com/api/docs/guides/text-to-speech#quickstart
+    response = client.audio.speech.create(model=MODELS["tts"], voice=mapped_voice, input=text, **kwargs)
     # relative_path = path.relative_to(Path.cwd())
     # safe_print(f"Writing speech to: {relative_path}")
     response.stream_to_file(path)
