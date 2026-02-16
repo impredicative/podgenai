@@ -6,7 +6,7 @@ import openai
 import pathvalidate
 
 import podgenai.exceptions
-from podgenai.config import PACKAGE_NAME
+from podgenai.config import PACKAGE_NAME, PROMPTS
 from podgenai.util.dotenv_ import load_dotenv
 from podgenai.util.binascii import hasher
 from podgenai.util.threading import safe_print
@@ -170,9 +170,14 @@ def write_speech_audio(text: str, path: str | Path, *, voice: str = next(iter(TT
     mapped_voice = TTS_VOICE_MAP.get(voice, voice)
     voice_str = voice if (voice == mapped_voice) else f"{voice} ({mapped_voice})"
 
+    model = MODELS["tts"]
+
+    if ("instructions" not in kwargs) and (not model.startswith("tts-1")):
+        kwargs["instructions"] = PROMPTS["tts_instructions"]
+    
     safe_print(f"Requesting speech audio in {voice_str} voice for: {path.stem}")
     # Ref: https://developers.openai.com/api/docs/guides/text-to-speech#quickstart
-    response = client.audio.speech.create(model=MODELS["tts"], voice=mapped_voice, input=text, **kwargs)
+    response = client.audio.speech.create(model=model, voice=mapped_voice, input=text, **kwargs)
     # relative_path = path.relative_to(Path.cwd())
     # safe_print(f"Writing speech to: {relative_path}")
     response.stream_to_file(path)
