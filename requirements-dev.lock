@@ -36,7 +36,7 @@ idna==3.11
     # via httpx
 jiter==0.13.0
     # via openai
-openai==2.18.0
+openai==2.21.0
     # via podgenai
 pathvalidate==3.3.1
     # via podgenai
