@@ -12,8 +12,8 @@ OUTPUT_FILE="./src/podgenai/audio/pause.mp3"
 
 SR=24000          # Sample rate (Hz)
 CHANNELS=1        # Mono (single channel)
-BITRATE="128k"    # Constant bitrate
-REQ_DUR=0.8       # Requested pause duration (seconds)
+BITRATE="160k"    # Constant bitrate
+REQ_DUR=0.7       # Requested pause duration (seconds)
 
 # MP3 Layer III structure
 MP3_FRAME_SAMPLES=1152
@@ -88,6 +88,6 @@ ffprobe -v error -select_streams a:0 -show_entries stream=duration \
 echo
 echo "ffprobe stream details:"
 ffprobe -v error -select_streams a:0 \
-  -show_entries stream=codec_name,profile,sample_rate,channels,channel_layout,bit_rate \
+  -show_entries stream=codec_name,codec_long_name,profile,sample_rate,channels,channel_layout,bit_rate \
   -of default=noprint_wrappers=1 \
   "${OUTPUT_FILE}"
