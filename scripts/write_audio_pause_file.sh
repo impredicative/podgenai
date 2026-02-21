@@ -12,7 +12,7 @@ SR=24000          # Sample rate (Hz)
 CHANNELS=1        # Mono (single channel)
 BITRATE="160k"    # Constant bitrate
 REQ_DUR=0.7       # Requested pause duration (seconds)
-OUTPUT_FILE="./src/podgenai/audio/pause${REQ_DUR}s.mp3"  # Output file path
+OUTPUT_FILE="./src/podgenai/audio/pause-${REQ_DUR}s.mp3"  # Output file path
 
 # MP3 Layer III structure
 MP3_FRAME_SAMPLES=1152
