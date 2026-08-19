@@ -19,11 +19,12 @@ def get_confirmation(task: Optional[str] = None) -> None:
             case "n" | "no":
                 raise podgenai.exceptions.InputError("User canceled.")
 
+
 def get_confirmation_or_int(range_: range, *, task: Optional[str] = None) -> None | int:
     """Receive input confirmation from the user, optionally for the specified task.
 
     If the user enters an integer in the allowed range, it is returned.
-    
+
     If confirmation is refused, `InputError` is raised.
     """
     task_prompt = f" with {task}" if task else ""

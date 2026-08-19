@@ -45,9 +45,9 @@ if MODELS["tts"] == "tts-1":
 else:
     # Note: OpenAI recommends only marin and cedar for the best quality. Ref: https://platform.openai.com/docs/guides/text-to-speech#voice-options
     TTS_VOICE_MAP = {
-            "modern-female": "marin",
-            "modern-male": "cedar",
-        }
+        "modern-female": "marin",
+        "modern-male": "cedar",
+    }
 
 EXTRA_TEXT_MODEL_PREFIX_KWARGS = {
     "gpt-4o-": {"max_completion_tokens": 16_384, "temperature": 0.5},
