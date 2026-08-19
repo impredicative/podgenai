@@ -13,10 +13,10 @@
 ## Approach
 The `chat-latest` and `gpt-4o-mini-tts-2025-12-15` models are used for text and speech generation respectively. For a given topic, the high-level reference approach is:
 
-* Applicable subtopics are listed using the LLM. If however the topic is unknown to the LLM, the process is aborted.
-* The voice is selected using the LLM from the configured choices.
-* Concurrently for each subtopic, the corresponding text and speech are generated using the LLM and TTS respectively.
-* The speech files are concatenated using `ffmpeg`, with a pause added between subtopics.
+1. Applicable subtopics are listed using the LLM. If however the topic is unknown to the LLM, the process is aborted.
+2. The voice is selected using the LLM from the configured choices.
+3. Concurrently for each subtopic, the corresponding text and speech are generated using the LLM and TTS respectively.
+4. The speech files are concatenated using `ffmpeg`, with a pause added between subtopics.
 
 Although there may sometimes exist some semantic repetition of content across subtopics, this has intentionally not been optimized away because this repetition of important points can help with learning and memorization.
 
