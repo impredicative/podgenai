@@ -1,5 +1,5 @@
 # podgenai
-**podgenai** is a Python 3.12 application to generate an informational single-speaker audiobook/podcast mp3 file on a given topic using an OpenAI LLM. The loosely targeted duration of the generated file is an hour, although the generated duration varies. A funded [OpenAI API key](https://platform.openai.com/api-keys) is required.
+**podgenai** is a Python 3.12 application to generate an informational single-speaker audiobook/podcast mp3 file on a given topic using an OpenAI LLM. The loosely targeted duration of the generated file is an hour, although producing comprehensive coverage often results in a substantially longer multi-hour duration. A funded [OpenAI API key](https://platform.openai.com/api-keys) is required.
 
 ## Links
 | Caption     | Link                                                 |
@@ -14,7 +14,7 @@
 The `chat-latest` and `gpt-4o-mini-tts-2025-12-15` models are used for text and speech generation respectively. For a given topic, the high-level reference approach is:
 
 * Applicable subtopics are listed using the LLM. If however the topic is unknown to the LLM, the process is aborted.
-* The voice is selected using the LLM from the available choices.
+* The voice is selected using the LLM from the configured choices.
 * Concurrently for each subtopic, the corresponding text and speech are generated using the LLM and TTS respectively.
 * The speech files are concatenated using `ffmpeg`, with a pause added between subtopics.
 
@@ -27,14 +27,10 @@ There also is a related [podcast](https://podcasters.spotify.com/pod/podgenai) (
 
 A playback speed of 1.05x is recommended for non-technical topics, 1.0x for technical topics, and 0.95x for foreign language topics.
 
-| Voice            | Name |
-|------------------|------|
-| analytical-male  | [Artificial General Intelligence (AGI): Approaches and Algorithms](https://mega.nz/file/0JkWnDQQ#PSUA5aj0q_yU18T4XsazYZoSG9bqjUi7vCLmjVrY1IA)
-| elegant-female   | [Monero](https://mega.nz/file/gF1Syaqb#NlzFP0KABKsAa8NdTaVTrsV-ERheULeHHJvAdb73Dt4)
-| emotive-male     | [Living a good life](https://mega.nz/file/NNMUFTJT#8ga2REaZaT79-zf83KqBT2tUW8Q8j5sT0WAuxQUEpQ8)
-| expository-male  | [History of Neural Networks](https://mega.nz/file/QNVw0TBC#ui8RfOL8ET33Swjt-DEsYSuek_NbQPoTla2FnfVvtj8)
-| informative-male | [Bitcoin for nerds](https://mega.nz/file/QVNyWYrZ#RqKuAcG6LUwOZi20ZBkygRNin9f7rpLBm1xsoILoAFI)
-| serene-female    | [Human circulatory system (unabridged)](https://mega.nz/file/UYt2WLDA#4q-UI8cWffzN0PG8ZGiQK_96dudklBJOfFmpE_3for4)
+| Voice                 | Name |
+|-----------------------|------|
+| modern-female (marin) | [New York City tourism: What's new](https://mega.nz/file/VJ1WRbxZ#62PvDAD0ttO7JD3l9CywICB2KAMUhxLc6Jed7WkE3B4)
+| modern-male (cedar)   | [Writing a Will](https://mega.nz/file/gE0EzKBT#Qm72FWa36joj_qFP7MlN2pyESLa0dS4Q6xiKwRIpLUY)
 
 ## Setup
 
