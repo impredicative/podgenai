@@ -55,8 +55,16 @@ def get_cached_episode_description(topic: str, fmt: str) -> str:
                     reformatted_denumbered_subtopics.append(subtopic)
                 denumbered_subtopics_list = reformatted_denumbered_subtopics
 
-            subtopics_list_html = "\n".join(f"  <li>{s}</li>" for s in denumbered_subtopics_list)
-            description = f"<p><strong>Sections</strong>:</p>\n<ol>\n{subtopics_list_html}\n</ol>\n<p><br></p><p><strong>Disclaimer</strong>: <em>{PROMPTS['tts_disclaimer']}</em></p>"
+            is_description_truncated = False
+            while True:
+                subtopics_list_html = "\n".join(f"  <li>{s}</li>" for s in denumbered_subtopics_list)
+                truncation_notice = f"<p><em>(Description is truncated down from {len(subtopics_list)} sections due to a size restriction.)</em></p>\n" if is_description_truncated else ""
+                description = f"<p><strong>Sections</strong>:</p>\n<ol>\n{subtopics_list_html}\n</ol>\n{truncation_notice}<p><br></p><p><strong>Disclaimer</strong>: <em>{PROMPTS['tts_disclaimer']}</em></p>"
+                if len(description) <= 4000:
+                    break
+                else:
+                    denumbered_subtopics_list.pop()
+                    is_description_truncated = True
         case "plain" | "text" | "txt":
             description = f"Sections:\n\n{subtopics_text_stripped}"
         case "llm" | "chat":
