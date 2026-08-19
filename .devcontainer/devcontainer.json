@@ -14,7 +14,6 @@
 	"customizations": {
         "vscode": {
             "extensions": [
-				"GitHub.copilot",
 				"mhutchie.git-graph",
 				"ms-python.python",
 				"streetsidesoftware.code-spell-checker",
