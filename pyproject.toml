@@ -6,11 +6,12 @@ authors = [
     { name = "Ouroboros Chrysopoeia", email = "impredicative@users.noreply.github.com" }
 ]
 dependencies = [
-    "click>=8.3.1",  # https://github.com/pallets/click/releases
-    "openai>=2.21.0",  # https://github.com/openai/openai-python/releases
+    "click>=8.4.2",  # https://github.com/pallets/click/releases
+    "openai>=3.3.0",  # https://github.com/openai/openai-python/releases
     "pathvalidate>=3.3.1",  # https://github.com/thombashi/pathvalidate/releases
-    "python-dotenv>=1.2.1",  # https://github.com/theskumar/python-dotenv/releases
-    "semantic-text-splitter>=0.22.0,<0.23.0",  # https://github.com/benbrandt/text-splitter/releases https://github.com/benbrandt/text-splitter/issues/605
+    "python-dotenv>=1.2.3",  # https://github.com/theskumar/python-dotenv/releases
+    "semantic-text-splitter>=0.32.0",  # https://github.com/benbrandt/text-splitter/releases https://github.com/benbrandt/text-splitter/tree/main/bindings/python
+    "tiktoken>=0.14.0",  # https://github.com/openai/tiktoken/releases https://github.com/openai/tiktoken/blob/main/CHANGELOG.md
 ]
 readme = "README.md"
 requires-python = ">= 3.12"
