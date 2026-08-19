@@ -2,12 +2,7 @@ I am making a lengthy audiobook podcast episode on a topic. Specify which voice 
 
 Here are the available voices in alphabetical order by name:
 
-    analytical-male (alloy)
-    elegant-female (sage)
-    emotive-male (echo)
-    expository-male (ash)
-    informative-male (onyx)
-    serene-female (nova)
+{voices}
 
 The topic is:
 

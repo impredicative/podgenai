@@ -10,6 +10,7 @@ PACKAGE_PATH: Path = Path(__file__).parent
 PACKAGE_NAME: str = PACKAGE_PATH.name
 REPO_PATH: Path = PACKAGE_PATH.parent.parent
 
+AUDIO_PATHS: dict[str, Path] = {p.stem: p for p in (PACKAGE_PATH / "audio").glob("*.mp3")}
 GiB = 1024**3
 MAX_CONCURRENT_WORKERS = int(os.environ.get("PODGENAI_OPENAI_MAX_WORKERS", 16))  # Note: Default value is documented in readme.
 assert MAX_CONCURRENT_WORKERS >= 1

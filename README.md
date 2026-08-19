@@ -11,12 +11,12 @@
 | Podcast RSS | https://anchor.fm/s/f4868644/podcast/rss             |
 
 ## Approach
-The `gpt-5.x-chat` and `tts-1` models are used. For a given topic, the high-level reference approach is:
+The `chat-latest` and `gpt-4o-mini-tts-2025-12-15` models are used for text and speech generation respectively. For a given topic, the high-level reference approach is:
 
 * Applicable subtopics are listed using the LLM. If however the topic is unknown to the LLM, the process is aborted.
 * The voice is selected using the LLM from the available choices.
 * Concurrently for each subtopic, the corresponding text and speech are generated using the LLM and TTS respectively.
-* The speech files are concatenated using `ffmpeg`.
+* The speech files are concatenated using `ffmpeg`, with a pause added between subtopics.
 
 Although there may sometimes exist some semantic repetition of content across subtopics, this has intentionally not been optimized away because this repetition of important points can help with learning and memorization.
 
@@ -41,7 +41,7 @@ A playback speed of 1.05x is recommended for non-technical topics, 1.0x for tech
 ### Common setup
 * In the working directory, create a file named `.env`, with the intended environment variable `OPENAI_API_KEY=<your OpenAI API key>`, or set it in a different way.
 * Optionally also set the environment variable `PODGENAI_OPENAI_MAX_WORKERS=32` for faster generation, with its default value being 16.
-* Ensure that `ffmpeg` is available. This is automatic if using the included devcontainer definition.
+* Ensure that `ffmpeg` and `ffprobe` are available. This is automatic if using the included devcontainer definition.
 * Continue the setup via GitHub or PyPI as below.
 
 ### Setup via GitHub using devcontainer

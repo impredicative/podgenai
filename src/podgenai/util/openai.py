@@ -4,6 +4,7 @@ from typing import Optional
 
 import openai
 import pathvalidate
+from openai.types.chat import ChatCompletion
 
 import podgenai.exceptions
 from podgenai.config import PACKAGE_NAME, PROMPTS
@@ -13,10 +14,8 @@ from podgenai.util.threading import safe_print
 
 load_dotenv()
 
-ChatCompletion = openai.types.chat.chat_completion.ChatCompletion
 OpenAI = openai.OpenAI
 
-MAX_TTS_INPUT_LEN = 4096
 MODELS = {
     "text": [
         "gpt-4o-2024-11-20",
@@ -25,29 +24,30 @@ MODELS = {
         "gpt-5-chat-latest",
         "gpt-5.2-2025-12-11",
         "gpt-5.2-chat-latest",
+        "gpt-5.6-sol",
+        "chat-latest",
     ][-1],  # Ref: https://platform.openai.com/docs/models
-    # Notes:
-    #   As of 2025-12, gpt-5.2-chat-latest is experimentally used because it has output that is slightly more suitable for the intended length than gpt-5.2-2025-12-11 which has longer output.
-    #   As of 2025-08, gpt-5-chat-latest is experimentally used, mostly approximating gpt-4.1 in behavior.
-    #   As of 2025-08, gpt-5-2025-08-07 is not used because it was observed to be impractically slow and verbose, although it was detailed.
-    #   As of 2025-06, gpt-4.1-2025-04-14 is used because it is less likely to reject broad valid topics than gpt-4o-2024-11-20.
-    #   As of 2024-11, gpt-4o-2024-11-20 is used because it seems to be even better at instruction-following than gpt-4o-2024-08-06.
-    #   As of 2024-09, gpt-4o-2024-08-06 is used because it has information about newer topics that the older gpt-4-0125-preview model does not.
-    #   As of 2024-05, gpt-4o-2024-05-13 is not used because it was observed to hallucinate significantly, whereas gpt-4-0125-preview doesn't.
-    #   As of 2024-04, gpt-4-turbo-2024-04-09 is not used because it was observed to produce slightly lesser content than gpt-4-0125-preview.
     "tts": [  # Demo: https://platform.openai.com/audio/tts
         "tts-1",  # Note: tts-1-hd is twice as expensive, and was observed to have a more limited concurrent usage quota resulting in openai.RateLimitError.
         "gpt-4o-mini-tts-2025-12-15",  # Ref: https://developers.openai.com/api/docs/models/gpt-4o-mini-tts.
-        ][0],
+    ][-1],
 }
-TTS_VOICE_MAP = {  # Note: Before adding any name, ensure that *all* names are still selectable in practice by testing various topics.
-    "analytical-male": "alloy",
-    "elegant-female": "sage",
-    "emotive-male": "echo",
-    "expository-male": "ash",
-    "informative-male": "onyx",
-    "serene-female": "nova",
-}  # Ref: https://platform.openai.com/docs/guides/text-to-speech#voice-options
+
+if MODELS["tts"] == "tts-1":
+    TTS_VOICE_MAP = {  # Note: Before adding any name, ensure that *all* names are still selectable in practice by testing various topics.
+        "analytical-male": "alloy",
+        "elegant-female": "sage",
+        "emotive-male": "echo",
+        "expository-male": "ash",
+        "informative-male": "onyx",
+        "serene-female": "nova",
+    }  # Ref: https://platform.openai.com/docs/guides/text-to-speech#voice-options
+else:
+    # Note: OpenAI recommends only marin and cedar for the best quality. Ref: https://platform.openai.com/docs/guides/text-to-speech#voice-options
+    TTS_VOICE_MAP = {
+            "modern-female": "marin",
+            "modern-male": "cedar",
+        }
 
 EXTRA_TEXT_MODEL_PREFIX_KWARGS = {
     "gpt-4o-": {"max_completion_tokens": 16_384, "temperature": 0.5},
@@ -56,6 +56,8 @@ EXTRA_TEXT_MODEL_PREFIX_KWARGS = {
     "gpt-5-chat-": {"max_completion_tokens": 16_384, "temperature": 0.5},  # Reasoning effort is not supported. Hallucinations were observed with temperature of 0.7.
     "gpt-5.2-chat-": {"max_completion_tokens": 16_384},  # Temperature and reasoning effort are not supported.
     "gpt-5.2-2": {"max_completion_tokens": 128_000, "reasoning_effort": "none", "temperature": 0.5},  # Note: Suffix of `2` (short for 2025) allows disambiguation from `gpt-5.1-chat`.
+    "gpt-5.6-": {"max_completion_tokens": 128_000, "reasoning_effort": "none"},
+    "chat-": {"max_completion_tokens": 128_000},
 }
 UNSUPPORTED_TEXT_MODEL_PREFIX_KWARGS = {
     "gpt-4o-": ("reasoning_effort", "verbosity"),
@@ -63,6 +65,7 @@ UNSUPPORTED_TEXT_MODEL_PREFIX_KWARGS = {
     "gpt-5-2": ("temperature",),  # Note: Suffix of `2` (short for 2025) allows disambiguation from `gpt-5-chat`.
     "gpt-5-chat-": ("reasoning_effort", "verbosity"),
     "gpt-5.2-chat-": ("temperature",),
+    "chat-": ("temperature", "reasoning_effort", "verbosity"),
 }
 extra_text_model_kwargs = {kw: v for prefix, kws in EXTRA_TEXT_MODEL_PREFIX_KWARGS.items() if MODELS["text"].startswith(prefix) for kw, v in kws.items()}
 unsupported_text_model_kwargs = {kw for prefix, kws in UNSUPPORTED_TEXT_MODEL_PREFIX_KWARGS.items() if MODELS["text"].startswith(prefix) for kw in kws}
@@ -152,10 +155,6 @@ def get_cached_content(prompt: str, *, read_cache: bool = True, cache_key_prefix
 def write_speech_audio(text: str, path: str | Path, *, voice: str = next(iter(TTS_VOICE_MAP)), client: Optional[OpenAI] = None, **kwargs) -> None:
     """Write the speech audio file for the given prompt to the given file path.
 
-    Text maximum length constraints by model:
-    * tts-1: 4096 characters
-    * gpt-4o-mini-tts:  2000 tokens
-
     `voice` can be one of the keys or values in TTS_VOICE_MAP, or one of the other supported voices.
 
     Additional keyword arguments are forwarded to `create`.
@@ -174,13 +173,13 @@ def write_speech_audio(text: str, path: str | Path, *, voice: str = next(iter(TT
 
     if ("instructions" not in kwargs) and (not model.startswith("tts-1")):
         kwargs["instructions"] = PROMPTS["tts_instructions"]
-    
+
     safe_print(f"Requesting speech audio in {voice_str} voice for: {path.stem}")
     # Ref: https://developers.openai.com/api/docs/guides/text-to-speech#quickstart
-    response = client.audio.speech.create(model=model, voice=mapped_voice, input=text, **kwargs)
     # relative_path = path.relative_to(Path.cwd())
     # safe_print(f"Writing speech to: {relative_path}")
-    response.stream_to_file(path)
+    with client.audio.speech.with_streaming_response.create(model=model, voice=mapped_voice, input=text, response_format="mp3", **kwargs) as response:
+        response.stream_to_file(path)
     assert path.exists(), path
     # safe_print(f"Wrote speech to: {relative_path}")
     safe_print(f"Received speech audio in {voice_str} voice for: {path.stem}")

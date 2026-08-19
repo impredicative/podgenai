@@ -62,8 +62,7 @@ def generate_media(topic: str, *, output_path: Optional[Path] = None, max_sectio
     speech_tasks = get_speech_tasks(subtopics_speech_texts, topic=topic, voice=mapped_voice)
     ensure_speech_audio_files(speech_tasks, voice=voice)
 
-    speech_paths = list(speech_tasks)
     output_path = get_output_file_path(output_path, topic=topic)
-    merge_speech_paths(speech_paths, topic=topic, output_path=output_path)
+    merge_speech_paths(speech_tasks, topic=topic, output_path=output_path)
     print(f"OUTPUT: {output_path}")
     return output_path

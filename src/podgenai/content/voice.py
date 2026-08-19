@@ -1,5 +1,6 @@
 import re
 
+import podgenai.exceptions
 from podgenai.config import PROMPTS
 from podgenai.util.openai import get_cached_content, TTS_VOICE_MAP
 from podgenai.work import get_topic_work_path
@@ -16,7 +17,8 @@ def get_voice(topic: str, max_attempts: int = 3) -> str:
     """
     # Note: More than a single attempt is necessary because an invalid value such as "emale" has at times been observed in the first attempt.
     prompt_name = "select_voice"
-    prompt = PROMPTS[prompt_name].format(topic=topic)
+    voices = "\n".join(f"    {name} ({value})" for name, value in sorted(TTS_VOICE_MAP.items()))
+    prompt = PROMPTS[prompt_name].format(voices=voices, topic=topic)
 
     for num_attempt in range(1, max_attempts + 1):
         raw_voice = get_cached_content(prompt, read_cache=num_attempt == 1, cache_key_prefix=f"0. {prompt_name}", cache_path=get_topic_work_path(topic))
@@ -28,6 +30,8 @@ def get_voice(topic: str, max_attempts: int = 3) -> str:
         if (match := _JOINT_PATTERN.fullmatch(voice)) and ((match_key := match.group("key")) in TTS_VOICE_MAP) and (match.group("value") == TTS_VOICE_MAP[match_key]):
             voice = match_key
             break
+    else:
+        raise podgenai.exceptions.LanguageModelOutputError(f"Failed to obtain a valid voice for topic '{topic}' after {max_attempts} attempts. Last raw voice: '{raw_voice}'.")
 
     assert voice in TTS_VOICE_MAP, {"topic": topic, "raw_voice": raw_voice, "voice": voice, "TTS_VOICE_MAP": TTS_VOICE_MAP}
     return voice

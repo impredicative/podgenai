@@ -1,12 +1,59 @@
 import datetime
+import functools
+import json
 from pathlib import Path
 import subprocess
-from typing import Optional
+from typing import Optional, TypedDict
 
 import pathvalidate
 
-from podgenai.config import CWD
+from podgenai.config import AUDIO_PATHS, CWD
+from podgenai.types import SpeechTask
 from podgenai.work import get_topic_work_path
+
+
+class AudioFileMetadataForConcat(TypedDict):
+    codec_name: str
+    codec_type: str
+    sample_rate: str
+    channels: int
+    channel_layout: str
+    time_base: str
+
+
+_EXPECTED_AUDIO_FILE_METADATA_FOR_CONCAT: AudioFileMetadataForConcat = {
+    "codec_name": "mp3",
+    "codec_type": "audio",
+    "sample_rate": "24000",
+    "channels": 1,
+    "channel_layout": "mono",
+    "time_base": "1/14112000",
+}
+
+
+@functools.lru_cache(maxsize=128)
+def get_audio_file_metadata_for_concat(path: Path) -> AudioFileMetadataForConcat:
+    """Return audio metadata relevant to stream-copy concatenation compatibility."""
+    assert path.is_file()
+    cmd = [
+        "ffprobe",
+        "-v",
+        "error",
+        "-select_streams",
+        "a:0",
+        "-show_entries",
+        "stream=codec_name,codec_type,sample_rate,channels,channel_layout,time_base",
+        "-of",
+        "json",
+        str(path),
+    ]
+    result = subprocess.run(cmd, check=True, capture_output=True, text=True)
+    data = json.loads(result.stdout)
+    streams = data.get("streams")
+    assert streams and len(streams) == 1
+    stream = streams[0]
+    metadata = AudioFileMetadataForConcat(**stream)
+    return metadata
 
 
 def get_default_output_filename(topic: str) -> str:
@@ -35,13 +82,32 @@ def get_output_file_path(output_path: Optional[Path], *, topic: str) -> Path:
     return output_path
 
 
-def merge_speech_paths(paths: list[Path], *, topic: str, output_path: Path) -> None:
+def merge_speech_paths(speech_tasks: list[SpeechTask], *, topic: str, output_path: Path) -> None:
     """Merge the ordered list of preexisting audio file paths for the given topic to a single audio file having the given output file path."""
+
+    short_pause_path, long_pause_path = AUDIO_PATHS["pause-0.25s"], AUDIO_PATHS["pause-0.50s"]
+    assert _EXPECTED_AUDIO_FILE_METADATA_FOR_CONCAT == get_audio_file_metadata_for_concat(short_pause_path)
+    assert _EXPECTED_AUDIO_FILE_METADATA_FOR_CONCAT == get_audio_file_metadata_for_concat(long_pause_path)
+
+    paths = []
+    for speech_task in speech_tasks:
+        path = speech_task["path"]
+        assert _EXPECTED_AUDIO_FILE_METADATA_FOR_CONCAT == get_audio_file_metadata_for_concat(path)
+        if speech_task["portion_num"] < speech_task["num_portions"]:
+            pause_path = short_pause_path
+        elif (speech_task["portion_num"] == speech_task["num_portions"]) and (speech_task != speech_tasks[-1]):
+            pause_path = long_pause_path
+        else:
+            pause_path = None
+        paths.append(path)
+        if pause_path is not None:
+            paths.append(pause_path)
+
     work_path = get_topic_work_path(topic)
     ffmpeg_paths = [str(p).replace("'", "'\\''") for p in paths]
     ffmpeg_filelist_path = work_path / "ffmpeg.list"
     ffmpeg_filelist_path.write_text("\n".join(f"file '{p}'" for p in ffmpeg_paths))
-    print(f"Merging {len(paths)} speech parts.")
-    subprocess.run(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(ffmpeg_filelist_path), "-c", "copy", "-loglevel", "error", str(output_path)], check=True)
+    print(f"Merging {len(paths)} speech parts with pauses.")
+    subprocess.run(["ffmpeg", "-y", "-xerror", "-f", "concat", "-safe", "0", "-i", str(ffmpeg_filelist_path), "-c", "copy", "-loglevel", "error", str(output_path)], check=True)
     assert output_path.exists()
-    print(f"Merged {len(paths)} speech parts.")
+    print(f"Merged {len(paths)} speech parts with pauses.")
