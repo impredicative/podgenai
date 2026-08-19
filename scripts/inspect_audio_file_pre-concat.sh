@@ -24,7 +24,6 @@ fi
 
 # Print audio stream info
 ffprobe -v error \
-  -select_streams a:0 \
-  -show_entries stream=codec_name,codec_long_name,profile,sample_rate,channels,channel_layout,bit_rate,sample_fmt,time_base \
+  -show_entries stream=index,codec_type,codec_name,sample_rate,channels,channel_layout,time_base:format=duration \
   -of default=noprint_wrappers=1 \
   "$FILE"
