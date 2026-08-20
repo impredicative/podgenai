@@ -7,21 +7,21 @@ authors = [
 ]
 dependencies = [
     "click>=8.4.2",  # https://github.com/pallets/click/releases
-    "openai>=3.3.0",  # https://github.com/openai/openai-python/releases
+    "openai>=3.3.1",  # https://github.com/openai/openai-python/releases
     "pathvalidate>=3.3.1",  # https://github.com/thombashi/pathvalidate/releases
     "python-dotenv>=1.2.3",  # https://github.com/theskumar/python-dotenv/releases
     "semantic-text-splitter>=0.32.0",  # https://github.com/benbrandt/text-splitter/releases https://github.com/benbrandt/text-splitter/tree/main/bindings/python
     "tiktoken>=0.14.0",  # https://github.com/openai/tiktoken/releases https://github.com/openai/tiktoken/blob/main/CHANGELOG.md
 ]
 readme = "README.md"
-requires-python = ">= 3.12"
+requires-python = ">= 3.13"
 keywords = ["podcast", "mp3", "audiobook", "openai", "aicast"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Natural Language :: English",
     "Topic :: Multimedia :: Sound/Audio :: Speech",
     "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
-    "Programming Language :: Python :: 3.12"
+    "Programming Language :: Python :: 3.13"
 ]
 
 [project.scripts]

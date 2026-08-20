@@ -1,5 +1,5 @@
 # podgenai
-**podgenai** is a Python 3.12 application to generate an informational single-speaker audiobook/podcast mp3 file on a given topic using an OpenAI LLM. The loosely targeted duration of the generated file is an hour, although producing comprehensive coverage often results in a substantially longer multi-hour duration. A funded [OpenAI API key](https://platform.openai.com/api-keys) is required.
+**podgenai** is a Python 3.13 application to generate an informational single-speaker audiobook/podcast mp3 file on a given topic using an OpenAI LLM. The loosely targeted duration of the generated file is an hour, although producing comprehensive coverage often results in a substantially longer multi-hour duration. A funded [OpenAI API key](https://platform.openai.com/api-keys) is required.
 
 ## Links
 | Caption     | Link                                                 |
@@ -53,7 +53,7 @@ A playback speed of 1.05x is recommended for non-technical topics, 1.0x for tech
 
 ### Setup via PyPI
 * Continue from the common setup steps.
-* Create and activate a Python 3.12 devcontainer or virtual environment.
+* Create and activate a Python 3.13 devcontainer or virtual environment.
 * Install via [PyPI](https://pypi.org/project/podgenai): `pip install -U podgenai`.
 
 ## Usage
