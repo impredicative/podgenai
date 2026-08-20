@@ -36,7 +36,7 @@ A playback speed of 1.05x is recommended for non-technical topics, 1.0x for tech
 
 ### Common setup
 * In the working directory, create a file named `.env`, with the intended environment variable `OPENAI_API_KEY=<your OpenAI API key>`, or set it in a different way.
-* Optionally also set the environment variable `PODGENAI_OPENAI_MAX_WORKERS=32` for faster generation, with its default value being 16.
+* In `.env`, optionally also set the environment variable `PODGENAI_OPENAI_MAX_WORKERS=32` for faster generation, with its default value being 16.
 * Ensure that `ffmpeg` and `ffprobe` are available. This is automatic if using the included devcontainer definition.
 * Continue the setup via GitHub or PyPI as below.
 
