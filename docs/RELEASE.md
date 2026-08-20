@@ -1,7 +1,7 @@
 Release steps as done locally:
 
 1. Run `rye run fix`, ensuring that all checks pass.
-2. Bump version in `pyproject.toml`, either manually or using `rye version -b major|minor|patch`.
+2. Run `rye version` to check the version, then run `rye version -b major|minor|patch` to bump the version.
 3. Use `git` to commit and push.
 4. Run `rye run release`.
 5. Tag the release in GitHub with the new version, also supplying release notes.
