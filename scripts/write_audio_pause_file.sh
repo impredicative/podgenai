@@ -4,7 +4,7 @@ set -euo pipefail
 SR=24000
 CHANNELS=1
 BITRATE="160k"
-REQ_DUR=0.50
+REQ_DUR="${1:?Usage: $0 <duration-seconds>}"
 OUTPUT_FILE="./src/podgenai/audio/pause-${REQ_DUR}s.mp3"
 
 ffmpeg -hide_banner -y \
