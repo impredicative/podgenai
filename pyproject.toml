@@ -57,7 +57,7 @@ dev = [
 check-lint = "ruff check"
 check-format = "ruff format --check"
 check-type = "ty check"
-check = ["check-lint", "check-format"]
+check = ["check-lint", "check-format", "check-type"]
 
 fix-lint = "ruff check --fix"
 fix-format = "ruff format"
