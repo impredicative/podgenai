@@ -1,3 +1,4 @@
+from typing import cast
 import io
 import urllib.request
 import xml.etree.ElementTree as ET
@@ -14,7 +15,7 @@ def extract_episode_titles(rss_content: str) -> list[str]:
     tree = ET.parse(io.StringIO(rss_content))
     root = tree.getroot()
 
-    episode_titles = [item.find("title").text for item in root.findall(".//item")]
+    episode_titles = [cast(str, cast(ET.Element, item.find("title")).text) for item in root.findall(".//item")]
     return episode_titles
 
 
