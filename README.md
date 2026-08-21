@@ -1,5 +1,5 @@
 # podgenai
-**podgenai** is a Python 3.13 application to generate an informational single-speaker audiobook/podcast mp3 file on a given topic using an OpenAI LLM. The loosely targeted duration of the generated file is an hour, although producing comprehensive coverage often results in a substantially longer multi-hour duration. A funded [OpenAI API key](https://platform.openai.com/api-keys) is required.
+**podgenai** is a Python 3.14 application to generate an informational single-speaker audiobook/podcast mp3 file on a given topic using an OpenAI LLM. The loosely targeted duration of the generated file is an hour, although producing comprehensive coverage often results in a substantially longer multi-hour duration. A funded [OpenAI API key](https://platform.openai.com/api-keys) is required.
 
 ## Links
 | Caption     | Link                                                 |
@@ -48,13 +48,13 @@ A playback speed of 1.05x is recommended for non-technical topics, 1.0x for tech
 ### Setup via GitHub manually
 * Continue from the common setup steps.
 * Clone or download this repo.
-* Ensure that [`rye`](https://rye-up.com/) is installed and available.
-* In the repo directory, run `rye sync --no-lock`.
+* Ensure that [`uv`](https://docs.astral.sh/uv/#installation) is installed and available.
+* In the repo directory, run `uv sync --locked` to set up the environment. Alternatively, run `./scripts/setup_uv.sh` to both install `uv` and run the sync command.
 
 ### Setup via PyPI
 * Continue from the common setup steps.
-* Create and activate a Python 3.13 devcontainer or virtual environment.
-* Install via [PyPI](https://pypi.org/project/podgenai): `pip install -U podgenai`.
+* Create and activate a Python 3.14 devcontainer or virtual environment.
+* Install via [PyPI](https://pypi.org/project/podgenai): `pip install -U podgenai` or `uv add -U podgenai` or `uv pip install -U podgenai`.
 
 ## Usage
 Usage can be as a command-line application or as a Python library. By default, the generated mp3 file will be written to the current working directory.

@@ -2,9 +2,13 @@
 name = "podgenai"
 version = "0.18.0"
 description = "OpenAI GPT based informational audiobook/podcast mp3 generator"
+readme = "README.md"
 authors = [
     { name = "Ouroboros Chrysopoeia", email = "impredicative@users.noreply.github.com" }
 ]
+requires-python = ">=3.14"
+license = "LGPL-3.0-only"
+license-files = ["LICENSE"]
 dependencies = [
     "click>=8.4.2",  # https://github.com/pallets/click/releases
     "openai>=3.3.1",  # https://github.com/openai/openai-python/releases
@@ -13,15 +17,13 @@ dependencies = [
     "semantic-text-splitter>=0.32.0",  # https://github.com/benbrandt/text-splitter/releases https://github.com/benbrandt/text-splitter/tree/main/bindings/python
     "tiktoken>=0.14.0",  # https://github.com/openai/tiktoken/releases https://github.com/openai/tiktoken/blob/main/CHANGELOG.md
 ]
-readme = "README.md"
-requires-python = ">= 3.13"
 keywords = ["podcast", "mp3", "audiobook", "openai", "aicast"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Natural Language :: English",
     "Topic :: Multimedia :: Sound/Audio :: Speech",
-    "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
-    "Programming Language :: Python :: 3.13"
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.14"
 ]
 
 [project.scripts]
@@ -29,42 +31,53 @@ podgenai = "podgenai.__main__:main"
 
 [project.urls]
 Repository = "https://github.com/impredicative/podgenai"
+Changelog = "https://github.com/impredicative/podgenai/releases"
 
 [build-system]
-requires = ["hatchling==1.26.3"]  # Without a version spec, hatchling==1.27.0 is used which fails to publish. Ref: https://github.com/astral-sh/rye/issues/1446#issuecomment-2545154562
-build-backend = "hatchling.build"
+requires = ["uv_build>=0.12.5,<0.13.0"]
+build-backend = "uv_build"
 
-[tool.rye]
-managed = true
-dev-dependencies = []
-universal = true
-
-[tool.rye.scripts]  # Run as "rye run <command>"
-check = { chain = ["check-lint", "check-fmt" ] }
-"check-lint" = "rye lint"
-"check-fmt" = "rye fmt --check"
-fix = { chain = ["fix-lint", "fix-fmt" ] }
-"fix-lint" = "rye lint --fix"
-"fix-fmt" = "rye fmt"
-lockup = "rye lock --update-all"
-syncup = "rye sync --update-all"
-build = "rye build --clean --verbose"
-publish = "rye publish --verbose"
-release = { chain = ["check", "build", "publish"]}
-describe = "python ./scripts/print_cached_episode_description.py"
-serve = "python -m http.server 8000"  # For downloading generated mp3 from GitHub Codespace.
-
-[tool.hatch.build]
-exclude = [".env", "archive/", "docs/", "scripts/", "work/"]
-
-[tool.hatch.metadata]
-allow-direct-references = true
-
-[tool.hatch.build.targets.wheel]
-packages = ["src/podgenai"]
+[tool.uv.build-backend]
+source-exclude = ["/.env", "/archive", "/docs", "/scripts", "/work"]
 
 [tool.ruff]
 line-length = 320
 
 [tool.ruff.lint]
 ignore = ["E731"]
+
+[dependency-groups]
+dev = [
+    "poethepoet>=0.48.0",
+    "ruff>=0.16.4",
+    "ty>=0.0.73",
+]
+
+[tool.poe.tasks]  # Run as "uv run poe <command>"
+check-lint = "ruff check"
+check-format = "ruff format --check"
+check-type = "ty check"
+check = ["check-lint", "check-format"]
+
+fix-lint = "ruff check --fix"
+fix-format = "ruff format"
+fix = ["fix-lint", "fix-format"]
+
+build = "uv build --clear --no-sources"
+publish-dry = "uv publish --dry-run"
+publish = "uv publish"
+release = ["check", "build", "publish"]
+release-dry = ["check", "build", "publish-dry"]
+
+uv-update = "uv self update"
+uv-version = "uv self version"
+
+update-deps.shell = """
+uv add --upgrade $(python -c 'import re,tomllib; d=tomllib.load(open("pyproject.toml","rb")); print(*(re.match(r"[A-Za-z0-9][A-Za-z0-9._-]*", x.lstrip()).group() for x in d["project"]["dependencies"]))')
+"""
+update-dev-deps.shell = """
+uv add --dev --upgrade $(python -c 'import re,tomllib; d=tomllib.load(open("pyproject.toml","rb")); print(*(re.match(r"[A-Za-z0-9][A-Za-z0-9._-]*", x.lstrip()).group() for x in d["dependency-groups"]["dev"] if isinstance(x,str)))')
+"""
+
+describe = "python scripts/print_cached_episode_description.py"
+serve = "python -m http.server 8000"  # For downloading generated mp3 from GitHub Codespace.

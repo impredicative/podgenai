@@ -3,11 +3,12 @@
 {
 	"name": "Debian",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"image": "mcr.microsoft.com/devcontainers/base:bookworm",
+	"image": "mcr.microsoft.com/devcontainers/base:trixie",
+	// Search at https://mcr.microsoft.com/en-us/catalog
 	"features": {
 		"ghcr.io/devcontainers-extra/features/ffmpeg-apt-get:1": {}
 	},
-    "postCreateCommand": "./scripts/setup_rye.sh",
+    "postCreateCommand": "./scripts/setup_uv.sh",
 	"containerEnv": {
         "UV_LINK_MODE": "copy"  // Prevents "warning: Failed to hardlink files"
     },
