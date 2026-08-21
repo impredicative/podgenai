@@ -1,7 +1,7 @@
-from typing import cast
 import io
 import urllib.request
 import xml.etree.ElementTree as ET
+from typing import cast
 
 RSS_URL = "https://anchor.fm/s/f4868644/podcast/rss"
 
