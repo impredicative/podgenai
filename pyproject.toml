@@ -44,7 +44,7 @@ source-exclude = ["/.env", "/archive", "/docs", "/scripts", "/work"]
 line-length = 320
 
 [tool.ruff.lint]
-ignore = ["E731"]
+ignore = ["DTZ005", "E731"]
 
 [dependency-groups]
 dev = [
@@ -53,7 +53,7 @@ dev = [
     "ty>=0.0.73",
 ]
 
-[tool.poe.tasks]  # Run as "uv run poe <command>"
+[tool.poe.tasks]  # Run as "uv run poe <command>" or as "poe <command>".
 check-lint = "ruff check"
 check-format = "ruff format --check"
 check-type = "ty check"
