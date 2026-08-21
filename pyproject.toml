@@ -73,12 +73,8 @@ changes = { shell = "git log \"$(git describe --tags --abbrev=0)..HEAD\" --forma
 uv-update = "uv self update"
 uv-version = "uv self version"
 
-update-deps.shell = """
-uv add --upgrade $(python -c 'import re,tomllib; d=tomllib.load(open("pyproject.toml","rb")); print(*(re.match(r"[A-Za-z0-9][A-Za-z0-9._-]*", x.lstrip()).group() for x in d["project"]["dependencies"]))')
-"""
-update-dev-deps.shell = """
-uv add --dev --upgrade $(python -c 'import re,tomllib; d=tomllib.load(open("pyproject.toml","rb")); print(*(re.match(r"[A-Za-z0-9][A-Za-z0-9._-]*", x.lstrip()).group() for x in d["dependency-groups"]["dev"] if isinstance(x,str)))')
-"""
+upgrade-deps = "uv lock --upgrade"
+outdated-deps = "uv tree --outdated"
 
 describe = "python scripts/print_cached_episode_description.py"
 serve = "python -m http.server 8000"  # For downloading generated mp3 from GitHub Codespace.
