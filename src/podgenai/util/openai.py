@@ -144,7 +144,7 @@ def get_cached_content(prompt: str, *, read_cache: bool = True, cache_key_prefix
         kwargs = {**extra_text_model_kwargs, **kwargs}  # Note: Order of inclusion is relevant.
         kwargs_str = (" with " + " ".join(f"{k}={v}" for k, v in kwargs.items())) if kwargs else ""
         safe_print(f"Requesting completion{kwargs_str} for: {cache_key_prefix}")
-        content = get_content(prompt, **kwargs)
+        content = get_content(prompt, **kwargs)  # ty: ignore[invalid-argument-type]
         safe_print(f"Received completion{kwargs_str} for: {cache_key_prefix}")
         cache_file_path.write_text(content)
 
