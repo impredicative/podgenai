@@ -68,6 +68,7 @@ publish-dry = "uv publish --dry-run"
 publish = "uv publish"
 release = ["check", "build", "publish"]
 release-dry = ["check", "build", "publish-dry"]
+changes.shell = "git log \"$(git describe --tags --abbrev=0)..HEAD\" --format='* %s'"
 
 uv-update = "uv self update"
 uv-version = "uv self version"
