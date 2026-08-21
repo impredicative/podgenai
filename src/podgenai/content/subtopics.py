@@ -21,10 +21,9 @@ def is_subtopics_list_valid(subtopics: list[str], max_sections: int | None) -> b
         print_error("No subtopics exist.")
         return False
 
-    if max_sections is not None:
-        if len(subtopics) > max_sections:
-            print_error(f"Up to {max_sections} subtopics are allowed, but {len(subtopics)} exist.")
-            return False
+    if (max_sections is not None) and (len(subtopics) > max_sections):
+        print_error(f"Up to {max_sections} subtopics are allowed, but {len(subtopics)} exist.")
+        return False
 
     seen = set()
     for num, subtopic in enumerate(subtopics, start=1):

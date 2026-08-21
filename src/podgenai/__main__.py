@@ -1,4 +1,5 @@
 import os
+import sys
 from pathlib import Path
 
 import click
@@ -53,7 +54,7 @@ def main(topic: str | None, path: Path | None, max_sections: int | None, markers
     except podgenai.exceptions.Error as exc:
         print_error(str(exc))
         print_error(f"Failed to generate for topic: {topic}")
-        exit(1)
+        sys.exit(1)
     except KeyboardInterrupt:
         print()  # This separates "^C" from the subsequent error.
         print_error("Interrupted by user.")
