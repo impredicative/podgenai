@@ -109,6 +109,7 @@ def get_content(prompt: str, *, client: OpenAI | None = None, completion: ChatCo
     if not completion:
         completion = get_completion(prompt, client=client, **kwargs)
     content = completion.choices[0].message.content
+    assert isinstance(content, str)
     content = content.strip()
     assert content
     return content
