@@ -33,6 +33,13 @@ podgenai = "podgenai.__main__:main"
 Repository = "https://github.com/impredicative/podgenai"
 Changelog = "https://github.com/impredicative/podgenai/releases"
 
+[dependency-groups]
+dev = [
+    "poethepoet>=0.48.0",
+    "ruff>=0.16.4",
+    "ty>=0.0.73",
+]
+
 [build-system]
 requires = ["uv_build>=0.12.5,<0.13.0"]
 build-backend = "uv_build"
@@ -45,13 +52,6 @@ line-length = 320
 
 [tool.ruff.lint]
 ignore = ["DTZ005", "E731"]
-
-[dependency-groups]
-dev = [
-    "poethepoet>=0.48.0",
-    "ruff>=0.16.4",
-    "ty>=0.0.73",
-]
 
 [tool.poe.tasks]  # Run as "uv run poe <command>" or as "poe <command>".
 check-lint = "ruff check"
