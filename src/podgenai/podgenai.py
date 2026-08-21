@@ -1,19 +1,18 @@
 from pathlib import Path
-from typing import Optional
 
-from podgenai.config import MAX_CONCURRENT_WORKERS, NUM_SECTIONS_MIN, NUM_SECTIONS_MAX
+from podgenai.config import MAX_CONCURRENT_WORKERS, NUM_SECTIONS_MAX, NUM_SECTIONS_MIN
 from podgenai.content.audio import get_output_file_path, merge_speech_paths
-from podgenai.content.subtopics import list_subtopics, get_subtopics_speech_texts
+from podgenai.content.subtopics import get_subtopics_speech_texts, list_subtopics
 from podgenai.content.topic import ensure_topic_is_valid
-from podgenai.content.tts import get_speech_tasks, ensure_speech_audio_files
+from podgenai.content.tts import ensure_speech_audio_files, get_speech_tasks
 from podgenai.content.voice import get_voice
 from podgenai.exceptions import InputError
 from podgenai.util.input import get_confirmation
-from podgenai.util.openai import ensure_openai_key, MODELS, TTS_VOICE_MAP
+from podgenai.util.openai import MODELS, TTS_VOICE_MAP, ensure_openai_key
 from podgenai.work import get_topic_work_path
 
 
-def generate_media(topic: str, *, output_path: Optional[Path] = None, max_sections: Optional[int] = None, markers: bool = True, confirm: bool = False) -> Path:
+def generate_media(topic: str, *, output_path: Path | None = None, max_sections: int | None = None, markers: bool = True, confirm: bool = False) -> Path:
     """Return the output path after generating and writing an audiobook podcast to file for the given topic.
 
     Params:

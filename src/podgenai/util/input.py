@@ -1,9 +1,8 @@
-from typing import Optional
 
 import podgenai.exceptions
 
 
-def get_confirmation(task: Optional[str] = None) -> None:
+def get_confirmation(task: str | None = None) -> None:
     """Receive input confirmation from the user, optionally for the specified task.
 
     If confirmation is refused, `InputError` is raised.
@@ -20,7 +19,7 @@ def get_confirmation(task: Optional[str] = None) -> None:
                 raise podgenai.exceptions.InputError("User canceled.")
 
 
-def get_confirmation_or_int(range_: range, *, task: Optional[str] = None) -> None | int:
+def get_confirmation_or_int(range_: range, *, task: str | None = None) -> None | int:
     """Receive input confirmation from the user, optionally for the specified task.
 
     If the user enters an integer in the allowed range, it is returned.

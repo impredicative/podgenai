@@ -1,6 +1,5 @@
 import os
 from pathlib import Path
-from typing import Optional
 
 import openai
 import pathvalidate
@@ -8,8 +7,8 @@ from openai.types.chat import ChatCompletion
 
 import podgenai.exceptions
 from podgenai.config import PACKAGE_NAME, PROMPTS
-from podgenai.util.dotenv_ import load_dotenv
 from podgenai.util.binascii import hasher
+from podgenai.util.dotenv_ import load_dotenv
 from podgenai.util.threading import safe_print
 
 load_dotenv()
@@ -82,7 +81,7 @@ def get_openai_client() -> OpenAI:
     return OpenAI()
 
 
-def get_completion(prompt: str, *, client: Optional[OpenAI] = None, **kwargs) -> ChatCompletion:
+def get_completion(prompt: str, *, client: OpenAI | None = None, **kwargs) -> ChatCompletion:
     """Return the completion for the given prompt.
 
     Additional keyword arguments are forwarded to the OpenAI API client's `chat.completions.create` method.
@@ -102,7 +101,7 @@ def get_completion(prompt: str, *, client: Optional[OpenAI] = None, **kwargs) ->
     return completion
 
 
-def get_content(prompt: str, *, client: Optional[OpenAI] = None, completion: Optional[ChatCompletion] = None, **kwargs) -> str:
+def get_content(prompt: str, *, client: OpenAI | None = None, completion: ChatCompletion | None = None, **kwargs) -> str:
     """Return the content for the given prompt.
 
     Additional keyword arguments are forwarded to `get_completion`.
@@ -152,7 +151,7 @@ def get_cached_content(prompt: str, *, read_cache: bool = True, cache_key_prefix
     return content
 
 
-def write_speech_audio(text: str, path: str | Path, *, voice: str = next(iter(TTS_VOICE_MAP)), client: Optional[OpenAI] = None, **kwargs) -> None:
+def write_speech_audio(text: str, path: str | Path, *, voice: str = next(iter(TTS_VOICE_MAP)), client: OpenAI | None = None, **kwargs) -> None:
     """Write the speech audio file for the given prompt to the given file path.
 
     `voice` can be one of the keys or values in TTS_VOICE_MAP, or one of the other supported voices.

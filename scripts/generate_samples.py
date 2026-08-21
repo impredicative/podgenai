@@ -1,7 +1,7 @@
 import re
 
-from podgenai.config import REPO_PATH
 from podgenai import generate_media
+from podgenai.config import REPO_PATH
 
 
 def list_sample_topics_from_readme() -> list[str]:

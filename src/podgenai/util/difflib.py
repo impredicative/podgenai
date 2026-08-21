@@ -2,15 +2,13 @@ from __future__ import annotations
 
 import difflib
 import re
-from typing import List, Optional, Tuple
-
 
 # Paragraph separator: one or more blank lines (possibly with spaces/tabs).
 # The capturing group ensures separators are retained by re.split.
 _PARAGRAPH_SEP_RE = re.compile(r"(\n\s*\n+)")
 
 
-def _tokenize_with_whitespace(text: str) -> List[str]:
+def _tokenize_with_whitespace(text: str) -> list[str]:
     """
     Split text into a sequence of tokens preserving all whitespace.
 
@@ -23,7 +21,7 @@ def _tokenize_with_whitespace(text: str) -> List[str]:
 
 def _split_marked_spans_by_paragraphs(
     text: str,
-    marker: Tuple[str, str],
+    marker: tuple[str, str],
 ) -> str:
     """
     Ensure that spans marked with 'marker' do not cross paragraph boundaries.
@@ -39,7 +37,7 @@ def _split_marked_spans_by_paragraphs(
     Paragraph boundaries are defined by _PARAGRAPH_SEP_RE.
     """
     start, end = marker
-    result_parts: List[str] = []
+    result_parts: list[str] = []
     i: int = 0
 
     while True:
@@ -83,8 +81,8 @@ def _split_marked_spans_by_paragraphs(
 
 def _replace_unchanged_paragraphs_with_marker(
     text: str,
-    deletion_marker: Tuple[str, str],
-    insertion_marker: Tuple[str, str],
+    deletion_marker: tuple[str, str],
+    insertion_marker: tuple[str, str],
     omission_marker: str,
 ) -> str:
     """
@@ -111,7 +109,7 @@ def _replace_unchanged_paragraphs_with_marker(
     first_changed = changed_indices[0]
     last_changed = changed_indices[-1]
 
-    result_parts: List[str] = []
+    result_parts: list[str] = []
 
     # Leading unchanged run before first_changed
     if first_changed > 0:
@@ -160,8 +158,8 @@ def _replace_unchanged_paragraphs_with_marker(
 
 def _drop_unchanged_paragraphs(
     text: str,
-    deletion_marker: Tuple[str, str],
-    insertion_marker: Tuple[str, str],
+    deletion_marker: tuple[str, str],
+    insertion_marker: tuple[str, str],
 ) -> str:
     """
     Remove paragraphs that contain no diff markers, along with their following
@@ -173,7 +171,7 @@ def _drop_unchanged_paragraphs(
     ins_start, _ = insertion_marker
 
     pieces = _PARAGRAPH_SEP_RE.split(text)
-    result_parts: List[str] = []
+    result_parts: list[str] = []
 
     for i in range(0, len(pieces), 2):
         segment = pieces[i]
@@ -191,7 +189,7 @@ def _drop_unchanged_paragraphs(
     return "".join(result_parts)
 
 
-def _normalize_diff_output(text: str, omission_marker: Optional[str]) -> str:
+def _normalize_diff_output(text: str, omission_marker: str | None) -> str:
     """
     Post-process the diff output to:
       - remove redundant blank lines around the omission marker (if used),
@@ -212,9 +210,9 @@ def _normalize_diff_output(text: str, omission_marker: Optional[str]) -> str:
 def diff_texts_inline(
     original: str,
     modified: str,
-    deletion_marker: Tuple[str, str] = ("[-", "-]"),
-    insertion_marker: Tuple[str, str] = ("[+", "+]"),
-    omission_marker: Optional[str] = "[...]",
+    deletion_marker: tuple[str, str] = ("[-", "-]"),
+    insertion_marker: tuple[str, str] = ("[+", "+]"),
+    omission_marker: str | None = "[...]",
 ) -> str:
     """
     Return a printable, word-level diff string between two multi-paragraph texts.
@@ -265,11 +263,11 @@ def diff_texts_inline(
         within paragraphs and paragraph breaks, subject to omission behavior,
         and with no trailing empty lines.
     """
-    orig_tokens: List[str] = _tokenize_with_whitespace(original)
-    mod_tokens: List[str] = _tokenize_with_whitespace(modified)
+    orig_tokens: list[str] = _tokenize_with_whitespace(original)
+    mod_tokens: list[str] = _tokenize_with_whitespace(modified)
 
     sm = difflib.SequenceMatcher(a=orig_tokens, b=mod_tokens)
-    parts: List[str] = []
+    parts: list[str] = []
 
     del_start, del_end = deletion_marker
     ins_start, ins_end = insertion_marker

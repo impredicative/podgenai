@@ -1,19 +1,18 @@
 import concurrent.futures
 import contextlib
 import io
-from typing import Optional
 
 import podgenai.exceptions
-from podgenai.config import MAX_CONCURRENT_WORKERS, PROMPTS, NUM_SECTIONS_MIN, NUM_SECTIONS_MAX
+from podgenai.config import MAX_CONCURRENT_WORKERS, NUM_SECTIONS_MAX, NUM_SECTIONS_MIN, PROMPTS
 from podgenai.util.openai import get_cached_content
-from podgenai.work import get_topic_work_path
 
 # from podgenai.util.difflib import diff_texts_inline
 # from podgenai.util.threading import safe_print
 from podgenai.util.sys import print_error, print_warning
+from podgenai.work import get_topic_work_path
 
 
-def is_subtopics_list_valid(subtopics: list[str], max_sections: Optional[int]) -> bool:
+def is_subtopics_list_valid(subtopics: list[str], max_sections: int | None) -> bool:
     """Return true if the subtopics are structurally valid, otherwise false.
 
     A validation error is printed if a subtopic is invalid.
@@ -55,7 +54,7 @@ def is_subtopics_list_valid(subtopics: list[str], max_sections: Optional[int]) -
     return True
 
 
-def list_subtopics(topic: str, max_sections: Optional[int] = None, max_attempts: int = 2) -> list[str]:
+def list_subtopics(topic: str, max_sections: int | None = None, max_attempts: int = 2) -> list[str]:
     """Return the list of subtopics for the given topic.
 
     Params:
@@ -204,7 +203,7 @@ def get_subtopic(*, topic: str, subtopics: list[str], subtopic: str) -> str:
     return draft_text
 
 
-def get_subtopics_texts(*, topic: str, subtopics: Optional[list[str]] = None) -> dict[str, str]:
+def get_subtopics_texts(*, topic: str, subtopics: list[str] | None = None) -> dict[str, str]:
     """Return the ordered full text for all subtopics within the context of the given topic and optional ordered list of subtopics.
 
     If the list of subtopics is not provided, it is read.
@@ -221,7 +220,7 @@ def get_subtopics_texts(*, topic: str, subtopics: Optional[list[str]] = None) ->
     return subtopics_texts
 
 
-def get_subtopics_speech_texts(*, topic: str, subtopics: Optional[list[str]] = None, markers: Optional[bool] = True) -> dict[str, str]:
+def get_subtopics_speech_texts(*, topic: str, subtopics: list[str] | None = None, markers: bool | None = True) -> dict[str, str]:
     """Return the ordered speech text for all subtopics within the context of the given topic and optional ordered list of subtopics.
 
     If the list of subtopics is not provided, it is read.

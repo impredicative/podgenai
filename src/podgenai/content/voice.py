@@ -2,9 +2,8 @@ import re
 
 import podgenai.exceptions
 from podgenai.config import PROMPTS
-from podgenai.util.openai import get_cached_content, TTS_VOICE_MAP
+from podgenai.util.openai import TTS_VOICE_MAP, get_cached_content
 from podgenai.work import get_topic_work_path
-
 
 _JOINT_PATTERN = re.compile(r"(?P<key>[\w-]+)\s+\((?P<value>[^)]+)\)")
 

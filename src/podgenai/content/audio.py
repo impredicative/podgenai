@@ -1,9 +1,9 @@
 import datetime
 import functools
 import json
-from pathlib import Path
 import subprocess
-from typing import Optional, TypedDict
+from pathlib import Path
+from typing import TypedDict
 
 import pathvalidate
 
@@ -64,7 +64,7 @@ def get_default_output_filename(topic: str) -> str:
     return output_filename
 
 
-def get_output_file_path(output_path: Optional[Path], *, topic: str) -> Path:
+def get_output_file_path(output_path: Path | None, *, topic: str) -> Path:
     """Return the validated output file path for the given topic."""
     if output_path is None:
         output_filename = get_default_output_filename(topic)
