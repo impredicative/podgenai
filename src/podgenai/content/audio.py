@@ -85,29 +85,25 @@ def get_output_file_path(output_path: Path | None, *, topic: str) -> Path:
 def merge_speech_paths(speech_tasks: list[SpeechTask], *, topic: str, output_path: Path) -> None:
     """Merge the ordered list of preexisting audio file paths for the given topic to a single audio file having the given output file path."""
 
-    short_pause_path, long_pause_path = AUDIO_PATHS["pause-0.25s"], AUDIO_PATHS["pause-0.50s"]
-    assert _EXPECTED_AUDIO_FILE_METADATA_FOR_CONCAT == get_audio_file_metadata_for_concat(short_pause_path)
-    assert _EXPECTED_AUDIO_FILE_METADATA_FOR_CONCAT == get_audio_file_metadata_for_concat(long_pause_path)
-
     paths = []
+    print(f"Merging {len(speech_tasks)} speech parts.")
     for speech_task in speech_tasks:
         path = speech_task["path"]
         assert _EXPECTED_AUDIO_FILE_METADATA_FOR_CONCAT == get_audio_file_metadata_for_concat(path)
-        if speech_task["portion_num"] < speech_task["num_portions"]:
-            pause_path = short_pause_path
-        elif (speech_task["portion_num"] == speech_task["num_portions"]) and (speech_task != speech_tasks[-1]):
-            pause_path = long_pause_path
-        else:
-            pause_path = None
         paths.append(path)
-        if pause_path is not None:
+        pause_after = speech_task["pause_after"]
+        if pause_after:
+            pause_filestem = f"pause-{pause_after:.2f}s"
+            assert pause_filestem in AUDIO_PATHS
+            pause_path = AUDIO_PATHS[pause_filestem]
+            assert _EXPECTED_AUDIO_FILE_METADATA_FOR_CONCAT == get_audio_file_metadata_for_concat(pause_path)
             paths.append(pause_path)
 
     work_path = get_topic_work_path(topic)
     ffmpeg_paths = [str(p).replace("'", "'\\''") for p in paths]
     ffmpeg_filelist_path = work_path / "ffmpeg.list"
     ffmpeg_filelist_path.write_text("\n".join(f"file '{p}'" for p in ffmpeg_paths))
-    print(f"Merging {len(paths)} speech parts with pauses.")
     subprocess.run(["ffmpeg", "-y", "-xerror", "-f", "concat", "-safe", "0", "-i", str(ffmpeg_filelist_path), "-c", "copy", "-loglevel", "error", str(output_path)], check=True)
     assert output_path.exists()
-    print(f"Merged {len(paths)} speech parts with pauses.")
+    assert _EXPECTED_AUDIO_FILE_METADATA_FOR_CONCAT == get_audio_file_metadata_for_concat(output_path)
+    print(f"Merged {len(speech_tasks)} speech parts.")

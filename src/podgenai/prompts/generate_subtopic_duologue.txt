@@ -1,0 +1,42 @@
+I am producing a lengthy 1-hour long audiobook podcast episode. Mentioned below is the name of the topic, its list of numbered points (segments), the current segment, and the current segment's corresponding single-speaker monologue. Note that this is an audio-only podcast, so the audience will not have access to video or to a screen. Also note that the audience is a mixed audience with an interest in the topic, spanning a spectrum of proficiency levels (novice / beginner / intermediate / advanced / expert). The audience must learn the supplied material in depth; their interest is both academic and pragmatic. In effect, with the podcast serving as exhaustive training material, the audience is empowered by information. Note however that the indicated topic may not always be professional in nature, and this is all right.
+
+Your task is to use the current segment's single-speaker monologue to write its corresponding two-speaker duologue conversation transcript. The duologue will subsequently be vocalized using a text-to-speech generator. Make the exchange genuinely conversational recomposition rather than dividing a monologue between two voices. The two speakers must actively engage with each other, but also question and challenge each other for pedagogical value, evolving the conversation forward naturally. They are to speak to each other, not to the audience.
+
+At the same time, avoid fluff or filler content. Limit the output to all that is supported by the input monologue. Do not add knowledge that is not supported by the input monologue. The content must flow well and be approachable. End the conversation with a natural and graceful conclusion rather than an abrupt stop.
+
+Don't prelude the conversation with the respective section name, as I will programmatically always do this myself. Also, kindly avoid beginning the conversation with the word "today", such as in the phrase "in today's segment", because the podcast could be listened to at any time. Do not make promises about what you will cover in the current segment; just cover it directly!
+
+For technical topics, avoid software code, whether inline or in code blocks, and mathematical equations or notation or symbols, as all of these are hard to vocalize. You must also skip any fancy formatting such as markdown, bullets, lists, bold, or parentheses, as these confuse the text-to-speech generator. Numbering is okay on rare occasions but only if it adds significant value.
+
+Always communicate in complete sentences, as this promotes objectivity and professionalism. Use simpler words whenever possible to assist in easier understanding, but without sacrificing the polish or quality of the content. You are not writing to be read; you are in effect writing to be listened. The writing style should as such be optimized for listening, not for reading.
+
+Your output is required in JSONL format, with one conversation turn per line. The conversation must be a back-and-forth duologue between the two speakers. Each line must be a valid JSON object containing exactly these properties:
+* speaker: This must alternate between "{boundary_voice_sex}" and "{non_boundary_voice_sex}". Additionally, the first and also the last speaker of the conversation must necessarily be "{boundary_voice_sex}".
+* speech: These are the words spoken during this turn by the speaker. The speech can contain one or more paragraphs, although usually just a single paragraph. Regardless of the length of the speech in this turn, it must of course be formatted in a single line. Escaped newline characters are implicitly allowed, but the speech must not contain any unescaped newline characters by definition. Avoid trivial or perfunctory responses, keeping every turn substantively meaningful.
+* tone: This is a single sentence of tone instructions for the text-to-speech generator, instructing the tone of voice to be used for this turn. Do not add any subject-matter information whatsoever to the tone instructions.
+
+Each line of your output will be parsed by a JSON parser. Do not make the mistake of returning a JSON array. Here is a structural example of a JSONL output, enclosed below in triple backticks for demonstration purposes:
+
+```
+{{"speaker":"{boundary_voice_sex}","speech":"The Sun is the star at the center of the solar system, and two of its effects are immediately important. Its gravity keeps Earth and the other planets in orbit, while its energy provides the light and heat that strongly influence conditions on Earth.","tone":"Speak with calm confidence and natural intellectual interest, using a clear and measured conversational pace."}}
+{{"speaker":"{non_boundary_voice_sex}","speech":"The source of that energy lies deep inside the Sun, where nuclear fusion takes place.\nNuclear fusion is a process in which lighter atomic nuclei combine to form heavier nuclei. In the Sun, hydrogen is ultimately converted into helium, releasing enormous amounts of energy. So the light reaching Earth begins with physical processes occurring deep inside a star.","tone":"Speak in an engaged and explanatory manner, with precise articulation, natural pacing, and restrained emphasis."}}
+{{"speaker":"{boundary_voice_sex}","speech":"And that makes the connection to Earth much broader than light alone. Solar energy warms the planet, helps drive the climate system, and supplies the light used in photosynthesis.\n\nThe connection runs all the way from fusion inside the Sun to physical processes and living systems on Earth. Energy is produced inside the Sun, some of it eventually reaches Earth, and its effects become part of the conditions experienced across the planet.","tone":"Speak thoughtfully and conversationally, with a smooth cadence, gentle emphasis, and measured delivery."}}
+```
+
+Lastly, do not otherwise comment on the task. Do not ask any follow-up questions or make any follow-up suggestions at the end. Your entire output is to be used toward generating the podcast segment.
+
+The topic for the podcast is: {topic}
+
+For your reference, the full list of intended numbered points (segments) for the podcast is:
+
+{subtopics}
+
+The current segment is: {numbered_subtopic}
+
+As a reminder, the voice required for the first and last speaker of the conversation is: {boundary_voice_sex}
+
+The remainder of the text is the single-speaker monologue for the current segment, enclosed within the `<speech>` and `</speech>` tags.
+
+<speech>
+{subtopic_monologue}
+</speech>

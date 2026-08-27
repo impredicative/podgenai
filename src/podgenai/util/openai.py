@@ -6,7 +6,7 @@ import pathvalidate
 from openai.types.chat import ChatCompletion
 
 import podgenai.exceptions
-from podgenai.config import PACKAGE_NAME, PROMPTS
+from podgenai.config import PACKAGE_NAME
 from podgenai.util.binascii import hasher
 from podgenai.util.dotenv_ import load_dotenv
 from podgenai.util.threading import safe_print
@@ -17,12 +17,6 @@ OpenAI = openai.OpenAI
 
 MODELS = {
     "text": [
-        "gpt-4o-2024-11-20",
-        "gpt-4.1-2025-04-14",
-        "gpt-5-2025-08-07",
-        "gpt-5-chat-latest",
-        "gpt-5.2-2025-12-11",
-        "gpt-5.2-chat-latest",
         "gpt-5.6-sol",
         "chat-latest",
     ][-1],  # Ref: https://platform.openai.com/docs/models
@@ -49,22 +43,11 @@ else:
     }
 
 EXTRA_TEXT_MODEL_PREFIX_KWARGS = {
-    "gpt-4o-": {"max_completion_tokens": 16_384, "temperature": 0.5},
-    "gpt-4.1-": {"max_completion_tokens": 32_768, "temperature": 0.5},
-    "gpt-5-2": {"max_completion_tokens": 128_000},  # Note: Temperature is not supported. Suffix of `2` (short for 2025) allows disambiguation from `gpt-5-chat`.
-    "gpt-5-chat-": {"max_completion_tokens": 16_384, "temperature": 0.5},  # Reasoning effort is not supported. Hallucinations were observed with temperature of 0.7.
-    "gpt-5.2-chat-": {"max_completion_tokens": 16_384},  # Temperature and reasoning effort are not supported.
-    "gpt-5.2-2": {"max_completion_tokens": 128_000, "reasoning_effort": "none", "temperature": 0.5},  # Note: Suffix of `2` (short for 2025) allows disambiguation from `gpt-5.1-chat`.
     "gpt-5.6-": {"max_completion_tokens": 128_000, "reasoning_effort": "none"},
     "chat-": {"max_completion_tokens": 128_000},
 }
 UNSUPPORTED_TEXT_MODEL_PREFIX_KWARGS = {
-    "gpt-4o-": ("reasoning_effort", "verbosity"),
-    "gpt-4.1-": ("reasoning_effort", "verbosity"),
-    "gpt-5-2": ("temperature",),  # Note: Suffix of `2` (short for 2025) allows disambiguation from `gpt-5-chat`.
-    "gpt-5-chat-": ("reasoning_effort", "verbosity"),
-    "gpt-5.2-chat-": ("temperature",),
-    "chat-": ("temperature", "reasoning_effort", "verbosity"),
+    "chat-": ("temperature", "reasoning_effort"),
 }
 extra_text_model_kwargs = {kw: v for prefix, kws in EXTRA_TEXT_MODEL_PREFIX_KWARGS.items() if MODELS["text"].startswith(prefix) for kw, v in kws.items()}
 unsupported_text_model_kwargs = {kw for prefix, kws in UNSUPPORTED_TEXT_MODEL_PREFIX_KWARGS.items() if MODELS["text"].startswith(prefix) for kw in kws}
@@ -152,47 +135,47 @@ def get_cached_content(prompt: str, *, read_cache: bool = True, cache_key_prefix
     return content
 
 
-def write_speech_audio(text: str, path: str | Path, *, voice: str = next(iter(TTS_VOICE_MAP)), client: OpenAI | None = None, **kwargs) -> None:
-    """Write the speech audio file for the given prompt to the given file path.
+def write_speech_audio(*, text: str, path: str | Path, voice: str, tone: str | None, client: OpenAI | None = None, **kwargs) -> None:
+    """Write the speech audio file for the given text to the given file path.
 
-    `voice` can be one of the keys or values in TTS_VOICE_MAP, or one of the other supported voices.
-
-    Additional keyword arguments are forwarded to `create`.
+    Params:
+    * `text`: The text to be converted to speech.
+    * `path`: The file path where the speech audio will be saved.
+    * `voice`: The OpenAI voice to use for the speech synthesis.
+    * `tone`: The tone instructions to use for the speech synthesis, if any. The `podgenai.exceptions.SpeechModelInputError` exception is raised if the model does not support it.
+    * `client`: The OpenAI client to use for the request, if any.
+    * `kwargs`: Additional keyword arguments are forwarded to the OpenAI client's `audio.speech.with_streaming_response.create` method.
     """
     if isinstance(path, str):
         path = Path(path)
     assert path.suffix == ".mp3"
+    path.parent.mkdir(parents=True, exist_ok=True)  # Note: This is necessary for duologue subtopic directories.
 
     if not client:
         client = get_openai_client()
 
-    mapped_voice = TTS_VOICE_MAP.get(voice, voice)
-    voice_str = voice if (voice == mapped_voice) else f"{voice} ({mapped_voice})"
-
     model = MODELS["tts"]
 
-    if ("instructions" not in kwargs) and (not model.startswith("tts-1")):
-        kwargs["instructions"] = PROMPTS["tts_instructions"]
+    if tone and (model == "tts-1"):
+        raise podgenai.exceptions.SpeechModelInputError(f"Speech model {model!r} does not support tone instructions for: {path.stem}")
+    if tone:
+        assert "instructions" not in kwargs
+        kwargs["instructions"] = tone
+        # safe_print(f"Using tone instructions for: {path.stem!r}: {tone}")
 
-    safe_print(f"Requesting speech audio in {voice_str} voice for: {path.stem}")
+    safe_print(f"Requesting speech audio in {voice} voice for: {path.stem}")
     # Ref: https://developers.openai.com/api/docs/guides/text-to-speech#quickstart
-    # relative_path = path.relative_to(Path.cwd())
-    # safe_print(f"Writing speech to: {relative_path}")
-    with client.audio.speech.with_streaming_response.create(model=model, voice=mapped_voice, input=text, response_format="mp3", **kwargs) as response:
+    with client.audio.speech.with_streaming_response.create(model=model, voice=voice, input=text, response_format="mp3", **kwargs) as response:
         response.stream_to_file(path)
     assert path.exists(), path
-    # safe_print(f"Wrote speech to: {relative_path}")
-    safe_print(f"Received speech audio in {voice_str} voice for: {path.stem}")
+    safe_print(f"Received speech audio in {voice} voice for: {path.stem}")
 
 
-def ensure_speech_audio(text: str, path: Path, **kwargs) -> None:
-    """Ensure the speech audio file for the given text to the given file path.
-
-    Additional keyword arguments are forwarded to `write_speech`.
-    """
+def ensure_speech_audio(*, text: str, path: Path, voice: str, tone: str | None) -> None:
+    """Ensure the speech audio file at the given file path."""
 
     if path.exists():
         assert path.is_file()
         safe_print(f"Speech audio file exists on disk for: {path.stem}")
         return
-    write_speech_audio(text, path=path, **kwargs)
+    write_speech_audio(text=text, path=path, voice=voice, tone=tone)

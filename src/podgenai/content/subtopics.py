@@ -1,15 +1,17 @@
 import concurrent.futures
 import contextlib
 import io
+import json
+import re
 
 import podgenai.exceptions
-from podgenai.config import MAX_CONCURRENT_WORKERS, NUM_SECTIONS_MAX, NUM_SECTIONS_MIN, PROMPTS
+from podgenai.config import MAX_CONCURRENT_WORKERS, MAX_TEXT_LENGTH_IN_FILENAME, NUM_SECTIONS_MAX, NUM_SECTIONS_MIN, PROMPTS
+from podgenai.types import SpeechLine, SubtopicDuologue, SubtopicText
 from podgenai.util.openai import get_cached_content
-
-# from podgenai.util.difflib import diff_texts_inline
-# from podgenai.util.threading import safe_print
 from podgenai.util.sys import print_error, print_warning
 from podgenai.work import get_topic_work_path
+
+_NUMBERED_SUBTOPIC_PATTERN = re.compile(r"^\d+\. \S.*$")  # Matches a numbered subtopic, e.g. "12. Foo bar".
 
 
 def is_subtopics_list_valid(subtopics: list[str], max_sections: int | None) -> bool:
@@ -18,36 +20,32 @@ def is_subtopics_list_valid(subtopics: list[str], max_sections: int | None) -> b
     A validation error is printed if a subtopic is invalid.
     """
     if not subtopics:
-        print_error("No subtopics exist.")
-        return False
+        return print_error("No subtopics exist.")
 
     if (max_sections is not None) and (len(subtopics) > max_sections):
-        print_error(f"Up to {max_sections} subtopics are allowed, but {len(subtopics)} exist.")
-        return False
+        return print_error(f"Up to {max_sections} subtopics are allowed, but {len(subtopics)} exist.")
 
     seen = set()
     for num, subtopic in enumerate(subtopics, start=1):
         if subtopic != subtopic.strip():
-            print_error(f"Subtopic {num} is invalid because it has leading or trailing whitespace: {subtopic!r}")
-            return False
+            return print_error(f"Subtopic {num} is invalid because it has leading or trailing whitespace: {subtopic!r}")
+
+        if not _NUMBERED_SUBTOPIC_PATTERN.match(subtopic):
+            return print_error(f"Subtopic {num} is invalid because it is not structured correctly: {subtopic}")
 
         expected_num_prefix = f"{num}. "
         if not subtopic.startswith(expected_num_prefix):
-            print_error(f"Subtopic {num} is invalid because it is not numbered correctly: {subtopic}")
-            return False
+            return print_error(f"Subtopic {num} is invalid because it is not numbered correctly: {subtopic}")
 
         subtopic_name = subtopic.removeprefix(expected_num_prefix).strip()
         if not subtopic_name:
-            print_error(f"Subtopic {num} is invalid because it has no value: {subtopic}")
-            return False
+            return print_error(f"Subtopic {num} is invalid because it has no value: {subtopic}")
 
         if subtopic_name != subtopic_name.lstrip():
-            print_error(f"Subtopic {num} is invalid because its name has leading whitespace: {subtopic!r}")
-            return False
+            return print_error(f"Subtopic {num} is invalid because its name has leading whitespace: {subtopic!r}")
 
         if subtopic_name in seen:
-            print_error(f"Subtopic {num} is invalid because its name is a duplicate: {subtopic}")
-            return False
+            return print_error(f"Subtopic {num} is invalid because its name is a duplicate: {subtopic}")
         seen.add(subtopic_name)
 
     return True
@@ -75,7 +73,9 @@ def list_subtopics(topic: str, max_sections: int | None = None, max_attempts: in
     rejection_error_prefix = "RequestError: "  # Defined in prompt.
 
     for num_attempt in range(1, max_attempts + 1):
-        response = get_cached_content(prompt, read_cache=num_attempt == 1, cache_key_prefix=f"0. {prompt_name}", cache_path=get_topic_work_path(topic), temperature=0.5)  # Default verbosity is preferred here.
+        response = get_cached_content(prompt, read_cache=num_attempt == 1, cache_key_prefix=f"0. {prompt_name}", cache_path=get_topic_work_path(topic), temperature=0.5, verbosity="low")
+        # Note: temperature=0.5 is specified in an attempt to increase the objectivity of the list of subtopics.
+        # Note: verbosity=low is specified in an attempt to reduce an excessive number of subtopics.
         assert response, response
 
         assert response.lower() not in none_subtopics, response
@@ -108,127 +108,183 @@ def list_subtopics(topic: str, max_sections: int | None = None, max_attempts: in
     return subtopics
 
 
-def is_subtopic_text_valid(text: str, numbered_name: str) -> bool:
-    """Return true if the subtopic text is structurally valid, otherwise false.
+def is_subtopic_monologue_valid(monologue: str, numbered_name: str) -> bool:
+    """Return true if the subtopic monologue is structurally valid, otherwise false.
 
-    A validation error is printed if the subtopic text is invalid.
+    A validation error is printed if the subtopic monologue is invalid.
     """
-    if not text:
-        print_error(f"Subtopic {numbered_name!r} is empty.")
-        return False
+    assert _NUMBERED_SUBTOPIC_PATTERN.match(numbered_name), numbered_name
+    if not monologue:
+        return print_error(f"Subtopic monologue {numbered_name!r} is empty.")
 
-    if text != text.rstrip():
-        print_error(f"Subtopic {numbered_name!r} has leading or trailing whitespace.")
-        return False
+    if monologue != monologue.rstrip():
+        return print_error(f"Subtopic monologue {numbered_name!r} has leading or trailing whitespace.")
 
-    checked_text = "\n" + text
-    if "\n```" in checked_text:
-        print_error(f"Subtopic {numbered_name!r} may contain a code block.")
-        return False
-    if ("\n## " in checked_text) or ("\n### " in checked_text):
-        print_error(f"Subtopic {numbered_name!r} may contain a markdown section header.")
-        return False
-    if ("\n* " in checked_text) or ("\n- " in checked_text) or ("\n• " in checked_text):
-        print_error(f"Subtopic {numbered_name!r} may contain a markdown list item.")
-        return False
+    checked_monologue = "\n" + monologue
+    if "\n```" in checked_monologue:
+        return print_error(f"Subtopic monologue {numbered_name!r} may contain a code block.")
+    if ("\n## " in checked_monologue) or ("\n### " in checked_monologue):
+        return print_error(f"Subtopic monologue {numbered_name!r} may contain a markdown section header.")
+    if ("\n* " in checked_monologue) or ("\n- " in checked_monologue) or ("\n• " in checked_monologue):
+        return print_error(f"Subtopic monologue {numbered_name!r} may contain a markdown list item.")
 
     return True
 
 
-def get_draft_subtopic(*, topic: str, subtopics: list[str], subtopic: str, max_attempts: int = 3) -> str:
-    """Return the draft full text for a given subtopic within the context of the given topic and list of subtopics."""
-    assert subtopic[0].isdigit()  # Is numbered.
-    common_kwargs = {"cache_key_prefix": f"{subtopic} (draft)", "cache_path": get_topic_work_path(topic)}  # Default reasoning_effort and verbosity are preferred here.
-    subtopics_str = "\n".join(subtopics)
+def is_unmarked_subtopic_duologue_valid(duologue: str, numbered_name: str, boundary_voice_sex: str, non_boundary_voice_sex: str) -> bool:
+    """Return true if the unmarked subtopic duologue is structurally valid, otherwise false.
 
-    for num_attempt in range(1, max_attempts + 1):
-        prompt = PROMPTS["generate_subtopic"].format(topic=topic, subtopics=subtopics_str, numbered_subtopic=subtopic)
-        text = get_cached_content(prompt, read_cache=num_attempt == 1, **common_kwargs)
-        text = text.rstrip()
-
-        error = io.StringIO()
-        with contextlib.redirect_stderr(error):
-            subtopic_text_is_valid = is_subtopic_text_valid(text, numbered_name=subtopic)
-        if not subtopic_text_is_valid:
-            error = error.getvalue().rstrip().removeprefix("Error: ")
-            if num_attempt == max_attempts:
-                raise podgenai.exceptions.LanguageModelOutputStructureError(error)
-            else:
-                print_warning(f"Fault in attempt {num_attempt} of {max_attempts} while getting subtopic text: {error}")
-                continue
-
-        break
-
-    assert text
-    return text
-
-
-def get_final_subtopic(*, topic: str, subtopics: list[str], subtopic: str, subtopic_text: str, max_attempts: int = 3) -> str:
-    """Return the final full text for a given subtopic within the context of the given topic and list of subtopics."""
-    assert subtopic[0].isdigit()  # Is numbered.
-    common_kwargs = {"cache_key_prefix": f"{subtopic} (final)", "cache_path": get_topic_work_path(topic)}  # Default reasoning_effort and verbosity are preferred here.
-    subtopics_str = "\n".join(subtopics)
-
-    for num_attempt in range(1, max_attempts + 1):
-        prompt = PROMPTS["refine_subtopic"].format(topic=topic, subtopics=subtopics_str, numbered_subtopic=subtopic, subtopic_text=subtopic_text)
-        final_text = get_cached_content(prompt, read_cache=num_attempt == 1, **common_kwargs)
-        final_text = final_text.rstrip()
-
-        error = io.StringIO()
-        with contextlib.redirect_stderr(error):
-            subtopic_text_is_valid = is_subtopic_text_valid(final_text, numbered_name=subtopic)
-        if not subtopic_text_is_valid:
-            error = error.getvalue().rstrip().removeprefix("Error: ")
-            if num_attempt == max_attempts:
-                raise podgenai.exceptions.LanguageModelOutputStructureError(error)
-            else:
-                print_warning(f"Fault in attempt {num_attempt} of {max_attempts} while getting final subtopic text: {error}")
-                continue
-
-        break
-
-    assert final_text
-    return final_text
-
-
-def get_subtopic(*, topic: str, subtopics: list[str], subtopic: str) -> str:
-    """Return the full text for a given subtopic within the context of the given topic and list of subtopics."""
-    draft_text = get_draft_subtopic(topic=topic, subtopics=subtopics, subtopic=subtopic)
-    # final_text = get_final_subtopic(topic=topic, subtopics=subtopics, subtopic=subtopic, subtopic_text=draft_text)
-    # if draft_text != final_text:
-    #     diff_text = diff_texts_inline(draft_text, final_text)
-    #     safe_print(f"\nRefinement diff for: {subtopic}:\n{diff_text}\n")
-    # return final_text
-    return draft_text
-
-
-def get_subtopics_texts(*, topic: str, subtopics: list[str] | None = None) -> dict[str, str]:
-    """Return the ordered full text for all subtopics within the context of the given topic and optional ordered list of subtopics.
-
-    If the list of subtopics is not provided, it is read.
+    A validation error is printed if the subtopic duologue is invalid.
     """
-    if not subtopics:
-        subtopics = list_subtopics(topic)
+    assert _NUMBERED_SUBTOPIC_PATTERN.match(numbered_name), numbered_name
+
+    if not duologue:
+        return print_error(f"Subtopic duologue {numbered_name!r} is empty.")
+
+    if duologue != duologue.rstrip():
+        return print_error(f"Subtopic duologue {numbered_name!r} has leading or trailing whitespace.")
+
+    lines = [line for line in io.StringIO(duologue) if line.strip()]
+    num_lines = len(lines)
+    if not num_lines:
+        return print_error(f"Subtopic duologue {numbered_name!r} is invalid because it has no lines.")
+
+    expected_keys = ("speaker", "speech", "tone")
+    expected_speakers = (boundary_voice_sex, non_boundary_voice_sex)
+    prev_speaker = None
+    for line_number, line in enumerate(lines, start=1):
+        try:
+            obj = json.loads(line)
+        except json.JSONDecodeError as exc:
+            return print_error(f"Subtopic duologue {numbered_name!r} is invalid because line {line_number} is not valid JSON: {exc.msg} at column {exc.colno}.")
+
+        if not isinstance(obj, dict):
+            return print_error(f"Subtopic duologue {numbered_name!r} is invalid because line {line_number} is not a JSON dictionary.")
+        for key in expected_keys:
+            if key not in obj:
+                return print_error(f"Subtopic duologue {numbered_name!r} is invalid because line {line_number} is missing the required property {key!r}.")
+        for key in obj:
+            if key not in expected_keys:
+                print_warning(f"Subtopic duologue {numbered_name!r} has line {line_number} with an unexpected property {key!r} having value: {obj[key]!r}")
+
+        speaker = obj["speaker"]
+        if speaker not in expected_speakers:
+            return print_error(f"Subtopic duologue {numbered_name!r} is invalid because line {line_number} has an invalid speaker: {speaker!r}.")
+        if (line_number == 1) and (speaker != boundary_voice_sex):
+            return print_error(f"Subtopic duologue {numbered_name!r} is invalid because the first speaker must be {boundary_voice_sex!r}, but was {speaker!r}.")
+        if (line_number == num_lines) and (speaker != boundary_voice_sex):
+            return print_error(f"Subtopic duologue {numbered_name!r} is invalid because the last speaker must be {boundary_voice_sex!r}, but was {speaker!r}.")
+        if speaker == prev_speaker:
+            print_warning(f"Subtopic duologue {numbered_name!r} has line {line_number} with the same speaker as the previous line: {speaker!r}.")
+        prev_speaker = speaker
+
+        speech = obj["speech"]
+        if not isinstance(speech, str) or not speech.strip():
+            return print_error(f"Subtopic duologue {numbered_name!r} is invalid because line {line_number} has invalid speech: {speech!r}.")
+
+        tone = obj["tone"]
+        if not isinstance(tone, str) or not tone.strip():
+            return print_error(f"Subtopic duologue {numbered_name!r} is invalid because line {line_number} has invalid tone instructions: {tone!r}.")
+
+    return True
+
+
+def get_subtopic_monologue(*, topic: str, subtopics: list[str], subtopic: str, max_attempts: int = 3) -> str:
+    """Return the monologue for a given subtopic within the context of the given topic and list of subtopics."""
+    assert _NUMBERED_SUBTOPIC_PATTERN.match(subtopic), subtopic
+    common_kwargs = {"cache_key_prefix": f"{subtopic[:MAX_TEXT_LENGTH_IN_FILENAME].rstrip()} (monologue)", "cache_path": get_topic_work_path(topic), "temperature": 0.5, "verbosity": "low"}
+    # Note: temperature=0.5 is specified in an attempt to increase the objectivity of the monologue.
+    # Note: verbosity=low is specified in an attempt to reduce an excessively long monologue.
+    subtopics_str = "\n".join(subtopics)
+
+    for num_attempt in range(1, max_attempts + 1):
+        prompt = PROMPTS["generate_subtopic_monologue"].format(topic=topic, subtopics=subtopics_str, numbered_subtopic=subtopic)
+        monologue = get_cached_content(prompt, read_cache=num_attempt == 1, **common_kwargs)
+        monologue = monologue.rstrip()
+
+        error = io.StringIO()
+        with contextlib.redirect_stderr(error):
+            subtopic_monologue_is_valid = is_subtopic_monologue_valid(monologue, numbered_name=subtopic)
+        if not subtopic_monologue_is_valid:
+            error = error.getvalue().rstrip().removeprefix("Error: ")
+            if num_attempt == max_attempts:
+                raise podgenai.exceptions.LanguageModelOutputStructureError(error)
+            else:
+                print_warning(f"Fault in attempt {num_attempt} of {max_attempts} while getting subtopic monologue: {error}")
+                continue
+
+        break
+
+    assert monologue
+    return monologue
+
+
+def get_subtopic_duologue(*, topic: str, subtopics: list[str], subtopic: str, subtopic_monologue: str, boundary_voice_sex: str, non_boundary_voice_sex: str, max_attempts: int = 3) -> list[SpeechLine]:
+    """Return the duologue for a given subtopic within the context of the given topic and list of subtopics."""
+    assert _NUMBERED_SUBTOPIC_PATTERN.match(subtopic), subtopic
+    common_kwargs = {"cache_key_prefix": f"{subtopic[:MAX_TEXT_LENGTH_IN_FILENAME].rstrip()} (duologue)", "cache_path": get_topic_work_path(topic)}
+    subtopics_str = "\n".join(subtopics)
+
+    for num_attempt in range(1, max_attempts + 1):
+        prompt = PROMPTS["generate_subtopic_duologue"].format(topic=topic, subtopics=subtopics_str, numbered_subtopic=subtopic, subtopic_monologue=subtopic_monologue, boundary_voice_sex=boundary_voice_sex, non_boundary_voice_sex=non_boundary_voice_sex)
+        duologue = get_cached_content(prompt, read_cache=num_attempt == 1, **common_kwargs)  # Default temperature and verbosity are used for duologue, considering it is derived from the monologue.
+        duologue = duologue.rstrip()
+
+        error = io.StringIO()
+        with contextlib.redirect_stderr(error):
+            subtopic_duologue_is_valid = is_unmarked_subtopic_duologue_valid(duologue, numbered_name=subtopic, boundary_voice_sex=boundary_voice_sex, non_boundary_voice_sex=non_boundary_voice_sex)
+        if not subtopic_duologue_is_valid:
+            error = error.getvalue().rstrip().removeprefix("Error: ")
+            if num_attempt == max_attempts:
+                raise podgenai.exceptions.LanguageModelOutputStructureError(error)
+            else:
+                print_warning(f"Fault in attempt {num_attempt} of {max_attempts} while getting subtopic duologue: {error}")
+                continue
+
+        break
+
+    assert duologue
+    duologue_lines: list[SpeechLine] = [json.loads(line) for line in io.StringIO(duologue) if line.strip()]
+    assert duologue_lines
+    return duologue_lines
+
+
+def get_subtopics_duologues(*, topic: str, subtopics_monologues: list[SubtopicText], boundary_voice_sex: str, non_boundary_voice_sex: str) -> list[SubtopicDuologue]:
+    """Return the ordered subtopic duologue for each subtopic within the context of the given topic, ordered list of subtopics, and subtopic monologue."""
+    assert subtopics_monologues
     if MAX_CONCURRENT_WORKERS == 1:
-        subtopics_texts = {s: get_subtopic(topic=topic, subtopics=subtopics, subtopic=s) for s in subtopics}
+        subtopic_duologues = [
+            SubtopicDuologue(subtopic=s["name"], duologue=get_subtopic_duologue(topic=topic, subtopics=[s["name"] for s in subtopics_monologues], subtopic=s["name"], subtopic_monologue=s["text"], boundary_voice_sex=boundary_voice_sex, non_boundary_voice_sex=non_boundary_voice_sex)) for s in subtopics_monologues
+        ]
     else:
         assert MAX_CONCURRENT_WORKERS > 1
         with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_CONCURRENT_WORKERS) as executor:
-            fn_get_subtopic = lambda subtopic: get_subtopic(topic=topic, subtopics=subtopics, subtopic=subtopic)
-            subtopics_texts = {s: text for s, text in zip(subtopics, executor.map(fn_get_subtopic, subtopics))}
-    return subtopics_texts
+            fn_get_subtopic_duologue = lambda s: get_subtopic_duologue(topic=topic, subtopics=[s["name"] for s in subtopics_monologues], subtopic=s["name"], subtopic_monologue=s["text"], boundary_voice_sex=boundary_voice_sex, non_boundary_voice_sex=non_boundary_voice_sex)
+            subtopic_duologues = [SubtopicDuologue(subtopic=s["name"], duologue=duologue) for s, duologue in zip(subtopics_monologues, executor.map(fn_get_subtopic_duologue, subtopics_monologues))]
+    return subtopic_duologues
 
 
-def get_subtopics_speech_texts(*, topic: str, subtopics: list[str] | None = None, markers: bool | None = True) -> dict[str, str]:
-    """Return the ordered speech text for all subtopics within the context of the given topic and optional ordered list of subtopics.
+def get_subtopics_monologues(*, topic: str, subtopics: list[str]) -> list[SubtopicText]:
+    """Return the ordered subtopic monologue for each subtopic within the context of the given topic and ordered list of subtopics."""
+    assert subtopics
+    if MAX_CONCURRENT_WORKERS == 1:
+        subtopic_monologues = [SubtopicText(name=s, text=get_subtopic_monologue(topic=topic, subtopics=subtopics, subtopic=s)) for s in subtopics]
+    else:
+        assert MAX_CONCURRENT_WORKERS > 1
+        with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_CONCURRENT_WORKERS) as executor:
+            fn_get_subtopic_monologue = lambda subtopic: get_subtopic_monologue(topic=topic, subtopics=subtopics, subtopic=subtopic)
+            subtopic_monologues = [SubtopicText(name=s, text=monologue) for s, monologue in zip(subtopics, executor.map(fn_get_subtopic_monologue, subtopics))]
+    return subtopic_monologues
 
-    If the list of subtopics is not provided, it is read.
 
-    If markers are enabled, markers are placed at the start of each subtopic section and at the end of the last subtopic section. If markers are disabled, they are not placed, and the disclaimer is moved from the beginning of the first section to the end of the last section.
+def mark_subtopics_duologues(*, topic: str, subtopics_duologues: list[SubtopicDuologue], markers: bool | None = True, marker_voice_sex: str) -> None:
+    """Mark the subtopic duologue for each subtopic within the context of the given topic and ordered list of subtopics.
+
+    If markers are enabled, markers are placed at the start of each subtopic section. The disclaimer is placed at the beginning of the first section.
+    If markers are disabled, they are not placed. The disclaimer is placed at the end of the last section.
     """
-    if not subtopics:
-        subtopics = list_subtopics(topic)
-    subtopics_texts = get_subtopics_texts(topic=topic, subtopics=subtopics)
+    assert subtopics_duologues
+    assert marker_voice_sex in ("male", "female")
 
     mark = (lambda marker: marker) if markers else (lambda marker: "")
     demark = (lambda marker: "") if markers else (lambda marker: marker)
@@ -236,14 +292,42 @@ def get_subtopics_speech_texts(*, topic: str, subtopics: list[str] | None = None
     process_subtopic_name = (lambda subtopic_name: subtopic_name.replace(".", ":", 1)) if markers else (lambda subtopic_name: subtopic_name.partition(". ")[2])
     # Note: The section number is removed altogether from the subtopic name if markers are disabled. This is because the number risks not being correctly spoken in an intended foreign language, especially so for non-Latin languages.
 
-    subtopics_speech_texts = {subtopic_name: f"{mark('Section ')}{process_subtopic_name(subtopic_name)}:\n\n{subtopic_text}" for subtopic_name, subtopic_text in subtopics_texts.items()}
+    for subtopic_duologue in subtopics_duologues:
+        assert _NUMBERED_SUBTOPIC_PATTERN.match(subtopic_duologue["subtopic"]), subtopic_duologue["subtopic"]
+        subtopic_duologue["duologue"].insert(0, SpeechLine(speaker=marker_voice_sex, speech=f"{mark('Section ')}{process_subtopic_name(subtopic_duologue['subtopic'])}", tone=None))
 
-    subtopics_speech_texts[subtopics[0]] = f"{topic}:\n\n{mark(f'{PROMPTS["tts_disclaimer"]}\n\n')}{subtopics_speech_texts[subtopics[0]]}"
-    # Note: TTS disclaimer about AI generated audio is required by OpenAI as per https://platform.openai.com/docs/guides/text-to-speech/do-i-own-the-outputted-audio-files
-    # Note: If markers are disabled, such as for foreign language use, the disclaimer is skipped from the beginning of the first section (to the end of the last section)
-    #       because otherwise the disclaimer can risk conditioning the TTS to speak "1" in English instead of in the foreign language.
+    subtopics_duologues[0]["duologue"][0]["speech"] = f"{topic}:\n\n{mark(f'{PROMPTS["tts_disclaimer"]}\n\n')}{subtopics_duologues[0]['duologue'][0]['speech']}"
+    if not markers:  # This condition check exists to avoid adding an empty SpeechLine if markers are enabled.
+        subtopics_duologues[-1]["duologue"].append(SpeechLine(speaker=marker_voice_sex, speech=demark(PROMPTS["tts_disclaimer"]), tone=None))
 
-    subtopics_speech_texts[subtopics[-1]] = f"{subtopics_speech_texts[subtopics[-1]]}{demark(f'\n\n{PROMPTS["tts_disclaimer"]}')}"
-    # Note: "The end." is not pronounced by gpt-4o-mini-tts-2025-12-15, although it is pronounced by tts-1.
 
-    return subtopics_speech_texts
+def get_subtopics_duologues_transcripts(*, subtopics_duologues: list[SubtopicDuologue]) -> list[SubtopicText]:
+    """Return the ordered subtopic duologue transcript for each subtopic within the context of the given topic and ordered list of subtopics."""
+    assert subtopics_duologues
+    return [
+        SubtopicText(name=subtopic_duologue["subtopic"], text="\n".join(f"#S{subtopic_num}L{line_num}: [{line['speaker']}] {line['speech']} (tone: {line.get('tone')})" for line_num, line in enumerate(subtopic_duologue["duologue"], start=0))) for subtopic_num, subtopic_duologue in enumerate(subtopics_duologues, start=1)
+    ]
+
+
+def get_subtopics_monologue_transcripts(*, topic: str, subtopic_monologues: list[SubtopicText], markers: bool | None = True) -> list[SubtopicText]:
+    """Return the ordered monologue transcript for all subtopics within the context of the given topic and ordered list of subtopics.
+
+    If markers are enabled, markers are placed at the start of each subtopic section. The disclaimer is placed at the beginning of the first section.
+    If markers are disabled, they are not placed. The disclaimer is placed at the end of the last section.
+    """
+    assert subtopic_monologues
+
+    mark = (lambda marker: marker) if markers else (lambda marker: "")
+    demark = (lambda marker: "") if markers else (lambda marker: marker)
+
+    process_subtopic_name = (lambda subtopic_name: subtopic_name.replace(".", ":", 1)) if markers else (lambda subtopic_name: subtopic_name.partition(". ")[2])
+    # Note: The section number is removed altogether from the subtopic name if markers are disabled. This is because the number risks not being correctly spoken in an intended foreign language, especially so for non-Latin languages.
+
+    for subtopic_monologue in subtopic_monologues:
+        assert _NUMBERED_SUBTOPIC_PATTERN.match(subtopic_monologue["name"]), subtopic_monologue["name"]
+    subtopics_monologue_transcripts = [SubtopicText(name=s["name"], text=f"{mark('Section ')}{process_subtopic_name(s['name'])}:\n\n{s['text']}") for s in subtopic_monologues]
+
+    subtopics_monologue_transcripts[0]["text"] = f"{topic}:\n\n{mark(f'{PROMPTS["tts_disclaimer"]}\n\n')}{subtopics_monologue_transcripts[0]['text']}"
+    subtopics_monologue_transcripts[-1]["text"] = f"{subtopics_monologue_transcripts[-1]['text']}{demark(f'\n\n{PROMPTS["tts_disclaimer"]}')}"
+
+    return subtopics_monologue_transcripts

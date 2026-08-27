@@ -1,5 +1,9 @@
 # podgenai
-**podgenai** is a Python 3.14 application to generate an informational single-speaker audiobook/podcast mp3 file on a given topic using an OpenAI LLM. The loosely targeted duration of the generated file is an hour, although producing comprehensive coverage often results in a substantially longer multi-hour duration. A funded [OpenAI API key](https://platform.openai.com/api-keys) is required.
+**podgenai** is a Python 3.14 application to generate an informational single-speaker or two-speaker audiobook/podcast mp3 file on a given topic using an OpenAI LLM. The output file is generated as a series of sections, each covering a subtopic of the given topic. A funded [OpenAI API key](https://platform.openai.com/api-keys) is required.
+
+The loosely targeted duration of the generated file is an hour, although comprehensive coverage often results in a multi-hour duration by default. A smaller duration can in practice be enforced by limiting the number of sections to as few as three, although this is expected to result in less comprehensive coverage of the topic.
+
+Although there might sometimes exist some semantic repetition of content across subtopics, this has intentionally not been optimized away because this repetition of important points can help with learning and memorization.
 
 ## Links
 | Caption     | Link                                                 |
@@ -11,26 +15,35 @@
 | Podcast RSS | https://anchor.fm/s/f4868644/podcast/rss             |
 
 ## Approach
-The `chat-latest` and `gpt-4o-mini-tts-2025-12-15` models are used for text and speech generation respectively. For a given topic, the high-level reference approach is:
+The `chat-latest` and `gpt-4o-mini-tts-2025-12-15` models are used for text and speech generation respectively. For a given topic, the high-level approach is as follows:
 
+For a single-speaker (monologue) generation:
 1. Applicable subtopics are listed using the LLM. If however the topic is unknown to the LLM, the process is aborted.
 2. The voice is selected using the LLM from the configured choices.
-3. Concurrently for each subtopic, the corresponding text and speech are generated using the LLM and TTS respectively.
-4. The speech files are concatenated using `ffmpeg`, with a pause added between subtopics.
+3. Concurrently for each subtopic, the corresponding monologue text is generated using the LLM.
+4. Concurrently for each subtopic, the corresponding speech is generated using the TTS.
+5. The speech files are concatenated using `ffmpeg`, with an appropriate pause added between parts and subtopics.
 
-Although there may sometimes exist some semantic repetition of content across subtopics, this has intentionally not been optimized away because this repetition of important points can help with learning and memorization.
+For a two-speaker (duologue) generation:
+1. Applicable subtopics are listed using the LLM. If however the topic is unknown to the LLM, the process is aborted.
+2. A male and a female voice are selected using the LLM from the configured choices.
+3. Concurrently for each subtopic, the corresponding monologue text is generated using the LLM.
+4. Concurrently for each subtopic, the corresponding duologue text and tone is generated using the LLM using its respective monologue text as a reference.
+5. Concurrently for each line, the corresponding speech is generated using the TTS.
+6. The speech files are concatenated using `ffmpeg`, with an appropriate pause added between parts, lines, and subtopics.
 
 ## Samples
-These generated mp3 files are available for download, one for each voice. As a reminder, the voice is selected by the LLM.
+These generated mp3 files are available for download:
+
+| Type | Voice(s) | Name | Links |
+|------|----------|------|-------|
+| two-speaker | modern-female (marin), modern-male (cedar) | Grand Turk for cruise tourists | [Mega](https://mega.nz/file/FE81QRzY#PIAoDOkfPoTWBJBCZg9PNq4YpGd4kfVUnZt5uaC4hJw), [Spotify](https://creators.spotify.com/pod/profile/podgenai/episodes/Grand-Turk-for-cruise-tourists-e3nv758) |
+| one-speaker | modern-female (marin) | New York City tourism: What's new | [Mega](https://mega.nz/file/VJ1WRbxZ#62PvDAD0ttO7JD3l9CywICB2KAMUhxLc6Jed7WkE3B4), [Spotify](https://creators.spotify.com/pod/profile/podgenai/episodes/New-York-City-tourism-Whats-new-e3njmjn) |
+| one-speaker | modern-male (cedar)   | Writing a Will | [Mega](https://mega.nz/file/gE0EzKBT#Qm72FWa36joj_qFP7MlN2pyESLa0dS4Q6xiKwRIpLUY), [Spotify](https://creators.spotify.com/pod/profile/podgenai/episodes/Writing-a-Will-e3njm2g) |
 
 There also is a related [podcast](https://podcasters.spotify.com/pod/podgenai) ([RSS](https://anchor.fm/s/f4868644/podcast/rss)) to which episodes may be posted over time.
 
 A playback speed of 1.05x is recommended for non-technical topics, 1.0x for technical topics, and 0.95x for foreign language topics.
-
-| Voice                 | Name |
-|-----------------------|------|
-| modern-female (marin) | [New York City tourism: What's new](https://mega.nz/file/VJ1WRbxZ#62PvDAD0ttO7JD3l9CywICB2KAMUhxLc6Jed7WkE3B4)
-| modern-male (cedar)   | [Writing a Will](https://mega.nz/file/gE0EzKBT#Qm72FWa36joj_qFP7MlN2pyESLa0dS4Q6xiKwRIpLUY)
 
 ## Setup
 
@@ -40,7 +53,7 @@ A playback speed of 1.05x is recommended for non-technical topics, 1.0x for tech
 * Ensure that `ffmpeg` and `ffprobe` are available. This is automatic if using the included devcontainer definition.
 * Continue the setup via GitHub or PyPI as below.
 
-### Setup via GitHub using devcontainer
+### Setup via GitHub using devcontainer (recommended)
 * Continue from the common setup steps.
 * Clone or download this repo.
 * Build and provision the defined devcontainer.
@@ -61,16 +74,16 @@ Usage can be as a command-line application or as a Python library. By default, t
 
 ### Usage tips
 * If a requested topic fails to generate subtopics due to a refusal, retry up to a few times, as it may succeed with several attempts. If it doesn't, try rewording it, perhaps to be broader or narrower or more factual. Up to two attempts are made per run, although the first attempt will reuse the disk cache if available.
-* For a potentially longer list of covered subtopics, consider appending the "(unabridged)" suffix to the requested topic, e.g. "PyTorch (unabridged)".
-* In case the topic fails to be spoken at the start of a podcast, delete `./work/<topic>/1.*.mp3` and regenerate the output.
+* To control the resulting duration, specify the target number of covered subtopics using the `--max-sections` (`-s`) option.
+* To switch from the default two-speaker generation to single-speaker generation, use the `--speakers` (`-k`) option.
 * To optionally generate a cover art image for your topic, [this custom GPT](https://chat.openai.com/g/g-SvmRhBwX1-podcast-episode-cover-art) can be used.
-* To attempt generation in a foreign language, specify the title in the desired language along with a parenthesized prefix of the language name, e.g. "México (español)". If the generation is refused the first time, try again. Also refer to and use the `--no-markers` option.
+* To attempt generation in a foreign language, specify the title in the desired language along with a parenthesized prefix of the language name, e.g. "México (Español)". If the generation is refused the first time, try again. Also refer to and use the `--no-markers` (`-nm`) option.
 
 ### Usage as application
 Usage help is copied below:
 ```
-$ python -m podgenai -h
-Usage: python -m podgenai [OPTIONS]
+$ podgenai -h
+Usage: podgenai [OPTIONS]
 
   Generate and write an audiobook podcast mp3 file for the given topic to the given output file path.
 
@@ -83,6 +96,7 @@ Options:
   -s, --max-sections INTEGER RANGE
                                   Maximum number of sections, between 3 and 100. If not given, it is unrestricted.
                                   [3<=x<=100]
+  -k, --speakers INTEGER RANGE    Number of speakers, either 1 or 2. If not given, it is 2.  [1<=x<=2]
   -m, --markers / -nm, --no-markers
                                   Include markers at the start or end of sections in the generated audio. If
                                   `--markers`, markers are included, and this is the default. If `--no-markers`,
@@ -97,13 +111,15 @@ Options:
 
 Usage examples:
 
-    $ python -m podgenai -t "My favorite topic"
+    $ podgenai -t "The Quest for Infinity"
 
-    $ python -m podgenai -t "My favorite topic" -p ~/Downloads/
+    $ podgenai -t "The Quest for Infinity" -p ~/Downloads/
 
-    $ python -m podgenai -t "My favorite topic" -p ~/Downloads/topic.mp3 -nc
+    $ podgenai -t "The Quest for Infinity" -p ~/Downloads/output.mp3 -nc
 
-    $ python -m podgenai -t "L'histoire de Napoléon Bonaparte (français)" -nm
+    $ podgenai -t "The Quest for Infinity" -s 3 -k 1
+
+    $ podgenai -t "La Quête de l’infini (Français)" -nm
 
 ### Usage as library
 ```python
@@ -111,7 +127,7 @@ Usage examples:
 >>> import inspect
 
 >>> print(inspect.signature(generate_media))
-(topic: str, *, output_path: Optional[pathlib.Path] = None, max_sections: Optional[int] = None, markers: bool = True, confirm: bool = False) -> pathlib.Path
+(topic: str, *, output_path: pathlib.Path | None = None, max_sections: int | None = None, speakers: int = 2, markers: bool = True, confirm: bool = False) -> pathlib.Path
 
 >>> print(inspect.getdoc(generate_media))
 ```
@@ -124,6 +140,7 @@ Params:
     If an intended file path, it must have an ".mp3" suffix. If a directory, it must exist, and the file name is auto-determined.
     If not given, the output file is written to the repo directory with an auto-determined file name.
 * `max_sections`: Maximum number of sections to generate. It is between 3 and 100. It is unrestricted if not given.
+* `speakers`: Number of speakers, either 1 or 2. Its default is 2.
 * `markers`: Include markers at the start or end of sections in the generated audio.
     If true, markers are included. If false, markers are excluded, as can be appropriate for foreign-language generation. Its default is true.
 * `confirm`: Confirm before full-text and speech generation.
@@ -133,7 +150,7 @@ If failed, a subclass of the `podgenai.exceptions.Error` exception is raised.
 ```
 
 ## Cache
-Text and speech segments are cached locally on disk in the `./work/<topic>` directory. They can manually be deleted. This deletion is currently not automatic. Moreover, it can currently be necessary to delete one or more applicable cached files if the cache is to be bypassed.
+Text and speech segments are cached locally on disk in the `./work/<topic>` directory. They can manually and selectively be deleted. This deletion is not automatic. Moreover, it is necessary to delete one or more applicable cached files to force a regeneration, although a change of runtime settings forces it as well, as do routine updates to the software.
 
 ## Disclaimer
 <sub>This software is provided "as is," without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose, and noninfringement. In no event shall the authors or copyright holders be liable for any claim, damages, or other liability, whether in an action of contract, tort, or otherwise, arising from, out of, or in connection with the software or the use or other dealings in the software.</sub>

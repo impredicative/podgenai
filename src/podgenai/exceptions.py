@@ -24,3 +24,7 @@ class LanguageModelOutputRejectionError(LanguageModelOutputError):
 
 class LanguageModelOutputStructureError(LanguageModelOutputError):
     """Language model output structure error."""
+
+
+class SpeechModelInputError(InputError):
+    """Speech model input error."""
