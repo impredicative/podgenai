@@ -17,14 +17,14 @@ Although there might sometimes exist some semantic repetition of content across 
 ## Approach
 The `chat-latest` and `gpt-4o-mini-tts-2025-12-15` models are used for text and speech generation respectively. For a given topic, the high-level approach is as follows:
 
-For a single-speaker (monologue) generation:
+### Single-speaker (monologue) generation
 1. Applicable subtopics are listed using the LLM. If however the topic is unknown to the LLM, the process is aborted.
 2. The voice is selected using the LLM from the configured choices.
 3. Concurrently for each subtopic, the corresponding monologue text is generated using the LLM.
 4. Concurrently for each subtopic, the corresponding speech is generated using the TTS.
 5. The speech files are concatenated using `ffmpeg`, with an appropriate pause added between parts and subtopics.
 
-For a two-speaker (duologue) generation:
+### Two-speaker (duologue) generation
 1. Applicable subtopics are listed using the LLM. If however the topic is unknown to the LLM, the process is aborted.
 2. A male and a female voice are selected using the LLM from the configured choices.
 3. Concurrently for each subtopic, the corresponding monologue text is generated using the LLM.
