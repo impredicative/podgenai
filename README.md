@@ -124,29 +124,35 @@ Usage examples:
 ### Usage as library
 ```python
 >>> from podgenai import generate_media
->>> import inspect
-
->>> print(inspect.signature(generate_media))
-(topic: str, *, output_path: pathlib.Path | None = None, max_sections: int | None = None, speakers: int = 2, markers: bool = True, confirm: bool = False) -> pathlib.Path
-
->>> print(inspect.getdoc(generate_media))
+>>> help(generate_media)
 ```
 ```text
-Return the output path after generating and writing an audiobook podcast to file for the given topic.
+Help on function generate_media in module podgenai.podgenai:
 
-Params:
-* `topic`: Topic.
-* `output_path`: Output file or directory path.
-    If an intended file path, it must have an ".mp3" suffix. If a directory, it must exist, and the file name is auto-determined.
-    If not given, the output file is written to the repo directory with an auto-determined file name.
-* `max_sections`: Maximum number of sections to generate. It is between 3 and 100. It is unrestricted if not given.
-* `speakers`: Number of speakers, either 1 or 2. Its default is 2.
-* `markers`: Include markers at the start or end of sections in the generated audio.
-    If true, markers are included. If false, markers are excluded, as can be appropriate for foreign-language generation. Its default is true.
-* `confirm`: Confirm before full-text and speech generation.
-    If true, a confirmation is interactively sought after generating and printing the list of subtopics, before generating the full-text, and also before generating the speech. Its default is false.
+generate_media(
+    topic: str,
+    *,
+    output_path: Path | None = None,
+    max_sections: int | None = None,
+    speakers: int = 2,
+    markers: bool = True,
+    confirm: bool = False
+) -> Path
+    Return the output path after generating and writing an audiobook podcast to file for the given topic.
 
-If failed, a subclass of the `podgenai.exceptions.Error` exception is raised.
+    Params:
+    * `topic`: Topic.
+    * `output_path`: Output file or directory path.
+        If an intended file path, it must have an ".mp3" suffix. If a directory, it must exist, and the file name is auto-determined.
+        If not given, the output file is written to the repo directory with an auto-determined file name.
+    * `max_sections`: Maximum number of sections to generate. It is between 3 and 100. It is unrestricted if not given.
+    * `speakers`: Number of speakers, either 1 or 2. Its default is 2.
+    * `markers`: Include markers at the start or end of sections in the generated audio.
+        If true, markers are included. If false, markers are excluded, as can be appropriate for foreign-language generation. Its default is true.
+    * `confirm`: Confirm before full-text and speech generation.
+        If true, a confirmation is interactively sought after generating and printing the list of subtopics, before generating the full-text, and also before generating the speech. Its default is false.
+
+    If failed, a subclass of the `podgenai.exceptions.Error` exception is raised.
 ```
 
 ## Cache
