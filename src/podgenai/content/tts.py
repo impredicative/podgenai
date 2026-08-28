@@ -2,7 +2,7 @@ import concurrent.futures
 
 import pathvalidate
 
-from podgenai.config import MAX_CONCURRENT_WORKERS, MAX_TEXT_LENGTH_IN_FILENAME, PAUSE_BETWEEN_PARTS, PAUSE_BETWEEN_SUBTOPICS, PROMPTS
+from podgenai.config import MAX_CONCURRENT_WORKERS, MAX_TEXT_LENGTH_IN_FILENAME, PAUSE_BETWEEN_PARTS, PAUSE_BETWEEN_SUBTOPICS, TTS_MONOLOGUE_TONE
 from podgenai.types import SpeechTask, SubtopicDuologue, SubtopicText
 from podgenai.util.binascii import hasher
 from podgenai.util.openai import MODELS, TTS_VOICE_MAP, ensure_speech_audio
@@ -71,7 +71,7 @@ def get_monologue_speech_tasks(*, subtopics_monologue_transcripts: list[Subtopic
                         speech_task = SpeechTask(path=part_path, text=part, part_num=part_num, num_parts=num_parts, voice=voice, tone=None, pause_after=pause_after)  # Note: Tone instructions are not supported by this TTS model.
                         speech_tasks.append(speech_task)
             case "gpt-4o-mini-tts-2025-12-15":
-                tone_instructions = PROMPTS["tts_monologue_tone"]
+                tone_instructions = TTS_MONOLOGUE_TONE
                 subtopic_dedup_hash = hasher(f"{subtopic_monologue}\n\n{tone_instructions}")
                 filename_stem = f"{subtopic_title[:MAX_TEXT_LENGTH_IN_FILENAME]} (monologue) ({tts_model}) ({voice}) [{subtopic_dedup_hash}]"
                 filename_stem = pathvalidate.sanitize_filename(filename_stem, platform="auto")

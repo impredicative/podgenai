@@ -1,6 +1,6 @@
 Produce a list of contiguously numbered points for a lengthy 1-hour long audiobook podcast episode on the given topic. Do not provide a nested hierarchy of points; emit only a flattened single-level instead of a hierarchy, even if it means duplicating a few words. Accordingly, do not emit any bullet points either. Moreover, each numbered point must be a relevant self-sufficient subtopic of the given topic. Being factual is of course important, so list only the subtopics you actually know to be well-documented, eschewing unverified ones, even if this means that the podcast will be smaller. Do not make up information just to please the user.
 
-In case you have nothing at all, just say "RequestError: {{reason}}" instead, where {{reason}} is a brief reason for rejecting the topic, optionally with a suggested name of a valid topic, e.g. "RequestError: Verifiable information is unavailable for ...", in your own words. Bear in mind that while excessive rejections are bad for business, hallucinating information is a cardinal sin. Hallucinations often are a result of an LLM's innate over-compliance, but awareness of this tendency should help mitigate it.
+In case you have nothing at all, just say "RequestError: {reason}" instead, where {reason} is a brief reason for rejecting the topic, optionally with a suggested name of a valid topic, e.g. "RequestError: Verifiable information is unavailable for ...", in your own words. Bear in mind that while excessive rejections are bad for business, hallucinating information is a cardinal sin. Hallucinations often are a result of an LLM's innate over-compliance, but awareness of this tendency should help mitigate it.
 
 Note that this is an audio-only podcast, so the audience will not have access to video or to a screen. For technical topics, avoid software code and fancy mathematical equations as they are hard to vocalize. Also note that the audience is a mixed audience with an interest in the topic, operating at a spectrum of proficiency levels (novice / beginner / intermediate / advanced / expert), with the intent being to progressively appeal to all levels. The audience must learn everything that they need to know in depth; their interest is both academic and pragmatic. In effect, with the podcast serving as exhaustive training material, the audience is empowered by information. Note however that the requested topic may not always be professional in nature, and this is all right.
 
@@ -8,8 +8,10 @@ You do not need to cover any prerequisite or foundational subtopics because they
 
 There is no need to end each subtopic name with a period. Two structural examples of listed subtopics are "1. Lorem ipsum dolor sit amet" and "2. Consectetur adipiscing elit".
 
-For your information, in a subsequent step, I will ask you to generate the corresponding text for each of the listed subtopic points, one point at a time. As such, it would help for each of the points you list to exclusively be those that you can subsequently factually expound upon at significant length.{optional_restriction}
+For your information, in a subsequent step, I will ask you to generate the corresponding text for each of the listed subtopic points, one point at a time. As such, it would help for each of the points you list to exclusively be those that you can subsequently factually expound upon at significant length.{% if max_sections is not none %}
+
+As a special user request, limit the number of points to a maximum of {{ max_sections }} while still ensuring broad coverage.{% endif %}
 
 The topic for the podcast is:
 
-{topic}
+{{ topic }}

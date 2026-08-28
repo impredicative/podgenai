@@ -11,6 +11,7 @@ license = "LGPL-3.0-only"
 license-files = ["LICENSE"]
 dependencies = [
     "click>=8.5.0",  # https://github.com/pallets/click/releases
+    "jinja2>=3.1.6",  # https://jinja.palletsprojects.com/en/stable/changes/
     "openai>=3.5.0",  # https://github.com/openai/openai-python/releases
     "pathvalidate>=3.3.1",  # https://github.com/thombashi/pathvalidate/releases
     "python-dotenv>=1.2.3",  # https://github.com/theskumar/python-dotenv/releases

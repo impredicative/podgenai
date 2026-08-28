@@ -5,7 +5,7 @@ import json
 import re
 
 import podgenai.exceptions
-from podgenai.config import MAX_CONCURRENT_WORKERS, MAX_TEXT_LENGTH_IN_FILENAME, NUM_SECTIONS_MAX, NUM_SECTIONS_MIN, PROMPTS
+from podgenai.config import MAX_CONCURRENT_WORKERS, MAX_TEXT_LENGTH_IN_FILENAME, NUM_SECTIONS_MAX, NUM_SECTIONS_MIN, PROMPTS, TTS_DISCLAIMER
 from podgenai.types import SpeechLine, SubtopicDuologue, SubtopicText
 from podgenai.util.openai import get_cached_content
 from podgenai.util.sys import print_error, print_warning
@@ -62,12 +62,11 @@ def list_subtopics(topic: str, max_sections: int | None = None, max_attempts: in
     The subclass `LanguageModelOutputStructureError` is raised if the output is structurally invalid.
     """
 
-    if max_sections:
+    if max_sections is not None:
         assert NUM_SECTIONS_MIN <= max_sections <= NUM_SECTIONS_MAX, (max_sections, NUM_SECTIONS_MIN, NUM_SECTIONS_MAX)
-    restriction = ("\n\n" + PROMPTS["list_subtopics_limit"].format(max_sections=max_sections)) if max_sections else ""
 
     prompt_name = "list_subtopics"
-    prompt = PROMPTS[prompt_name].format(topic=topic, optional_restriction=restriction)
+    prompt = PROMPTS[prompt_name].render(topic=topic, max_sections=max_sections)
     none_subtopics = ("none", "none.")
     invalid_subtopics = ("", *none_subtopics)
     rejection_error_prefix = "RequestError: "  # Defined in prompt.
@@ -198,7 +197,7 @@ def get_subtopic_monologue(*, topic: str, subtopics: list[str], subtopic: str, m
     subtopics_str = "\n".join(subtopics)
 
     for num_attempt in range(1, max_attempts + 1):
-        prompt = PROMPTS["generate_subtopic_monologue"].format(topic=topic, subtopics=subtopics_str, numbered_subtopic=subtopic)
+        prompt = PROMPTS["generate_subtopic_monologue"].render(topic=topic, subtopics=subtopics_str, numbered_subtopic=subtopic)
         monologue = get_cached_content(prompt, read_cache=num_attempt == 1, **common_kwargs)
         monologue = monologue.rstrip()
 
@@ -226,7 +225,7 @@ def get_subtopic_duologue(*, topic: str, subtopics: list[str], subtopic: str, su
     subtopics_str = "\n".join(subtopics)
 
     for num_attempt in range(1, max_attempts + 1):
-        prompt = PROMPTS["generate_subtopic_duologue"].format(topic=topic, subtopics=subtopics_str, numbered_subtopic=subtopic, subtopic_monologue=subtopic_monologue, boundary_voice_sex=boundary_voice_sex, non_boundary_voice_sex=non_boundary_voice_sex)
+        prompt = PROMPTS["generate_subtopic_duologue"].render(topic=topic, subtopics=subtopics_str, numbered_subtopic=subtopic, subtopic_monologue=subtopic_monologue, boundary_voice_sex=boundary_voice_sex, non_boundary_voice_sex=non_boundary_voice_sex)
         duologue = get_cached_content(prompt, read_cache=num_attempt == 1, **common_kwargs)  # Default temperature and verbosity are used for duologue, considering it is derived from the monologue.
         duologue = duologue.rstrip()
 
@@ -296,9 +295,9 @@ def mark_subtopics_duologues(*, topic: str, subtopics_duologues: list[SubtopicDu
         assert _NUMBERED_SUBTOPIC_PATTERN.match(subtopic_duologue["subtopic"]), subtopic_duologue["subtopic"]
         subtopic_duologue["duologue"].insert(0, SpeechLine(speaker=marker_voice_sex, speech=f"{mark('Section ')}{process_subtopic_name(subtopic_duologue['subtopic'])}", tone=None))
 
-    subtopics_duologues[0]["duologue"][0]["speech"] = f"{topic}:\n\n{mark(f'{PROMPTS["tts_disclaimer"]}\n\n')}{subtopics_duologues[0]['duologue'][0]['speech']}"
+    subtopics_duologues[0]["duologue"][0]["speech"] = f"{topic}:\n\n{mark(f'{TTS_DISCLAIMER}\n\n')}{subtopics_duologues[0]['duologue'][0]['speech']}"
     if not markers:  # This condition check exists to avoid adding an empty SpeechLine if markers are enabled.
-        subtopics_duologues[-1]["duologue"].append(SpeechLine(speaker=marker_voice_sex, speech=demark(PROMPTS["tts_disclaimer"]), tone=None))
+        subtopics_duologues[-1]["duologue"].append(SpeechLine(speaker=marker_voice_sex, speech=demark(TTS_DISCLAIMER), tone=None))
 
 
 def get_subtopics_duologues_transcripts(*, subtopics_duologues: list[SubtopicDuologue]) -> list[SubtopicText]:
@@ -327,7 +326,7 @@ def get_subtopics_monologue_transcripts(*, topic: str, subtopic_monologues: list
         assert _NUMBERED_SUBTOPIC_PATTERN.match(subtopic_monologue["name"]), subtopic_monologue["name"]
     subtopics_monologue_transcripts = [SubtopicText(name=s["name"], text=f"{mark('Section ')}{process_subtopic_name(s['name'])}:\n\n{s['text']}") for s in subtopic_monologues]
 
-    subtopics_monologue_transcripts[0]["text"] = f"{topic}:\n\n{mark(f'{PROMPTS["tts_disclaimer"]}\n\n')}{subtopics_monologue_transcripts[0]['text']}"
-    subtopics_monologue_transcripts[-1]["text"] = f"{subtopics_monologue_transcripts[-1]['text']}{demark(f'\n\n{PROMPTS["tts_disclaimer"]}')}"
+    subtopics_monologue_transcripts[0]["text"] = f"{topic}:\n\n{mark(f'{TTS_DISCLAIMER}\n\n')}{subtopics_monologue_transcripts[0]['text']}"
+    subtopics_monologue_transcripts[-1]["text"] = f"{subtopics_monologue_transcripts[-1]['text']}{demark(f'\n\n{TTS_DISCLAIMER}')}"
 
     return subtopics_monologue_transcripts

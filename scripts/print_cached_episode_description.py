@@ -1,6 +1,6 @@
 import re
 
-from podgenai.config import PROMPTS
+from podgenai.config import TTS_DISCLAIMER
 from podgenai.content.topic import get_topic
 from podgenai.work import get_topic_work_path
 
@@ -60,7 +60,7 @@ def get_cached_episode_description(topic: str, fmt: str) -> str:
             while True:
                 subtopics_list_html = "\n".join(f"  <li>{s}</li>" for s in denumbered_subtopics_list)
                 truncation_notice = f"<p><em>(Description is truncated down from {len(subtopics_list)} sections due to a size restriction.)</em></p>\n" if is_description_truncated else ""
-                description = f"<p><strong>Sections</strong>:</p>\n<ol>\n{subtopics_list_html}\n</ol>\n{truncation_notice}<p><br></p><p><strong>Disclaimer</strong>: <em>{PROMPTS['tts_disclaimer']}</em></p>"
+                description = f"<p><strong>Sections</strong>:</p>\n<ol>\n{subtopics_list_html}\n</ol>\n{truncation_notice}<p><br></p><p><strong>Disclaimer</strong>: <em>{TTS_DISCLAIMER}</em></p>"
                 if len(description) <= 4000:
                     break
                 else:

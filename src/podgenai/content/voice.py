@@ -25,7 +25,7 @@ def get_monologue_voice_key(*, topic: str, max_attempts: int = 3, allowed_voice_
             assert voice_key in TTS_VOICE_MAP, {"topic": topic, "key": voice_key, "allowed_voice_keys": allowed_voice_keys}
         tts_voice_map = {voice_key: value for voice_key, value in TTS_VOICE_MAP.items() if voice_key in allowed_voice_keys}
     voices = "\n".join(f"    {voice_key} ({value})" for voice_key, value in sorted(tts_voice_map.items()))
-    prompt = PROMPTS[prompt_name].format(voices=voices, topic=topic)
+    prompt = PROMPTS[prompt_name].render(voices=voices, topic=topic)
 
     for num_attempt in range(1, max_attempts + 1):
         raw_voice = get_cached_content(prompt, read_cache=num_attempt == 1, cache_key_prefix=f"0. {prompt_name}", cache_path=get_topic_work_path(topic))
