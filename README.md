@@ -15,7 +15,7 @@ Although there might sometimes exist some semantic repetition of content across 
 | Podcast RSS | https://anchor.fm/s/f4868644/podcast/rss             |
 
 ## Approach
-The `chat-latest` and `gpt-4o-mini-tts-2025-12-15` models are used for text and speech generation respectively. For a given topic, the high-level approach is as follows:
+The `gpt-5.6-sol` and `gpt-4o-mini-tts-2025-12-15` models are used for text and speech generation respectively. For a given topic, the high-level approach is as follows:
 
 ### Single-speaker (monologue) generation
 1. Applicable subtopics are listed using the LLM. If however the topic is unknown to the LLM, the process is aborted.
