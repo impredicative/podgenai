@@ -168,3 +168,6 @@ work/
 
 # Output:
 *.mp3
+
+# LLM
+spec/
