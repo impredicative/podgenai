@@ -17,8 +17,8 @@ OpenAI = openai.OpenAI
 
 MODELS = {
     "text": [
-        "chat-latest", # Has a small input context window of 400K tokens which could be insufficient for a source document input.
-        "gpt-5.6-sol", # Has a large input context window of 1,050K tokens which is safer for a large source document input.
+        "chat-latest",  # Has a small input context window of 400K tokens which could be insufficient for a source document input.
+        "gpt-5.6-sol",  # Has a large input context window of 1,050K tokens which is safer for a large source document input.
     ][-1],  # Ref: https://platform.openai.com/docs/models
     "tts": [  # Demo: https://platform.openai.com/audio/tts
         "tts-1",  # Note: tts-1-hd is twice as expensive, and was observed to have a more limited concurrent usage quota resulting in openai.RateLimitError.
