@@ -15,6 +15,7 @@
 	"customizations": {
         "vscode": {
             "extensions": [
+				"samuelcolvin.jinjahtml",
 				"mhutchie.git-graph",
 				"ms-python.python",
 				"streetsidesoftware.code-spell-checker",
