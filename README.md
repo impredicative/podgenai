@@ -1,5 +1,5 @@
 # podgenai
-**podgenai** is a handwritten Python 3.14 application to generate an informational single-speaker or two-speaker audiobook/podcast mp3 file on a given topic using an OpenAI LLM. The material is generated from the model's internal knowledge. Web search or external sources are not used. The output file is generated as a series of sections, each covering a subtopic of the given topic. A funded [OpenAI API key](https://platform.openai.com/api-keys) is required.
+**podgenai** is a Python 3.14 application to generate an informational single-speaker or two-speaker audiobook/podcast mp3 file on a given topic using an OpenAI LLM. The material is generated from the model's internal knowledge. Web search or external sources are not used. The output file is generated as a series of sections, each covering a subtopic of the given topic. A funded [OpenAI API key](https://platform.openai.com/api-keys) is required.
 
 The loosely targeted duration of the generated file is an hour, although comprehensive coverage often results in a multi-hour duration by default. A smaller duration can in practice be enforced by limiting the number of sections to as few as three, although this is expected to result in less comprehensive coverage of the topic.
 
