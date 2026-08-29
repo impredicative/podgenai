@@ -1,6 +1,8 @@
+import argparse
 import re
+import sys
 
-from podgenai.config import TTS_DISCLAIMER
+from podgenai.config import TTS_DISCLAIMER_W_DOC, TTS_DISCLAIMER_WO_DOC
 from podgenai.content.topic import get_topic
 from podgenai.work import get_topic_work_path
 
@@ -22,7 +24,7 @@ def _get_denumbered_subsections(lines: list[str]) -> list[str]:
     return [line[line.find(" ") + 1 :] if line.find(".") != -1 else line for line in lines]
 
 
-def get_cached_episode_description(topic: str, fmt: str) -> str:
+def get_cached_episode_description(topic: str, fmt: str, is_from_document: bool = False) -> str:
     topic = _lstrip_optional_timestamp(topic)
     work_path = get_topic_work_path(topic, create=False)
     if not work_path.is_dir():
@@ -44,7 +46,8 @@ def get_cached_episode_description(topic: str, fmt: str) -> str:
     assert subtopics_list
 
     match fmt:
-        case "html":
+        case "html" | "spotify":
+            tts_disclaimer = TTS_DISCLAIMER_W_DOC if is_from_document else TTS_DISCLAIMER_WO_DOC
             denumbered_subtopics_list = _get_denumbered_subsections(subtopics_list)
 
             if all(":" in s for s in denumbered_subtopics_list):
@@ -57,13 +60,17 @@ def get_cached_episode_description(topic: str, fmt: str) -> str:
                 denumbered_subtopics_list = reformatted_denumbered_subtopics
 
             is_description_truncated = False
+            indent = "  "
             while True:
-                subtopics_list_html = "\n".join(f"  <li>{s}</li>" for s in denumbered_subtopics_list)
-                truncation_notice = f"<p><em>(Description is truncated down from {len(subtopics_list)} sections due to a size restriction.)</em></p>\n" if is_description_truncated else ""
-                description = f"<p><strong>Sections</strong>:</p>\n<ol>\n{subtopics_list_html}\n</ol>\n{truncation_notice}<p><br></p><p><strong>Disclaimer</strong>: <em>{TTS_DISCLAIMER}</em></p>"
+                subtopics_list_html = "\n".join(f"{indent}<li>{s}</li>" for s in denumbered_subtopics_list)
+                truncation_notice = f"<p><em>(Description is truncated down from {len(subtopics_list)} to {len(denumbered_subtopics_list)} sections due to a size restriction.)</em></p>\n" if is_description_truncated else ""
+                description = f"<p><strong>Sections</strong>:</p>\n<ol>\n{subtopics_list_html}\n</ol>\n{truncation_notice}<p><br></p><p><strong>Disclaimer</strong>: <em>{tts_disclaimer}</em></p>"
                 if len(description) <= 4000:
                     break
                 else:
+                    if indent:
+                        indent = ""
+                        continue
                     denumbered_subtopics_list.pop()
                     is_description_truncated = True
         case "plain" | "text" | "txt":
@@ -71,18 +78,21 @@ def get_cached_episode_description(topic: str, fmt: str) -> str:
         case "llm" | "chat":
             description = f"{topic}\n\nSections:\n{subtopics_text_stripped}"
         case _:
-            assert False, fmt
+            sys.exit(f"Unsupported format: {fmt}.")
 
     return description
 
 
 def main():
-    topic = get_topic()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-t", help="Episode topic.")
+    parser.add_argument("-d", action="store_true", help="Episode was created from a document.")
+    parser.add_argument("-f", default="html", help="Description format.")
+    args = parser.parse_args()
 
-    description = get_cached_episode_description(topic, fmt="llm")
-    print(f"\nLLM:\n{description}")
+    topic = args.t or get_topic()
 
-    description = get_cached_episode_description(topic, fmt="html")
+    description = get_cached_episode_description(topic, fmt=args.f, is_from_document=args.d)
     print(f"\nHTML:\n{description}")
 
 

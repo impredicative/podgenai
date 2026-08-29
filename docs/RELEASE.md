@@ -1,6 +1,6 @@
 Release steps as done locally:
 
-1. Run `poe fix`, ensuring that all checks pass.
+1. Run `poe fix` and `poe check`, ensuring that all checks pass.
 2. Run `uv version` to check the version, then run `uv version --bump major|minor|patch` to bump the version.
 3. Use `git` to commit and push.
 4. Run `poe release`.

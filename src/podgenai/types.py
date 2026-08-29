@@ -2,6 +2,20 @@ from pathlib import Path
 from typing import Literal, Required, TypedDict
 
 
+class TextModel(TypedDict):
+    name: Required[str]
+    context_window: Required[int]  # In tokens.
+    max_output: Required[int]  # In tokens.
+    extra_kwargs: Required[dict[str, object]]  # Extra keyword arguments to pass to the client when using this model.
+    unsupported_kwargs: Required[set[str]]  # Keyword arguments that are unsupported by this model.
+
+
+class Models(TypedDict):
+    knowledge: Required[TextModel]
+    text: Required[TextModel]
+    tts: Required[str]
+
+
 class SpeechLine(TypedDict):
     speaker: Required[Literal["male", "female"]]
     speech: Required[str]

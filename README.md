@@ -1,5 +1,5 @@
 # podgenai
-**podgenai** is a Python 3.14 application to generate an informational single-speaker or two-speaker audiobook/podcast mp3 file on a given topic using an OpenAI LLM. The material is generated from the model's internal knowledge. Web search or external sources are not used. The output file is generated as a series of sections, each covering a subtopic of the given topic. A funded [OpenAI API key](https://platform.openai.com/api-keys) is required.
+**podgenai** is a Python 3.14 application to generate an informational single-speaker or two-speaker audiobook/podcast mp3 file on a given topic using an OpenAI LLM. The material is generated from the model's internal knowledge from a given markdown source document. Web search or other sources are not used. The output file is generated as a series of sections, each covering a subtopic of the given topic. A funded [OpenAI API key](https://platform.openai.com/api-keys) is required.
 
 The loosely targeted duration of the generated file is an hour, although comprehensive coverage often results in a multi-hour duration by default. A smaller duration can in practice be enforced by limiting the number of sections to as few as three, although this is expected to result in less comprehensive coverage of the topic.
 
@@ -15,20 +15,27 @@ Although there might sometimes exist some semantic repetition of content across 
 | Podcast RSS | https://anchor.fm/s/f4868644/podcast/rss             |
 
 ## Approach
-The `gpt-5.6-sol` and `gpt-4o-mini-tts-2025-12-15` models are used for text and speech generation respectively. For a given topic, the high-level approach is as follows:
+### Models used
+* `gpt-5.6-sol` is used for monologue text generation if the episode is to be created from the model's internal knowledge. It also is always used for listing subtopics and for duologue text generation.
+* `gpt-5.6-terra` is used for monologue text generation if the episode is to be created from a given markdown source document.
+* `gpt-4o-mini-tts-2025-12-15` is used for speech generation.
 
 ### Single-speaker (monologue) generation
-1. Applicable subtopics are listed using the LLM. If however the topic is unknown to the LLM, the process is aborted.
+For a given topic, the high-level monologue generation approach is as follows:
+
+1. Applicable subtopics are listed using the LLM. If however the topic is unknown to the LLM or is not supported by a given source document, the process is aborted with an explanatory error.
 2. The voice is selected using the LLM from the configured choices.
-3. Concurrently for each subtopic, the corresponding monologue text is generated using the LLM.
+3. Concurrently for each subtopic, the corresponding monologue text is generated using the LLM. If a source document was provided, it is used for each generation.
 4. Concurrently for each subtopic, the corresponding speech is generated using the TTS.
 5. The speech files are concatenated using `ffmpeg`, with an appropriate pause added between parts and subtopics.
 
 ### Two-speaker (duologue) generation
-1. Applicable subtopics are listed using the LLM. If however the topic is unknown to the LLM, the process is aborted.
+For a given topic, the high-level duologue generation approach is as follows:
+
+1. Applicable subtopics are listed using the LLM. If however the topic is unknown to the LLM or is not supported by a given source document, the process is aborted with an explanatory error.
 2. A male and a female voice are selected using the LLM from the configured choices.
-3. Concurrently for each subtopic, the corresponding monologue text is generated using the LLM.
-4. Concurrently for each subtopic, the corresponding duologue text and tone is generated using the LLM using its respective monologue text as a reference.
+3. Concurrently for each subtopic, the corresponding monologue text is generated using the LLM. If a source document was provided, it is used for each generation.
+4. Concurrently for each subtopic, the corresponding duologue text and tone instructions are generated using the LLM using the subtopic's monologue text.
 5. Concurrently for each line, the corresponding speech is generated using the TTS.
 6. The speech files are concatenated using `ffmpeg`, with an appropriate pause added between parts, lines, and subtopics.
 
@@ -37,9 +44,10 @@ These generated mp3 files are available for download:
 
 | Type | Voice(s) | Name | Links |
 |------|----------|------|-------|
-| two-speaker | modern-female (marin), modern-male (cedar) | Grand Turk for cruise tourists | [Mega](https://mega.nz/file/FE81QRzY#PIAoDOkfPoTWBJBCZg9PNq4YpGd4kfVUnZt5uaC4hJw), [Spotify](https://creators.spotify.com/pod/profile/podgenai/episodes/Grand-Turk-for-cruise-tourists-e3nv758) |
-| one-speaker | modern-female (marin) | New York City tourism: What's new | [Mega](https://mega.nz/file/VJ1WRbxZ#62PvDAD0ttO7JD3l9CywICB2KAMUhxLc6Jed7WkE3B4), [Spotify](https://creators.spotify.com/pod/profile/podgenai/episodes/New-York-City-tourism-Whats-new-e3njmjn) |
-| one-speaker | modern-male (cedar)   | Writing a Will | [Mega](https://mega.nz/file/gE0EzKBT#Qm72FWa36joj_qFP7MlN2pyESLa0dS4Q6xiKwRIpLUY), [Spotify](https://creators.spotify.com/pod/profile/podgenai/episodes/Writing-a-Will-e3njm2g) |
+| two-speaker from model | modern-female (marin), modern-male (cedar) | Grand Turk for cruise tourists | [Mega](https://mega.nz/file/FE81QRzY#PIAoDOkfPoTWBJBCZg9PNq4YpGd4kfVUnZt5uaC4hJw), [Spotify](https://creators.spotify.com/pod/profile/podgenai/episodes/Grand-Turk-for-cruise-tourists-e3nv758) |
+| two-speaker from source | modern-female (marin), modern-male (cedar) | Indoor Carbon Dioxide and Health | [Mega](https://mega.nz/file/tNMjiD6I#UJtHW9_7q8f8cH8ImHldM6dIcKf1pGTDxvl7wjYQi3w), [Spotify](https://creators.spotify.com/pod/profile/podgenai/episodes/Indoor-Carbon-Dioxide-and-Health-e3o1vu9) |
+| one-speaker from model | modern-female (marin) | New York City tourism: What's new | [Mega](https://mega.nz/file/VJ1WRbxZ#62PvDAD0ttO7JD3l9CywICB2KAMUhxLc6Jed7WkE3B4), [Spotify](https://creators.spotify.com/pod/profile/podgenai/episodes/New-York-City-tourism-Whats-new-e3njmjn) |
+| one-speaker from model | modern-male (cedar)   | Writing a Will | [Mega](https://mega.nz/file/gE0EzKBT#Qm72FWa36joj_qFP7MlN2pyESLa0dS4Q6xiKwRIpLUY), [Spotify](https://creators.spotify.com/pod/profile/podgenai/episodes/Writing-a-Will-e3njm2g) |
 
 There also is a related [podcast](https://podcasters.spotify.com/pod/podgenai) ([RSS](https://anchor.fm/s/f4868644/podcast/rss)) to which episodes may be posted over time.
 
@@ -79,6 +87,9 @@ Usage can be as a command-line application or as a Python library. By default, t
 * To optionally generate a cover art image for your topic, [this custom GPT](https://chat.openai.com/g/g-SvmRhBwX1-podcast-episode-cover-art) can be used.
 * To attempt generation in a foreign language, specify the title in the desired language along with a parenthesized prefix of the language name, e.g. "México (Español)". If the generation is refused the first time, try again. Also refer to and use the `--no-markers` (`-nm`) option.
 
+### Source document usage
+It is not necessary to provide a source document for common topics because the LLM has considerable internal knowledge of them. If however a source document is to be used, it must be a text or markdown file specified using the `--document` (`-d`) option. It is suggested that the source document be a detailed report on the topic, such as an exhaustive deep-research report. Multiple source documents are not supported, but can first be consolidated into a single document. A binary file such as PDF or DOCX is not supported, but can first be converted to markdown using a tool or an LLM.
+
 ### Usage as application
 Usage help is copied below:
 ```
@@ -93,6 +104,9 @@ Options:
                                   suffix. If a directory, it must exist, and the file name is auto-determined. If not
                                   given, the output file is written to the current working directory with an auto-
                                   determined file name.
+  -d, --document PATH             Path to a single text or markdown document file to use as the exclusive source for
+                                  the podcast. If not given, the podcast is generated from the model's internal
+                                  knowledge.
   -s, --max-sections INTEGER RANGE
                                   Maximum number of sections, between 3 and 100. If not given, it is unrestricted.
                                   [3<=x<=100]
@@ -113,11 +127,13 @@ Usage examples:
 
     $ podgenai -t "The Quest for Infinity"
 
-    $ podgenai -t "The Quest for Infinity" -p ~/Downloads/
+    $ podgenai -t "The Quest for Infinity" -p ~/Documents/
 
-    $ podgenai -t "The Quest for Infinity" -p ~/Downloads/output.mp3 -nc
+    $ podgenai -t "The Quest for Infinity" -p ~/Documents/output.mp3 -nc
 
     $ podgenai -t "The Quest for Infinity" -s 3 -k 1
+
+    # podgenai -t "The Quest for Infinity" -d ~/Downloads/deep-research_report.md
 
     $ podgenai -t "La Quête de l’infini (Français)" -nm
 
@@ -133,6 +149,7 @@ generate_media(
     topic: str,
     *,
     output_path: Path | None = None,
+    document: str | None = None,
     max_sections: int | None = None,
     speakers: int = 2,
     markers: bool = True,
@@ -145,6 +162,8 @@ generate_media(
     * `output_path`: Output file or directory path.
         If an intended file path, it must have an ".mp3" suffix. If a directory, it must exist, and the file name is auto-determined.
         If not given, the output file is written to the repo directory with an auto-determined file name.
+    * `document`: Contents of a single text or markdown document to use as the exclusive source for the podcast.
+        If not given, the podcast is generated from the model's internal knowledge.
     * `max_sections`: Maximum number of sections to generate. It is between 3 and 100. It is unrestricted if not given.
     * `speakers`: Number of speakers, either 1 or 2. Its default is 2.
     * `markers`: Include markers at the start or end of sections in the generated audio.

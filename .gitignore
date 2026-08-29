@@ -166,8 +166,12 @@ cython_debug/
 .diskcache/
 work/
 
-# Output:
+# Output
 *.mp3
 
 # LLM
+sources/
 spec/
+
+# Local
+scratch/
