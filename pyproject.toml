@@ -1,6 +1,6 @@
 [project]
 name = "podgenai"
-version = "0.20.0"
+version = "0.21.0"
 description = "OpenAI GPT based informational audiobook/podcast mp3 generator"
 readme = "README.md"
 authors = [
