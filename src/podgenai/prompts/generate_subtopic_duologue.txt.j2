@@ -13,19 +13,23 @@ Always communicate in complete sentences, as this promotes objectivity and profe
 Your output is required in JSONL format, with one conversation turn per line. The conversation must be a back-and-forth duologue between the two speakers. Each line must be a valid JSON object containing exactly these properties:
 * speaker: This must alternate between "{{ boundary_voice_sex }}" and "{{ non_boundary_voice_sex }}". Additionally, the first and also the last speaker of the conversation must necessarily be "{{ boundary_voice_sex }}".
 * speech: These are the words spoken during this turn by the speaker. The speech can contain one or more paragraphs, although usually just a single paragraph. Regardless of the length of the speech in this turn, it must of course be formatted in a single line. Escaped newline characters are implicitly allowed, but the speech must not contain any unescaped newline characters by definition. Avoid trivial or perfunctory responses, keeping every turn substantively meaningful.
-* tone: This is a single sentence of tone instructions for the text-to-speech generator, instructing the tone of voice to be used for this turn. Do not add any subject-matter information whatsoever to the tone instructions.
+* tone: This is a single sentence of instructions for the text-to-speech generator for this turn. Describe the intended vocal delivery, including relevant aspects such as tone, affect, personality, pacing, emotion, emphasis, punctuation, and pronunciation. Include only aspects that materially contribute to the vocal delivery of the turn. Do not add or refer to any subject-matter information whatsoever in these instructions.
 
 Each line of your output will be parsed by a JSON parser. Do not make the mistake of returning a JSON array. Here is a structural example of a JSONL output, enclosed below in triple backticks for demonstration purposes:
 
 ```
-{"speaker":"{{ boundary_voice_sex }}","speech":"The Sun is the star at the center of the solar system, and two of its effects are immediately important. Its gravity keeps Earth and the other planets in orbit, while its energy provides the light and heat that strongly influence conditions on Earth.","tone":"Speak with calm confidence and natural intellectual interest, using a clear and measured conversational pace."}
-{"speaker":"{{ non_boundary_voice_sex }}","speech":"The source of that energy lies deep inside the Sun, where nuclear fusion takes place.\nNuclear fusion is a process in which lighter atomic nuclei combine to form heavier nuclei. In the Sun, hydrogen is ultimately converted into helium, releasing enormous amounts of energy. So the light reaching Earth begins with physical processes occurring deep inside a star.","tone":"Speak in an engaged and explanatory manner, with precise articulation, natural pacing, and restrained emphasis."}
-{"speaker":"{{ boundary_voice_sex }}","speech":"And that makes the connection to Earth much broader than light alone. Solar energy warms the planet, helps drive the climate system, and supplies the light used in photosynthesis.\n\nThe connection runs all the way from fusion inside the Sun to physical processes and living systems on Earth. Energy is produced inside the Sun, some of it eventually reaches Earth, and its effects become part of the conditions experienced across the planet.","tone":"Speak thoughtfully and conversationally, with a smooth cadence, gentle emphasis, and measured delivery."}
+{"speaker":"{{ boundary_voice_sex }}","speech":"The Sun is the star at the center of the solar system, but its importance to Earth goes well beyond simply being there. Its gravity keeps Earth and the other planets in orbit, and its energy provides the light and heat that strongly influence conditions here.","tone":"Speak with calm, assured curiosity in a clear conversational voice, using a relaxed pace, smooth phrasing, and subtle emphasis on key statements."}
+{"speaker":"{{ non_boundary_voice_sex }}","speech":"And that energy raises an important question. Where does it actually come from?\n\nThe answer takes us deep inside the Sun, where nuclear fusion occurs. In fusion, lighter atomic nuclei combine to form heavier nuclei. In the Sun, hydrogen is ultimately converted into helium, and enormous amounts of energy are released in the process.","tone":"Speak with lively but measured curiosity, giving the question a naturally inquisitive inflection before shifting into a warm, confident explanatory delivery with clear articulation and moderate pacing."}
+{"speaker":"{{ boundary_voice_sex }}","speech":"So when we talk about sunlight reaching Earth, we are really talking about the result of physical processes that began deep inside a star.","tone":"Speak reflectively and conversationally with a composed, thoughtful affect, using an unhurried cadence, smooth phrasing, and gentle emphasis near the end."}
+{"speaker":"{{ non_boundary_voice_sex }}","speech":"Exactly. And the effect on Earth is much broader than light alone. Solar energy warms the planet, helps drive the climate system, and provides the light used in photosynthesis.","tone":"Speak with engaged assurance and a lightly affirming opening, then continue in a clear, explanatory voice with steady pacing, crisp articulation, and restrained emphasis."}
+{"speaker":"{{ boundary_voice_sex }}","speech":"Photosynthesis is an interesting part of that connection, because it shows that solar energy does not just affect Earth's physical conditions. It also becomes relevant to living systems.","tone":"Speak with thoughtful interest and quiet enthusiasm, maintaining a natural conversational cadence while using a slight pause and gentle vocal emphasis to mark the shift in perspective."}
 ```
 
 Lastly, do not otherwise comment on the task. Do not ask any follow-up questions or make any follow-up suggestions at the end. Your entire output is to be used toward generating the podcast segment.
 
-The topic for the podcast is: {{ topic }}
+The topic for the podcast is:
+
+    {{ topic }}
 
 For your reference, the full list of intended numbered points (segments) for the podcast is:
 
@@ -35,9 +39,9 @@ The current segment is:
 
 {{ numbered_subtopic }}
 
-As a reminder, the voice required for the first and last speaker of the conversation is: {{ boundary_voice_sex }}
+As a reminder, the voice required for the first and last speaker of the conversation is: {{ boundary_voice_sex }}.
 
-The remainder of the text is the single-speaker monologue for the current segment, enclosed within the `<speech>` and `</speech>` tags.
+The remainder of the text is the single-speaker monologue for the current segment, enclosed within the `<speech>` and `</speech>` tags:
 
 <speech>
 {{ subtopic_monologue }}
