@@ -10,7 +10,8 @@
 	},
     "postCreateCommand": "./scripts/setup_uv.sh",
 	"containerEnv": {
-        "UV_LINK_MODE": "copy"  // Prevents "warning: Failed to hardlink files"
+        "UV_LINK_MODE": "copy",  // Prevents "warning: Failed to hardlink files"
+		"UV_PUBLISH_USERNAME": "__token__"
     },
 	"customizations": {
         "vscode": {
