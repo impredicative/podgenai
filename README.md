@@ -16,24 +16,15 @@ Although there might sometimes exist some semantic repetition of content across 
 
 ## Approach
 
-### Single-speaker (monologue) generation
-For a given topic, the high-level monologue generation approach is as follows:
+For a given topic, the high-level generation approach is as follows:
 
-1. Applicable subtopics are listed using the LLM. If however the topic is unknown to the LLM or is not supported by a given source document, the process is aborted with an explanatory error.
-2. The voice is selected using the LLM from the configured choices.
+1. Applicable subtopics are listed using the LLM. If, however, the topic is unknown to the LLM or is not supported by a given source document, the process is aborted with an explanatory error.
+2. The required voice or voices are selected using the LLM from the configured choices. For a monologue, a single voice is selected; for a duologue, a male and a female voice are selected.
 3. Concurrently for each subtopic, the corresponding monologue text is generated using the LLM. If a source document was provided, it is used for each generation.
-4. Concurrently for each subtopic, the corresponding speech is generated using the TTS.
-5. The speech files are concatenated using `ffmpeg`, with an appropriate pause added between parts and subtopics.
+4. For a duologue, concurrently for each subtopic, the corresponding duologue text and tone instructions are generated using the LLM from the subtopic's monologue text.
+5. Speech is generated using text-to-speech (TTS): concurrently for each subtopic in a monologue, or concurrently for each line in a duologue.
+6. The speech files are concatenated using `ffmpeg`, with appropriate pauses added between parts and subtopics, as well as between lines for a duologue.
 
-### Two-speaker (duologue) generation
-For a given topic, the high-level duologue generation approach is as follows:
-
-1. Applicable subtopics are listed using the LLM. If however the topic is unknown to the LLM or is not supported by a given source document, the process is aborted with an explanatory error.
-2. A male and a female voice are selected using the LLM from the configured choices.
-3. Concurrently for each subtopic, the corresponding monologue text is generated using the LLM. If a source document was provided, it is used for each generation.
-4. Concurrently for each subtopic, the corresponding duologue text and tone instructions are generated using the LLM using the subtopic's monologue text.
-5. Concurrently for each line, the corresponding speech is generated using the TTS.
-6. The speech files are concatenated using `ffmpeg`, with an appropriate pause added between parts, lines, and subtopics.
 
 ### Models used
 * `gpt-5.6-sol` is used for monologue text generation if the episode is to be created from the model's internal knowledge. It also is always used for listing subtopics and for duologue text generation.
