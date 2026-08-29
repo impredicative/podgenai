@@ -1,5 +1,5 @@
 # podgenai
-**podgenai** is a Python 3.14 application to generate an informational single-speaker or two-speaker audiobook/podcast mp3 file on a given topic using an OpenAI LLM. The material is generated from the model's internal knowledge from a given markdown source document. Web search or other sources are not used. The output file is generated as a series of sections, each covering a subtopic of the given topic. A funded [OpenAI API key](https://platform.openai.com/api-keys) is required.
+**podgenai** is a Python 3.14 application to generate an informational single-speaker or two-speaker audiobook/podcast mp3 file on a given topic using an OpenAI LLM. The material is generated from the model's internal knowledge or otherwise from a given markdown source document. Web search or other sources are not used. The output file is generated as a series of sections, each covering a subtopic of the given topic. A funded [OpenAI API key](https://platform.openai.com/api-keys) is required.
 
 The loosely targeted duration of the generated file is an hour, although comprehensive coverage often results in a multi-hour duration by default. A smaller duration can in practice be enforced by limiting the number of sections to as few as three, although this is expected to result in less comprehensive coverage of the topic.
 
@@ -15,10 +15,6 @@ Although there might sometimes exist some semantic repetition of content across 
 | Podcast RSS | https://anchor.fm/s/f4868644/podcast/rss             |
 
 ## Approach
-### Models used
-* `gpt-5.6-sol` is used for monologue text generation if the episode is to be created from the model's internal knowledge. It also is always used for listing subtopics and for duologue text generation.
-* `gpt-5.6-terra` is used for monologue text generation if the episode is to be created from a given markdown source document.
-* `gpt-4o-mini-tts-2025-12-15` is used for speech generation.
 
 ### Single-speaker (monologue) generation
 For a given topic, the high-level monologue generation approach is as follows:
@@ -38,6 +34,11 @@ For a given topic, the high-level duologue generation approach is as follows:
 4. Concurrently for each subtopic, the corresponding duologue text and tone instructions are generated using the LLM using the subtopic's monologue text.
 5. Concurrently for each line, the corresponding speech is generated using the TTS.
 6. The speech files are concatenated using `ffmpeg`, with an appropriate pause added between parts, lines, and subtopics.
+
+### Models used
+* `gpt-5.6-sol` is used for monologue text generation if the episode is to be created from the model's internal knowledge. It also is always used for listing subtopics and for duologue text generation.
+* `gpt-5.6-terra` is used for monologue text generation if the episode is to be created from a given markdown source document.
+* `gpt-4o-mini-tts-2025-12-15` is used for speech generation.
 
 ## Samples
 These generated mp3 files are available for download:
