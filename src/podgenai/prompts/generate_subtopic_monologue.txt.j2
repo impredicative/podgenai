@@ -4,6 +4,7 @@
         "future_ideas": "novel ideas",
         "factual_basis": "well-documented facts",
         "fabrication_warning": "make up information",
+        "segment_grounding": "at significant length",
         "uses_source": false,
     },
     "source": {
@@ -11,6 +12,7 @@
         "future_ideas": "novel ideas documented in the source",
         "factual_basis": "facts documented in the source",
         "fabrication_warning": "use your internal knowledge, infer unsupported facts, or make up information",
+        "segment_grounding": "at significant length using the source document",
         "uses_source": true,
     },
 } -%}
@@ -37,14 +39,14 @@ The topic for the podcast is:
 
 For your reference, the full list of intended numbered points (segments) for the podcast is:
 
-{{ subtopics }}
+{{ subtopics }}{% if variant.uses_source %}
 
-The current specific segment on which you are to expound upon at significant length is:
-
-{{ numbered_subtopic }}{% if variant.uses_source %}
-
-The remainder of the text is the source document, enclosed within the `<document>` and `</document>` tags:
+The source document is below, enclosed within the `<document>` and `</document>` tags. Note that the current segment is named below the source document.
 
 <document>
 {{ source }}
 </document>{% endif %}
+
+The current specific segment on which you are to expound upon {{ variant.segment_grounding }} is:
+
+{{ numbered_subtopic }}
