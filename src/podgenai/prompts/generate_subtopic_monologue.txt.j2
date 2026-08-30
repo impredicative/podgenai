@@ -41,11 +41,11 @@ For your reference, the full list of intended numbered points (segments) for the
 
 {{ subtopics }}{% if variant.uses_source %}
 
-The source document is below, enclosed within the `<document>` and `</document>` tags. Note that the current segment is named below the source document.
+The source document is below, enclosed within the `<{{ source_tag }}>` and `</{{ source_tag }}>` tags. Note that the current segment is named below the source document.
 
-<document>
+<{{ source_tag }}>
 {{ source }}
-</document>{% endif %}
+</{{ source_tag }}>{% endif %}
 
 The current specific segment on which you are to expound upon {{ variant.segment_grounding }} is:
 

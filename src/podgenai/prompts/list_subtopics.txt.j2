@@ -37,8 +37,8 @@ The topic for the podcast is:
 
     {{ topic }}{% if variant.uses_source %}
 
-The remainder of the text is the source document, enclosed within the `<document>` and `</document>` tags:
+The remainder of the text is the source document, enclosed within the `<{{ source_tag }}>` and `</{{ source_tag }}>` tags:
 
-<document>
+<{{ source_tag }}>
 {{ source }}
-</document>{% endif %}
+</{{ source_tag }}>{% endif %}

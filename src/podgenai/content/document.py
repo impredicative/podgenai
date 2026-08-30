@@ -1,6 +1,5 @@
-import io
-
 import podgenai.exceptions
+from podgenai.util.binascii import hasher
 from podgenai.util.openai import MODELS
 from podgenai.util.tiktoken import get_token_count
 
@@ -25,8 +24,11 @@ def ensure_document_is_valid(document: str) -> None:
             reduction_ratio = excess_tokens / document_token_count
             raise exception(f"Document uses {document_token_count:,} tokens, but the {model['name']} model's input capacity is {text_model_input_token_capacity:,} tokens. Reduce the document size by at least {excess_tokens:,} tokens ({reduction_ratio:.0%}).")
 
-    for line_num, line in enumerate(io.StringIO(document), start=1):
-        line = line.strip()
-        for tag in ("<document>", "</document>"):
-            if line == tag:
-                raise exception(f"Document contains a line with the '{tag}' tag on line {line_num}. It must not contain the tag.")
+    document_tag = get_document_tag(document)
+    if document_tag.casefold() in document.casefold():
+        raise exception(f"Document contains the intended document tag '{document_tag}'. It must not contain the tag.")
+
+
+def get_document_tag(document: str) -> str:
+    """Return the name of the tag for the document based on the hash of the document, e.g. `document_d8698a76`."""
+    return f"document_{hasher(document)}"

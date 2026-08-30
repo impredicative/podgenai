@@ -6,6 +6,7 @@ import re
 
 import podgenai.exceptions
 from podgenai.config import MAX_CONCURRENT_WORKERS, MAX_TEXT_LENGTH_IN_FILENAME, NUM_SECTIONS_MAX, NUM_SECTIONS_MIN, PROMPTS, TTS_DISCLAIMER_W_DOC, TTS_DISCLAIMER_WO_DOC
+from podgenai.content.document import get_document_tag
 from podgenai.types import SpeechLine, SubtopicDuologue, SubtopicText
 from podgenai.util.openai import MODELS, get_cached_content
 from podgenai.util.sys import print_error, print_warning
@@ -68,7 +69,8 @@ def list_subtopics(topic: str, document: str | None = None, max_sections: int | 
         assert NUM_SECTIONS_MIN <= max_sections <= NUM_SECTIONS_MAX, (max_sections, NUM_SECTIONS_MIN, NUM_SECTIONS_MAX)
 
     prompt_name = "list_subtopics"
-    prompt = PROMPTS[prompt_name].render(topic=topic, max_sections=max_sections, source=document)
+    document_tag = get_document_tag(document) if document is not None else None
+    prompt = PROMPTS[prompt_name].render(topic=topic, max_sections=max_sections, source=document, source_tag=document_tag)
     none_subtopics = ("none", "none.")
     invalid_subtopics = ("", *none_subtopics)
     rejection_error_prefix = "RequestError: "  # Defined in prompt.
@@ -203,10 +205,11 @@ def get_subtopic_monologue(*, topic: str, document: str | None = None, subtopics
     # Note: verbosity=low is specified in an attempt to reduce an excessively long monologue.
     subtopics_str = "\n".join(subtopics)
     model = MODELS["text"] if document else MODELS["knowledge"]
+    document_tag = get_document_tag(document) if document is not None else None
     # Note: The knowledge model is used for subtopic monologue generation only when the document is not present. This is due to a prohibitive cost of using the knowledge model for each subtopic when the document is present.
 
     for num_attempt in range(1, max_attempts + 1):
-        prompt = PROMPTS["generate_subtopic_monologue"].render(topic=topic, subtopics=subtopics_str, numbered_subtopic=subtopic, source=document)
+        prompt = PROMPTS["generate_subtopic_monologue"].render(topic=topic, subtopics=subtopics_str, numbered_subtopic=subtopic, source=document, source_tag=document_tag)
         monologue = get_cached_content(prompt, read_cache=num_attempt == 1, model=model, **common_kwargs)
         monologue = monologue.rstrip()
 
