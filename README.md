@@ -1,7 +1,7 @@
 # podgenai
 **podgenai** is a Python 3.14 application to generate an informational single-speaker or two-speaker audiobook/podcast mp3 file on a given topic using an OpenAI LLM. The material is generated from the model's internal knowledge or otherwise from a given markdown source document. Web search or other sources are not used. The output file is generated as a series of sections, each covering a subtopic of the given topic. A funded [OpenAI API key](https://platform.openai.com/api-keys) is required.
 
-The loosely targeted duration of the generated file is an hour, although comprehensive coverage often results in a multi-hour duration by default. A smaller duration can in practice be enforced by limiting the number of sections to as few as three, although this is expected to result in less comprehensive coverage of the topic. For a maximal one hundred segment podcast, the heuristic for its duration is ten hours, and for its cost is $10 USD, with much of this cost being for the TTS generation.
+The loosely targeted duration of the generated file is an hour, although comprehensive coverage often results in a multi-hour duration by default. A smaller duration can in practice be enforced by limiting the number of sections to as few as three, although this is expected to result in less comprehensive coverage of the topic. For a ten hour podcast, the heuristic for its cost is $10 USD, with much of this cost being for the TTS generation, with a smaller duration costing proportionally less.
 
 Although there might sometimes exist some semantic repetition of content across subtopics, this has intentionally not been optimized away because this repetition of important points can help with learning and memorization.
 
