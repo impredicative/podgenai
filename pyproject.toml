@@ -12,7 +12,7 @@ license-files = ["LICENSE"]
 dependencies = [
     "click>=8.5.0",  # https://github.com/pallets/click/releases
     "jinja2>=3.1.6",  # https://jinja.palletsprojects.com/en/stable/changes/
-    "openai>=3.5.0",  # https://github.com/openai/openai-python/releases
+    "openai>=3.7.0",  # https://github.com/openai/openai-python/releases
     "pathvalidate>=3.3.1",  # https://github.com/thombashi/pathvalidate/releases
     "python-dotenv>=1.2.3",  # https://github.com/theskumar/python-dotenv/releases
     "semantic-text-splitter>=0.32.0",  # https://github.com/benbrandt/text-splitter/releases https://github.com/benbrandt/text-splitter/tree/main/bindings/python
@@ -37,8 +37,8 @@ Changelog = "https://github.com/impredicative/podgenai/releases"
 [dependency-groups]
 dev = [
     "poethepoet>=0.48.0",
-    "ruff>=0.16.4",
-    "ty>=0.0.73",
+    "ruff>=0.16.5",
+    "ty>=0.0.77",
 ]
 
 [build-system]
