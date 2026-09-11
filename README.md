@@ -80,9 +80,13 @@ Usage can be as a command-line application or as a Python library. By default, t
 * To attempt generation in a foreign language, specify the title in the desired language along with a parenthesized prefix of the language name, e.g. "México (Español)". If the generation is refused the first time, try again. Also refer to and use the `--no-markers` (`-nm`) option.
 
 ### Source document usage
-It is not necessary to provide a source document for common topics because the LLM has considerable internal knowledge of them. If a source document is to be used, it must be a text or markdown file specified using the `--document` (`-d`) option. It is suggested that the source document be a detailed report on the topic, such as an exhaustive deep-research report. For those with a ChatGPT subscription, a custom GPT can be for example be created and used to generate such a downloadable report using [this definition](https://gist.github.com/impredicative/d270fe8cea8edf295f90ffde6fdd4fec).
+It is not necessary to provide a source document for common topics because the LLM has considerable internal knowledge of them. If a source document is to be used, it must be a text or markdown file specified using the `--document` (`-d`) option. It is suggested that the source document be a detailed report on the topic.
 
 Multiple source documents are not supported, but can first be consolidated by an LLM into a single document. A binary file such as PDF or DOCX is not supported either, but can first be converted to markdown using a tool or an LLM.
+
+The following are links to some reusable skill definitions for generating a compatible source document:
+* [Deep research report](https://gist.github.com/impredicative/d270fe8cea8edf295f90ffde6fdd4fec)
+* [Convert single file to markdown](https://gist.github.com/impredicative/37757c8219ab6867f203560c1318b911)
 
 ### Usage as application
 Usage help is copied below:
