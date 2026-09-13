@@ -1,9 +1,9 @@
 ---
-name: convert-single-file-to-markdown
+name: single-file-to-markdown
 description: Convert a single provided file into a downloadable Markdown file, representing source images and figures as readable text. Use when asked to convert a file to Markdown, including preparation of a podgenai source document.
 ---
 
-# Convert single file to markdown
+# Single file to markdown
 
 Convert the provided file to a downloadable markdown format file.
 
