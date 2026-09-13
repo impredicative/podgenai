@@ -19,7 +19,7 @@ For a given topic, the high-level generation approach is as follows:
 1. Applicable subtopics are listed using the LLM. If, however, the topic is unknown to the LLM or is not supported by a given source document, the process is aborted with an explanatory error.
 2. The required voice or voices are selected using the LLM from the configured choices. For a monologue, a single voice is selected; for a duologue, a male and a female voice are selected.
 3. Concurrently for each subtopic, the corresponding monologue text is generated using the LLM. If a source document was provided, it is used for each generation.
-4. The monologue texts are deduplicated to remove substantive repetition across adjacent subtopics. This is done concurrently using a red-black odd-even approach to avoid information loss. It is observed to decrease the total text length by 6-40%.
+4. The monologue texts are deduplicated to remove substantive repetition across adjacent subtopics. This is done concurrently while avoiding information loss by using a red-black odd-even approach. It is observed to decrease the total text length by 6-40%.
 5. For a duologue, concurrently for each subtopic, the corresponding duologue text and tone instructions are generated using the LLM from the subtopic's monologue text.
 6. Speech is generated using text-to-speech (TTS), either concurrently for each subtopic in a monologue, or concurrently for each line in a duologue.
 7. The speech files are concatenated using `ffmpeg`, with appropriate pauses added between parts and subtopics, as well as between lines for a duologue.
