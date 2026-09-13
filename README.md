@@ -43,7 +43,7 @@ These generated mp3 files are available for download:
 | Type | Voice(s) | Name | Links |
 |------|----------|------|-------|
 | two-speaker from model | modern-female (marin), modern-male (cedar) | Heterarchy | [Mega](https://mega.nz/file/REtklDAQ#nD34Q92y0sGdYhy5xalZXJI2PF1iimUAu5PxeFMPQTs), [Spotify](https://creators.spotify.com/pod/profile/podgenai/episodes/Heterarchy-e3op8dn) |
-| two-speaker from source | modern-female (marin), modern-male (cedar) | Indigo light for myopia prevention | [Mega](https://mega.nz/file/pNdQkC4L#xudau_i13jilBtHdOY20f90iGDdUXUG1Bk7tBUoAoZs), [Spotify](https://creators.spotify.com/pod/profile/podgenai/episodes/Indigo-light-for-myopia-prevention-e3op95a) |
+| two-speaker from [source](<sources/Prevention of myopia in a near-primate by supplemental indigo light suggests a hypothesis for the myopia boom (2026).md>) | modern-female (marin), modern-male (cedar) | Indigo light for myopia prevention | [Mega](https://mega.nz/file/pNdQkC4L#xudau_i13jilBtHdOY20f90iGDdUXUG1Bk7tBUoAoZs), [Spotify](https://creators.spotify.com/pod/profile/podgenai/episodes/Indigo-light-for-myopia-prevention-e3op95a) |
 | one-speaker from model | modern-female (marin) | New York City tourism: What's new | [Mega](https://mega.nz/file/VJ1WRbxZ#62PvDAD0ttO7JD3l9CywICB2KAMUhxLc6Jed7WkE3B4), [Spotify](https://creators.spotify.com/pod/profile/podgenai/episodes/New-York-City-tourism-Whats-new-e3njmjn) |
 | one-speaker from model | modern-male (cedar)   | Writing a Will | [Mega](https://mega.nz/file/gE0EzKBT#Qm72FWa36joj_qFP7MlN2pyESLa0dS4Q6xiKwRIpLUY), [Spotify](https://creators.spotify.com/pod/profile/podgenai/episodes/Writing-a-Will-e3njm2g) |
 
