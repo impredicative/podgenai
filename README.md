@@ -92,7 +92,7 @@ Multiple source documents are not supported, but can first be consolidated by an
 
 The following AI skills can be used to prepare a compatible source document:
 
-* [Deep research report](https://gist.github.com/impredicative/d270fe8cea8edf295f90ffde6fdd4fec)
+* [Deep research report](skills/deep-research-report/SKILL.md)
 * [Convert single file to Markdown](skills/convert-single-file-to-markdown/SKILL.md)
 
 ### Usage as application
