@@ -82,7 +82,7 @@ Usage can be as a command-line application or as a Python library. By default, t
 * If a requested topic fails to generate subtopics due to a refusal, retry up to a few times, as it may succeed with several attempts. If it doesn't, try rewording it, perhaps to be broader or narrower or more factual. Up to two attempts are made per run, although the first attempt will reuse the disk cache if available.
 * To control the resulting duration, specify the target number of covered subtopics using the `--max-sections` (`-s`) option.
 * To switch from the default two-speaker generation to single-speaker generation, use the `--speakers` (`-k`) option.
-* To optionally generate a cover art image for your topic, [this custom GPT](https://chat.openai.com/g/g-SvmRhBwX1-podcast-episode-cover-art) or [this skill definition](https://gist.github.com/impredicative/9807bc812f1948dddff09df88036779f) can be used.
+* To optionally generate a cover art image for your topic, [this custom GPT](https://chat.openai.com/g/g-SvmRhBwX1-podcast-episode-cover-art) or the [Podcast episode cover art skill](skills/podcast-episode-cover-art/SKILL.md) can be used.
 * To attempt generation in a foreign language, specify the title in the desired language along with a parenthesized prefix of the language name, e.g. "México (Español)". If the generation is refused the first time, try again. Also refer to and use the `--no-markers` (`-nm`) option.
 
 ### Source document usage
@@ -93,7 +93,7 @@ Multiple source documents are not supported, but can first be consolidated by an
 The following AI skills can be used to prepare a compatible source document:
 
 * [Deep research report](skills/deep-research-report/SKILL.md)
-* [Convert single file to Markdown](skills/convert-single-file-to-markdown/SKILL.md)
+* [Single file to Markdown](skills/single-file-to-markdown/SKILL.md)
 
 ### Usage as application
 Usage help is copied below:
