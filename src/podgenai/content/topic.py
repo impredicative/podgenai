@@ -1,39 +1,31 @@
-import contextlib
-import io
-
 import podgenai.exceptions
 from podgenai.util.sys import print_error
 
 
-def is_topic_valid(topic: str) -> bool:
-    """Return true if the topic is structurally valid, otherwise false.
-
-    A validation error is printed if the topic is invalid.
-    """
+def is_topic_valid(topic: str) -> str | None:
+    """Return an error message if the topic is structurally invalid, otherwise None."""
     if not isinstance(topic, str):  # Note: This happens if `-t` flag is provided without any value.
-        return print_error("Topic must be a string.")
+        return "Topic must be a string."
     if topic != topic.strip():
-        return print_error("Topic must not have leading or trailing whitespace.")
+        return "Topic must not have leading or trailing whitespace."
     if len(topic) == 0:
-        return print_error("No topic was provided.")
+        return "No topic was provided."
     if len(topic) < 2:
-        return print_error("Topic must be at least two characters long.")
+        return "Topic must be at least two characters long."
     if len(topic.splitlines()) > 1:
-        return print_error("Topic must be in a single line.")
+        return "Topic must be in a single line."
     if (topic[0] == topic[-1] == "'") or (topic[0] == topic[-1] == '"'):
-        return print_error("Topic must not be quoted.")
+        return "Topic must not be quoted."
     if topic[-1] == ":":
-        return print_error("Topic must not end in a colon.")
-    return True
+        return "Topic must not end in a colon."
+    return None
 
 
 def ensure_topic_is_valid(topic: str) -> None:
     """Raise `InputError` if the topic is structurally invalid."""
-    error = io.StringIO()
-    with contextlib.redirect_stderr(error):
-        if not is_topic_valid(topic):
-            error = error.getvalue().rstrip().removeprefix("Error: ")
-            raise podgenai.exceptions.InputError(error)
+    validation_error = is_topic_valid(topic)
+    if validation_error is not None:
+        raise podgenai.exceptions.InputError(validation_error)
 
 
 def get_topic() -> str:
@@ -42,6 +34,8 @@ def get_topic() -> str:
     while not topic:
         topic = input("Specify the topic: ")
         topic = topic.strip()
-        if not is_topic_valid(topic):
+        validation_error = is_topic_valid(topic)
+        if validation_error is not None:
+            print_error(validation_error)
             topic = None
     return topic

@@ -1,9 +1,7 @@
 # podgenai
 **podgenai** is a Python 3.14 application to generate an informational single-speaker or two-speaker audiobook/podcast mp3 file on a given topic using an OpenAI LLM. The material is generated from the model's internal knowledge or otherwise from a given markdown source document. Web search or other sources are not used. The output file is generated as a series of sections, each covering a subtopic of the given topic. A funded [OpenAI API key](https://platform.openai.com/api-keys) is required.
 
-The loosely targeted duration of the generated file is an hour, although comprehensive coverage often results in a multi-hour duration by default. A smaller duration can in practice be enforced by limiting the number of sections to as few as three, although this is expected to result in less comprehensive coverage of the topic. For a ten hour podcast, the heuristic for its cost is $10 USD, with much of this cost being for the TTS generation, with a smaller duration costing proportionally less.
-
-Although there might sometimes exist some semantic repetition of content across subtopics, this has intentionally not been optimized away because this repetition of important points can help with learning and memorization.
+The loosely targeted duration of the generated file is an hour, although comprehensive coverage often results in a multi-hour duration by default. A smaller duration can in practice be enforced by limiting the number of sections to as few as three, although this is expected to result in less comprehensive coverage of the topic. For a hypothetical ten hour podcast, the heuristic for its cost is $10 USD, with much of this cost being for the TTS generation, with a smaller duration costing proportionally less.
 
 ## Links
 | Caption     | Link                                                 |
@@ -21,23 +19,31 @@ For a given topic, the high-level generation approach is as follows:
 1. Applicable subtopics are listed using the LLM. If, however, the topic is unknown to the LLM or is not supported by a given source document, the process is aborted with an explanatory error.
 2. The required voice or voices are selected using the LLM from the configured choices. For a monologue, a single voice is selected; for a duologue, a male and a female voice are selected.
 3. Concurrently for each subtopic, the corresponding monologue text is generated using the LLM. If a source document was provided, it is used for each generation.
-4. For a duologue, concurrently for each subtopic, the corresponding duologue text and tone instructions are generated using the LLM from the subtopic's monologue text.
-5. Speech is generated using text-to-speech (TTS): concurrently for each subtopic in a monologue, or concurrently for each line in a duologue.
-6. The speech files are concatenated using `ffmpeg`, with appropriate pauses added between parts and subtopics, as well as between lines for a duologue.
+4. The monologue texts are deduplicated to remove substantive repetition across adjacent subtopics. This is done concurrently using a red-black odd-even approach to avoid information loss. It is observed to decrease the total text length by 6-40%.
+5. For a duologue, concurrently for each subtopic, the corresponding duologue text and tone instructions are generated using the LLM from the subtopic's monologue text.
+6. Speech is generated using text-to-speech (TTS), either concurrently for each subtopic in a monologue, or concurrently for each line in a duologue.
+7. The speech files are concatenated using `ffmpeg`, with appropriate pauses added between parts and subtopics, as well as between lines for a duologue.
 
 
 ### Models used
-* `gpt-5.6-sol` is used for monologue text generation if the episode is to be created from the model's internal knowledge. It also is always used for listing subtopics and for duologue text generation.
-* `gpt-5.6-terra` is used for monologue text generation if the episode is to be created from a given markdown source document.
-* `gpt-4o-mini-tts-2025-12-15` is used for speech generation.
+* `gpt-5.6-sol` is used for:
+    - listing subtopics
+    - voice selection
+    - monologue text generation if the episode is to be created from the model's internal knowledge
+    - duologue text generation
+* `gpt-5.6-terra` is used for:
+    - monologue text generation if the episode is to be created from a given source document
+    - monologue text deduplication
+* `gpt-4o-mini-tts-2025-12-15` is used for:
+    - speech generation
 
 ## Samples
 These generated mp3 files are available for download:
 
 | Type | Voice(s) | Name | Links |
 |------|----------|------|-------|
-| two-speaker from model | modern-female (marin), modern-male (cedar) | Grand Turk for cruise tourists | [Mega](https://mega.nz/file/FE81QRzY#PIAoDOkfPoTWBJBCZg9PNq4YpGd4kfVUnZt5uaC4hJw), [Spotify](https://creators.spotify.com/pod/profile/podgenai/episodes/Grand-Turk-for-cruise-tourists-e3nv758) |
-| two-speaker from source | modern-female (marin), modern-male (cedar) | Indoor Carbon Dioxide and Health | [Mega](https://mega.nz/file/tNMjiD6I#UJtHW9_7q8f8cH8ImHldM6dIcKf1pGTDxvl7wjYQi3w), [Spotify](https://creators.spotify.com/pod/profile/podgenai/episodes/Indoor-Carbon-Dioxide-and-Health-e3o1vu9) |
+| two-speaker from model | modern-female (marin), modern-male (cedar) | Heterarchy | [Mega](https://mega.nz/file/REtklDAQ#nD34Q92y0sGdYhy5xalZXJI2PF1iimUAu5PxeFMPQTs), [Spotify](https://creators.spotify.com/pod/profile/podgenai/episodes/Heterarchy-e3op8dn) |
+| two-speaker from source | modern-female (marin), modern-male (cedar) | Indigo light for myopia prevention | [Mega](https://mega.nz/file/pNdQkC4L#xudau_i13jilBtHdOY20f90iGDdUXUG1Bk7tBUoAoZs), [Spotify](https://creators.spotify.com/pod/profile/podgenai/episodes/Indigo-light-for-myopia-prevention-e3op95a) |
 | one-speaker from model | modern-female (marin) | New York City tourism: What's new | [Mega](https://mega.nz/file/VJ1WRbxZ#62PvDAD0ttO7JD3l9CywICB2KAMUhxLc6Jed7WkE3B4), [Spotify](https://creators.spotify.com/pod/profile/podgenai/episodes/New-York-City-tourism-Whats-new-e3njmjn) |
 | one-speaker from model | modern-male (cedar)   | Writing a Will | [Mega](https://mega.nz/file/gE0EzKBT#Qm72FWa36joj_qFP7MlN2pyESLa0dS4Q6xiKwRIpLUY), [Spotify](https://creators.spotify.com/pod/profile/podgenai/episodes/Writing-a-Will-e3njm2g) |
 
@@ -76,7 +82,7 @@ Usage can be as a command-line application or as a Python library. By default, t
 * If a requested topic fails to generate subtopics due to a refusal, retry up to a few times, as it may succeed with several attempts. If it doesn't, try rewording it, perhaps to be broader or narrower or more factual. Up to two attempts are made per run, although the first attempt will reuse the disk cache if available.
 * To control the resulting duration, specify the target number of covered subtopics using the `--max-sections` (`-s`) option.
 * To switch from the default two-speaker generation to single-speaker generation, use the `--speakers` (`-k`) option.
-* To optionally generate a cover art image for your topic, [this custom GPT](https://chat.openai.com/g/g-SvmRhBwX1-podcast-episode-cover-art) can be used.
+* To optionally generate a cover art image for your topic, [this custom GPT](https://chat.openai.com/g/g-SvmRhBwX1-podcast-episode-cover-art) or [this skill definition](https://gist.github.com/impredicative/9807bc812f1948dddff09df88036779f) can be used.
 * To attempt generation in a foreign language, specify the title in the desired language along with a parenthesized prefix of the language name, e.g. "México (Español)". If the generation is refused the first time, try again. Also refer to and use the `--no-markers` (`-nm`) option.
 
 ### Source document usage

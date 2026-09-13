@@ -91,7 +91,7 @@ def get_content(prompt: str, *, client: OpenAI | None = None, model: TextModel =
     return content
 
 
-def get_cached_content(prompt: str, *, read_cache: bool = True, cache_key_prefix: str, cache_path: Path, model: TextModel = MODELS["knowledge"], **kwargs) -> str:
+def get_cached_content(prompt: str, *, read_cache: bool = True, cache_key_prefix: str, cache_path: Path, model: TextModel = MODELS["knowledge"], verify_prompt: bool = VERIFY_PROMPT, **kwargs) -> str:
     """Return the content for the given prompt using the disk cache if available, otherwise normally.
 
     Params:
@@ -111,7 +111,7 @@ def get_cached_content(prompt: str, *, read_cache: bool = True, cache_key_prefix
     cache_file_path = cache_path / cache_key
     pathvalidate.validate_filepath(cache_file_path, platform="auto")
 
-    with exclusive_prompt(prompt=prompt, enabled=VERIFY_PROMPT):
+    with exclusive_prompt(prompt=prompt, enabled=verify_prompt):
         if read_cache and cache_file_path.exists():
             assert cache_file_path.is_file()
             content = cache_file_path.read_text().rstrip()  # rstrip is used in case the file is manually modified in an editor which adds a trailing newline.

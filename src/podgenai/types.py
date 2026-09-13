@@ -40,3 +40,7 @@ class SubtopicDuologue(TypedDict):
 class SubtopicText(TypedDict):
     name: Required[str]
     text: Required[str]
+
+
+class DeduplicatedSubtopicText(SubtopicText):
+    is_deduplicated: Required[bool]

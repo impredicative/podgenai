@@ -65,7 +65,8 @@ def get_cached_episode_description(topic: str, fmt: str, is_from_document: bool 
                 subtopics_list_html = "\n".join(f"{indent}<li>{s}</li>" for s in denumbered_subtopics_list)
                 truncation_notice = f"<p><em>(Description is truncated down from {len(subtopics_list)} to {len(denumbered_subtopics_list)} sections due to a size restriction.)</em></p>\n" if is_description_truncated else ""
                 description = f"<p><strong>Sections</strong>:</p>\n<ol>\n{subtopics_list_html}\n</ol>\n{truncation_notice}<p><br></p><p><strong>Disclaimer</strong>: <em>{tts_disclaimer}</em></p>"
-                if len(description) <= 4000:
+                detagged_description = re.sub(r"<[^>]+>", "", description)  # Spotify seems to accept using the detagged content length.
+                if len(detagged_description) <= 4000:
                     break
                 else:
                     if indent:

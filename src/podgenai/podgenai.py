@@ -3,7 +3,7 @@ from pathlib import Path
 from podgenai.config import MAX_CONCURRENT_WORKERS, NUM_SECTIONS_MAX, NUM_SECTIONS_MIN
 from podgenai.content.audio import get_output_file_path, merge_speech_paths
 from podgenai.content.document import ensure_document_is_valid
-from podgenai.content.subtopics import get_subtopics_duologues, get_subtopics_duologues_transcripts, get_subtopics_monologue_transcripts, get_subtopics_monologues, list_subtopics, mark_subtopics_duologues
+from podgenai.content.subtopics import deduplicate_subtopics_monologues, get_subtopics_duologues, get_subtopics_duologues_transcripts, get_subtopics_monologue_transcripts, get_subtopics_monologues, list_subtopics, mark_subtopics_duologues
 from podgenai.content.topic import ensure_topic_is_valid
 from podgenai.content.tts import ensure_speech_audio_files, get_duologue_speech_tasks, get_monologue_speech_tasks
 from podgenai.content.voice import get_duologue_voice_keys, get_monologue_voice_key, get_voice_sex_from_voice_key
@@ -81,11 +81,18 @@ def generate_media(topic: str, *, output_path: Path | None = None, document: str
 
     if confirm:
         task = "monologue text generation"
-        if speakers == 2:
-            task += " (used subsequently for duologue)"
         get_confirmation(task)
-
     subtopics_monologues = get_subtopics_monologues(topic=topic, document=document, subtopics=subtopics_list)
+
+    if confirm:
+        task = "monologue text deduplication"
+        get_confirmation(task)
+    original_subtopics_monologues_size = sum(len(subtopic["text"]) for subtopic in subtopics_monologues)
+    subtopics_monologues = deduplicate_subtopics_monologues(topic=topic, subtopics_monologues=subtopics_monologues)
+    deduplicated_subtopics_monologues_size = sum(len(subtopic["text"]) for subtopic in subtopics_monologues)
+    deduplication_ratio = deduplicated_subtopics_monologues_size / original_subtopics_monologues_size
+    print(f"DEDUPLICATION: {original_subtopics_monologues_size:,} -> {deduplicated_subtopics_monologues_size:,} characters ({deduplication_ratio:.0%})")
+
     subtopics_monologue_transcripts = get_subtopics_monologue_transcripts(topic=topic, is_from_document=bool(document), subtopic_monologues=subtopics_monologues, markers=markers)
     assert subtopics_monologue_transcripts
     monologue = "\n\n".join(subtopic["text"] for subtopic in subtopics_monologue_transcripts)
@@ -116,7 +123,6 @@ def generate_media(topic: str, *, output_path: Path | None = None, document: str
     if confirm:
         get_confirmation("speech audio generation")
     ensure_speech_audio_files(speech_tasks)
-
     output_path = get_output_file_path(output_path, topic=topic)
     merge_speech_paths(speech_tasks, topic=topic, output_path=output_path)
     print(f"OUTPUT: {output_path}")

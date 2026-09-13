@@ -1,0 +1,36 @@
+I am producing a lengthy 1-hour long audiobook podcast episode. Mentioned below is the name of the topic, its list of numbered points (segments), and the current segment. Also included are the single-speaker monologues of the preceding segment (if any), the current segment, and the succeeding segment (if any). Note that this is an audio-only podcast, so the audience will not have access to video or to a screen. Also note that the audience is a mixed audience with an interest in the topic, spanning a spectrum of proficiency levels (novice / beginner / intermediate / advanced / expert). The audience must learn the supplied material in depth; their interest is both academic and pragmatic. In effect, with the podcast serving as exhaustive training material, the audience is empowered by information. Note however that the indicated topic may not always be professional in nature, and this is all right.
+
+Your task is to refine the current segment's single-speaker monologue to remove duplicative or repetitive content, if any. Without this refinement, there can remain significant repetitive content among successive segments. The resulting content must continue to flow well. The updated monologue will subsequently be vocalized using a text-to-speech generator.
+
+To provide more detail about your task, you are to:
+* Remove duplicative and repetitive content from the current segment's monologue that is already covered in the preceding segment's monologue, particularly if such content belongs better in the preceding segment than in the current segment.
+* Remove duplicative and repetitive content from the current segment's monologue that is already covered in the succeeding segment's monologue, particularly if such content belongs better in the succeeding segment than in the current segment.
+
+The respective segment titles and their pedagogical sequence can help discern which segment is more appropriate for the applicable content. The underlying goal is to ensure that each segment's monologue is mostly unique and does not repeat information unnecessarily, while allowing limited necessary repetition when it serves a pedagogical purpose.
+
+In your updated monologue, maintain the same writing style as of the original monologue. Continue to always communicate in complete sentences, as this promotes objectivity and professionalism. Continue to use simpler words whenever possible to assist in easier understanding, but without sacrificing the polish or quality of the content. You are not writing to be read; you are in effect writing to be listened. The writing style is optimized for listening, not for reading.
+
+Output only the entire updated monologue text of the current segment. Do not output the segment's title or any enclosing tags. Do not add information from adjacent segments into the current segment, except to help connect its statements smoothly. Do not invent any new information.
+
+Do not otherwise comment on the task. Do not ask any follow-up questions or make any follow-up suggestions at the end. Your entire output is to be used toward generating the podcast segment.
+
+In the event that the current segment's monologue is already satisfactory, alternatively output the word "OK" without quotes. If you do so, do not output the monologue text or anything else. Note that minor stylistic opportunities alone are not grounds for a rewrite. You are to rewrite only when there is a substantive duplication or repetition that warrants removal. If no substantive duplication remains, return OK.
+
+Your output will be processed by software to either replace the current segment's monologue or to leave it unchanged.
+
+The topic for the podcast is:
+
+    {{ topic }}
+
+For your reference, the full list of intended numbered points (segments) for the podcast is:
+
+{{ subtopics }}
+
+The current segment is:
+
+{{ numbered_subtopic }}
+
+The remainder of the text is the XML-wrapped titles and single-speaker monologues of the applicable segments.
+
+
+{{ segments_xml }}
