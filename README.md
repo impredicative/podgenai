@@ -90,9 +90,10 @@ It is not necessary to provide a source document for common topics because the L
 
 Multiple source documents are not supported, but can first be consolidated by an LLM into a single document. A binary file such as PDF or DOCX is not supported either, but can first be converted to markdown using a tool or an LLM.
 
-The following are links to some reusable skill definitions for generating a compatible source document:
+The following AI skills can be used to prepare a compatible source document:
+
 * [Deep research report](https://gist.github.com/impredicative/d270fe8cea8edf295f90ffde6fdd4fec)
-* [Convert single file to markdown](https://gist.github.com/impredicative/37757c8219ab6867f203560c1318b911)
+* [Convert single file to Markdown](skills/convert-single-file-to-markdown/SKILL.md)
 
 ### Usage as application
 Usage help is copied below:
