@@ -1,5 +1,11 @@
 from pathlib import Path
-from typing import Literal, Required, TypedDict
+from typing import Literal, NotRequired, Required, TypedDict
+
+
+class KeyValueOverride(TypedDict):
+    key: Required[str]
+    value: Required[str]
+    override: Required[str]
 
 
 class TextModel(TypedDict):
@@ -7,7 +13,8 @@ class TextModel(TypedDict):
     context_window: Required[int]  # In tokens.
     max_output: Required[int]  # In tokens.
     extra_kwargs: Required[dict[str, object]]  # Extra keyword arguments to pass to the client when using this model.
-    unsupported_kwargs: Required[set[str]]  # Keyword arguments that are unsupported by this model.
+    unsupported_kwargs: NotRequired[set[str]]  # Keyword arguments that are unsupported by this model.
+    overridden_kwargs: NotRequired[list[KeyValueOverride]]  # Key value overrides for this model.
 
 
 class Models(TypedDict):

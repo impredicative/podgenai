@@ -7,7 +7,7 @@ from openai.types.chat import ChatCompletion
 
 import podgenai.exceptions
 from podgenai.config import PACKAGE_NAME, VERIFY_PROMPT
-from podgenai.types import Models, TextModel
+from podgenai.types import KeyValueOverride, Models, TextModel
 from podgenai.util.binascii import hasher
 from podgenai.util.dotenv_ import load_dotenv
 from podgenai.util.threading import exclusive_print, exclusive_prompt
@@ -19,11 +19,14 @@ OpenAI = openai.OpenAI
 MODELS: Models = {
     "knowledge": [
         TextModel(name="chat-latest", context_window=400_000, max_output=128_000, extra_kwargs={"max_completion_tokens": 128_000}, unsupported_kwargs={"temperature", "reasoning_effort"}),
-        TextModel(name="gpt-5.6-sol", context_window=1_050_000, max_output=128_000, extra_kwargs={"max_completion_tokens": 128_000, "reasoning_effort": "none"}, unsupported_kwargs=set()),
+        TextModel(name="gpt-5.6-sol", context_window=1_050_000, max_output=128_000, extra_kwargs={"max_completion_tokens": 128_000, "reasoning_effort": "none"}),
+        TextModel(name="gpt-6-astra", context_window=1_050_000, max_output=128_000, extra_kwargs={"max_completion_tokens": 128_000, "reasoning_effort": "low"}, unsupported_kwargs={"temperature"}, overridden_kwargs=[KeyValueOverride(key="reasoning_effort", value="none", override="low")]),
+        TextModel(name="gpt-6-sol", context_window=1_050_000, max_output=128_000, extra_kwargs={"max_completion_tokens": 128_000, "reasoning_effort": "none"}),
     ][-1],  # Ref: https://platform.openai.com/docs/models
     "text": [
-        TextModel(name="gpt-5.6-terra", context_window=1_050_000, max_output=128_000, extra_kwargs={"max_completion_tokens": 128_000, "reasoning_effort": "none"}, unsupported_kwargs=set()),
-    ][0],  # Ref: https://platform.openai.com/docs/models
+        TextModel(name="gpt-5.6-terra", context_window=1_050_000, max_output=128_000, extra_kwargs={"max_completion_tokens": 128_000, "reasoning_effort": "none"}),
+        TextModel(name="gpt-6-sol", context_window=1_050_000, max_output=128_000, extra_kwargs={"max_completion_tokens": 128_000, "reasoning_effort": "none"}),
+    ][-1],  # Ref: https://platform.openai.com/docs/models
     "tts": [  # Demo: https://platform.openai.com/audio/tts
         "tts-1",  # Note: tts-1-hd is twice as expensive, and was observed to have a more limited concurrent usage quota resulting in openai.RateLimitError.
         "gpt-4o-mini-tts-2025-12-15",  # Ref: https://developers.openai.com/api/docs/models/gpt-4o-mini-tts.
@@ -117,8 +120,16 @@ def get_cached_content(prompt: str, *, read_cache: bool = True, cache_key_prefix
             content = cache_file_path.read_text().rstrip()  # rstrip is used in case the file is manually modified in an editor which adds a trailing newline.
             exclusive_print(f"Read completion from disk for: {cache_key_prefix}")
         else:
-            kwargs = {k: v for k, v in kwargs.items() if k not in model["unsupported_kwargs"]}
+            unsupported_kwargs = model.get("unsupported_kwargs", set())
+            kwargs = {k: v for k, v in kwargs.items() if k not in unsupported_kwargs}
+
+            for overridden_kwarg in model.get("overridden_kwargs", []):
+                key, value, override = overridden_kwarg["key"], overridden_kwarg["value"], overridden_kwarg["override"]
+                if (key in kwargs) and (kwargs[key] == value):
+                    kwargs[key] = override
+
             kwargs = {**model["extra_kwargs"], **kwargs}  # Note: Order of inclusion is relevant.
+
             kwargs_str = (f" with model={model['name']} " + " ".join(f"{k}={v}" for k, v in kwargs.items())) if kwargs else ""
             exclusive_print(f"Requesting completion{kwargs_str} for: {cache_key_prefix}")
             content = get_content(prompt, model=model, **kwargs)  # ty: ignore[invalid-argument-type]

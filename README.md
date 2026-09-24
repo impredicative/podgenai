@@ -26,15 +26,15 @@ For a given topic, the high-level generation approach is as follows:
 
 
 ### Models used
-* `gpt-5.6-sol` is used for:
+* Knowledge model (`gpt-6-sol`) is used for:
     - listing subtopics
     - voice selection
     - monologue text generation if the episode is to be created from the model's internal knowledge
     - duologue text generation
-* `gpt-5.6-terra` is used for:
+* Text model (`gpt-6-sol`) is used for:
     - monologue text generation if the episode is to be created from a given source document
     - monologue text deduplication
-* `gpt-4o-mini-tts-2025-12-15` is used for:
+* Text-to-speech model (`gpt-4o-mini-tts-2025-12-15`) is used for:
     - speech generation
 
 ## Samples
