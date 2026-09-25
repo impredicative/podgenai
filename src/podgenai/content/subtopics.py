@@ -355,11 +355,11 @@ def deduplicate_subtopics_monologues(*, topic: str, subtopics_monologues: list[S
         subtopics_monologues_size = sum(len(subtopic["text"]) for subtopic in subtopics_monologues)
         subtopics_monologues_size_ratio = subtopics_monologues_size / original_subtopics_monologues_size
         if all(subtopic_monologue["is_deduplicated"] for subtopic_monologue in subtopics_monologues):
-            print(f"All {num_subtopics} subtopic monologues are deduplicated after iteration {iteration}/{max_iterations}, having {subtopics_monologues_size_ratio:.2%} of the original length.")
+            print(f"All {num_subtopics} subtopic monologues are deduplicated after iteration {iteration}/{max_iterations}, cumulatively having {subtopics_monologues_size_ratio:.2%} of the original length.")
             break
         else:
             num_deduplicated = sum(subtopic_monologue["is_deduplicated"] for subtopic_monologue in subtopics_monologues)
-            print(f"After iteration {iteration}/{max_iterations}, only {num_deduplicated}/{num_subtopics} subtopic monologues are deduplicated, having {subtopics_monologues_size_ratio:.2%} of the original length.")
+            print(f"After iteration {iteration}/{max_iterations}, only {num_deduplicated}/{num_subtopics} subtopic monologues are deduplicated, cumulatively having {subtopics_monologues_size_ratio:.2%} of the original length.")
 
     subtopic_monologues: list[SubtopicText] = [SubtopicText(name=subtopic_monologue["name"], text=subtopic_monologue["text"]) for subtopic_monologue in subtopics_monologues]
     return subtopic_monologues
