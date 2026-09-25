@@ -8,8 +8,9 @@ from podgenai.content.topic import ensure_topic_is_valid
 from podgenai.content.tts import ensure_speech_audio_files, get_duologue_speech_tasks, get_monologue_speech_tasks
 from podgenai.content.voice import get_duologue_voice_keys, get_monologue_voice_key, get_voice_sex_from_voice_key
 from podgenai.exceptions import InputError
+from podgenai.util.contextvars import collect_records
 from podgenai.util.input import get_confirmation
-from podgenai.util.openai import MODELS, TTS_VOICE_MAP, ensure_openai_key
+from podgenai.util.openai import MODELS, TOKEN_METRICS, TTS_VOICE_MAP, ensure_openai_key
 from podgenai.util.tiktoken import get_token_count
 from podgenai.work import get_topic_work_path
 
@@ -54,62 +55,78 @@ def generate_media(topic: str, *, output_path: Path | None = None, document: str
         ensure_document_is_valid(document)
     print(f"CONFIRMATIONS: {'enabled' if confirm else 'disabled'}")
 
-    subtopics_list = list_subtopics(topic, document=document, max_sections=max_sections)  # Can commonly raise an exception, so it's done before getting voice.
+    with collect_records(TOKEN_METRICS) as token_metrics_collector:
+        subtopics_list = list_subtopics(topic, document=document, max_sections=max_sections)  # Can commonly raise an exception, so it's done before getting voice.
 
-    match speakers:
-        case 1:
-            voice_key = get_monologue_voice_key(topic=topic)
-            print(f"VOICE: {voice_key} ({TTS_VOICE_MAP[voice_key]})")
-        case 2:
-            marker_voice_key, boundary_voice_key = get_duologue_voice_keys(topic=topic)
-            non_boundary_voice_key = marker_voice_key
-            print(f"VOICES: {marker_voice_key} ({TTS_VOICE_MAP[marker_voice_key]}), {boundary_voice_key} ({TTS_VOICE_MAP[boundary_voice_key]})")
-            marker_voice_sex = get_voice_sex_from_voice_key(marker_voice_key)
-            boundary_voice_sex = get_voice_sex_from_voice_key(boundary_voice_key)
-            non_boundary_voice_sex = get_voice_sex_from_voice_key(non_boundary_voice_key)
-            voice_keys_by_sex = {boundary_voice_sex: boundary_voice_key, non_boundary_voice_sex: non_boundary_voice_key}
-            male_voice_key = voice_keys_by_sex["male"]
-            female_voice_key = voice_keys_by_sex["female"]
-        case _:
-            assert False
-    print(f"SUBTOPICS:\n{'\n'.join(subtopics_list)}")
-    if document is not None:
-        document_subtopic_model = MODELS["text"]["name"]  # Note: With the document present, the knowledge model is not used by get_subtopic_monologue due to a prohibitive cost.
-        document_token_count = get_token_count(document, model=document_subtopic_model)
-        cumulative_document_token_count = document_token_count * len(subtopics_list)
-        print(f"DOCUMENT: {document_token_count:,} input tokens x {len(subtopics_list)} subtopics = {cumulative_document_token_count:,} input tokens ({document_subtopic_model})")
+        match speakers:
+            case 1:
+                voice_key = get_monologue_voice_key(topic=topic)
+                print(f"VOICE: {voice_key} ({TTS_VOICE_MAP[voice_key]})")
+            case 2:
+                marker_voice_key, boundary_voice_key = get_duologue_voice_keys(topic=topic)
+                non_boundary_voice_key = marker_voice_key
+                print(f"VOICES: {marker_voice_key} ({TTS_VOICE_MAP[marker_voice_key]}), {boundary_voice_key} ({TTS_VOICE_MAP[boundary_voice_key]})")
+                marker_voice_sex = get_voice_sex_from_voice_key(marker_voice_key)
+                boundary_voice_sex = get_voice_sex_from_voice_key(boundary_voice_key)
+                non_boundary_voice_sex = get_voice_sex_from_voice_key(non_boundary_voice_key)
+                voice_keys_by_sex = {boundary_voice_sex: boundary_voice_key, non_boundary_voice_sex: non_boundary_voice_key}
+                male_voice_key = voice_keys_by_sex["male"]
+                female_voice_key = voice_keys_by_sex["female"]
+            case _:
+                assert False
+        print(f"SUBTOPICS:\n{'\n'.join(subtopics_list)}")
+        if document is not None:
+            document_subtopic_model = MODELS["text"]["name"]  # Note: With the document present, the knowledge model is not used by get_subtopic_monologue due to a prohibitive cost.
+            document_token_count = get_token_count(document, model=document_subtopic_model)
+            cumulative_document_token_count = document_token_count * len(subtopics_list)
+            print(f"DOCUMENT: {document_token_count:,} input tokens x {len(subtopics_list)} subtopics = {cumulative_document_token_count:,} input tokens ({document_subtopic_model})")
 
-    if confirm:
-        task = "monologue text generation"
-        get_confirmation(task)
-    subtopics_monologues = get_subtopics_monologues(topic=topic, document=document, subtopics=subtopics_list)
+        if confirm:
+            task = "monologue text generation"
+            get_confirmation(task)
+        subtopics_monologues = get_subtopics_monologues(topic=topic, document=document, subtopics=subtopics_list)
 
-    if confirm:
-        task = "monologue text deduplication"
-        get_confirmation(task)
-    original_subtopics_monologues_size = sum(len(subtopic["text"]) for subtopic in subtopics_monologues)
-    subtopics_monologues = deduplicate_subtopics_monologues(topic=topic, subtopics_monologues=subtopics_monologues)
-    deduplicated_subtopics_monologues_size = sum(len(subtopic["text"]) for subtopic in subtopics_monologues)
-    deduplication_ratio = deduplicated_subtopics_monologues_size / original_subtopics_monologues_size
-    print(f"DEDUPLICATION: {original_subtopics_monologues_size:,} -> {deduplicated_subtopics_monologues_size:,} characters ({deduplication_ratio:.0%})")
+        if confirm:
+            task = "monologue text deduplication"
+            get_confirmation(task)
+        original_subtopics_monologues_size = sum(len(subtopic["text"]) for subtopic in subtopics_monologues)
+        subtopics_monologues = deduplicate_subtopics_monologues(topic=topic, subtopics_monologues=subtopics_monologues)
+        deduplicated_subtopics_monologues_size = sum(len(subtopic["text"]) for subtopic in subtopics_monologues)
+        deduplication_ratio = deduplicated_subtopics_monologues_size / original_subtopics_monologues_size
+        print(f"DEDUPLICATION: {original_subtopics_monologues_size:,} -> {deduplicated_subtopics_monologues_size:,} characters ({deduplication_ratio:.0%})")
 
-    subtopics_monologue_transcripts = get_subtopics_monologue_transcripts(topic=topic, is_from_document=bool(document), subtopic_monologues=subtopics_monologues, markers=markers)
-    assert subtopics_monologue_transcripts
-    monologue = "\n\n".join(subtopic["text"] for subtopic in subtopics_monologue_transcripts)
-    print(f"\nMONOLOGUE:\n{monologue}\n")
-    match speakers:
-        case 1:
-            pass
-        case 2:
-            if confirm:
-                get_confirmation("duologue text generation")
-            subtopics_duologues = get_subtopics_duologues(topic=topic, subtopics_monologues=subtopics_monologues, boundary_voice_sex=boundary_voice_sex, non_boundary_voice_sex=non_boundary_voice_sex)  # Note: Document is not needed or used.
-            mark_subtopics_duologues(topic=topic, is_from_document=bool(document), subtopics_duologues=subtopics_duologues, markers=markers, marker_voice_sex=marker_voice_sex)
-            subtopics_duologue_transcripts = get_subtopics_duologues_transcripts(subtopics_duologues=subtopics_duologues)
-            duologue = "\n\n".join(subtopic["text"] for subtopic in subtopics_duologue_transcripts)
-            print(f"\nDUOLOGUE:\n{duologue}\n")
-        case _:
-            assert False
+        subtopics_monologue_transcripts = get_subtopics_monologue_transcripts(topic=topic, is_from_document=bool(document), subtopic_monologues=subtopics_monologues, markers=markers)
+        assert subtopics_monologue_transcripts
+        monologue = "\n\n".join(subtopic["text"] for subtopic in subtopics_monologue_transcripts)
+        print(f"\nMONOLOGUE:\n{monologue}\n")
+        match speakers:
+            case 1:
+                pass
+            case 2:
+                if confirm:
+                    get_confirmation("duologue text generation")
+                subtopics_duologues = get_subtopics_duologues(topic=topic, subtopics_monologues=subtopics_monologues, boundary_voice_sex=boundary_voice_sex, non_boundary_voice_sex=non_boundary_voice_sex)  # Note: Document is not needed or used.
+                mark_subtopics_duologues(topic=topic, is_from_document=bool(document), subtopics_duologues=subtopics_duologues, markers=markers, marker_voice_sex=marker_voice_sex)
+                subtopics_duologue_transcripts = get_subtopics_duologues_transcripts(subtopics_duologues=subtopics_duologues)
+                duologue = "\n\n".join(subtopic["text"] for subtopic in subtopics_duologue_transcripts)
+                print(f"\nDUOLOGUE:\n{duologue}\n")
+            case _:
+                assert False
+
+    df_token_metrics = token_metrics_collector.to_dataframe()
+    if df_token_metrics.empty:
+        print("\nTOKENS: (none)\n")
+    else:
+        df_token_metrics_agg = df_token_metrics.groupby("prompt_cache_key", dropna=False).agg(
+            calls=("prompt_cache_key", "size"),
+            input_tokens=("input_tokens", "sum"),
+            cache_read_tokens=("cache_read_tokens", "sum"),
+            calls_with_cache_read=("cache_read_tokens", lambda token_counts: (token_counts > 0).sum()),
+            cache_write_tokens=("cache_write_tokens", "sum"),
+            calls_with_cache_write=("cache_write_tokens", lambda token_counts: (token_counts > 0).sum()),
+            output_tokens=("output_tokens", "sum"),
+        )
+        print(f"\nTOKENS:\n{df_token_metrics_agg.to_string()}\n")
 
     match speakers:
         case 1:

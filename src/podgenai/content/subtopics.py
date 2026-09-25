@@ -1,4 +1,3 @@
-import concurrent.futures
 import io
 import json
 import math
@@ -10,6 +9,7 @@ import podgenai.exceptions
 from podgenai.config import MAX_CONCURRENT_WORKERS, MAX_TEXT_LENGTH_IN_FILENAME, NUM_SECTIONS_MAX, NUM_SECTIONS_MIN, PROMPTS, TTS_DISCLAIMER_W_DOC, TTS_DISCLAIMER_WO_DOC
 from podgenai.content.document import get_document_tag
 from podgenai.types import DeduplicatedSubtopicText, SpeechLine, SubtopicDuologue, SubtopicText
+from podgenai.util.contextvars import ContextThreadPoolExecutor
 
 # from podgenai.util.difflib import diff_texts_inline
 from podgenai.util.openai import MODELS, get_cached_content
@@ -76,14 +76,15 @@ def list_subtopics(topic: str, document: str | None = None, max_sections: int | 
     invalid_subtopics = ("", *none_subtopics)
     rejection_error_prefix = "RequestError: "  # Defined in prompt.
     reasoning_effort = ["none", "low"][0]  # Note: reasoning_effort=none is demonstrably sufficient at least when not having a document.
-    cache_key_prefix = f"0. {prompt_name}"
+    local_cache_key_prefix = f"0. {prompt_name}"
+    remote_cache_key = prompt_name if document is None else f"{prompt_name}:from_document"
 
     temperature = 0.5 if (reasoning_effort == "none") else 1
     # Note: temperature=0.5 is specified in an attempt to increase the objectivity of the list of subtopics.
     # temperature=0.5 is not supported with reasoning_effort!=none.
 
     for num_attempt in range(1, max_attempts + 1):
-        response = get_cached_content(prompt, read_cache=num_attempt == 1, cache_key_prefix=cache_key_prefix, cache_path=get_topic_work_path(topic), temperature=temperature, reasoning_effort=reasoning_effort, verbosity="low")
+        response = get_cached_content(prompt, read_cache=num_attempt == 1, local_cache_key_prefix=local_cache_key_prefix, cache_path=get_topic_work_path(topic), temperature=temperature, reasoning_effort=reasoning_effort, verbosity="low", remote_cache_key=remote_cache_key)
         # Note: verbosity=low is specified in an attempt to reduce an excessive number of subtopics.
         assert response, response
 
@@ -195,16 +196,18 @@ def is_unmarked_subtopic_duologue_valid(duologue: str, numbered_name: str, bound
 def get_subtopic_monologue(*, topic: str, document: str | None = None, subtopics: list[str], subtopic: str, max_attempts: int = 3) -> str:
     """Return the monologue for a given subtopic within the context of the given topic and list of subtopics."""
     assert _NUMBERED_SUBTOPIC_PATTERN.match(subtopic), subtopic
-    common_kwargs: dict[str, Any] = {"cache_key_prefix": f"{subtopic[:MAX_TEXT_LENGTH_IN_FILENAME].rstrip()} (monologue)", "cache_path": get_topic_work_path(topic), "temperature": 0.5, "verbosity": "low"}
     # Note: temperature=0.5 is specified in an attempt to increase the objectivity of the monologue.
     # Note: verbosity=low is specified in an attempt to reduce an excessively long monologue.
     subtopics_str = "\n".join(subtopics)
     model = MODELS["text"] if document else MODELS["knowledge"]
     document_tag = get_document_tag(document) if document is not None else None
     # Note: The knowledge model is used for subtopic monologue generation only when the document is not present. This is due to a prohibitive cost of using the knowledge model for each subtopic when the document is present.
+    prompt_name = "generate_subtopic_monologue"
+    prompt = PROMPTS[prompt_name].render(topic=topic, subtopics=subtopics_str, numbered_subtopic=subtopic, source=document, source_tag=document_tag)
+    remote_cache_key = prompt_name if document is None else f"{prompt_name}:from_document"
+    common_kwargs: dict[str, Any] = {"local_cache_key_prefix": f"{subtopic[:MAX_TEXT_LENGTH_IN_FILENAME].rstrip()} (monologue)", "cache_path": get_topic_work_path(topic), "temperature": 0.5, "verbosity": "low", "remote_cache_key": remote_cache_key}
 
     for num_attempt in range(1, max_attempts + 1):
-        prompt = PROMPTS["generate_subtopic_monologue"].render(topic=topic, subtopics=subtopics_str, numbered_subtopic=subtopic, source=document, source_tag=document_tag)
         monologue = get_cached_content(prompt, read_cache=num_attempt == 1, model=model, **common_kwargs)
         monologue = monologue.rstrip()
 
@@ -257,9 +260,10 @@ def deduplicate_subtopic_monologue(*, topic: str, subtopics: list[str], subtopic
     segments_xml.append("\n</segment_monologues>")
     segments_xml_str = "\n".join(segments_xml)
 
-    common_kwargs: dict[str, Any] = {"cache_key_prefix": f"{subtopic[:MAX_TEXT_LENGTH_IN_FILENAME].rstrip()} (monologue) (dedup {iteration})", "cache_path": cache_path, "temperature": 0.0}
+    prompt_name = "dedup_subtopic_monologue"
+    common_kwargs: dict[str, Any] = {"local_cache_key_prefix": f"{subtopic[:MAX_TEXT_LENGTH_IN_FILENAME].rstrip()} (monologue) (dedup {iteration})", "cache_path": cache_path, "remote_cache_key": prompt_name, "temperature": 0.0}
     # Note: temperature=0.0 is specified in an attempt to minimize the iterations required for deduplication.
-    prompt = PROMPTS["dedup_subtopic_monologue"].render(topic=topic, subtopics=subtopics_str, numbered_subtopic=subtopic, segments_xml=segments_xml_str)
+    prompt = PROMPTS[prompt_name].render(topic=topic, subtopics=subtopics_str, numbered_subtopic=subtopic, segments_xml=segments_xml_str)
 
     for num_attempt in range(1, max_attempts + 1):
         monologue = get_cached_content(prompt, read_cache=num_attempt == 1, model=MODELS["text"], **common_kwargs)
@@ -336,7 +340,7 @@ def deduplicate_subtopics_monologues(*, topic: str, subtopics_monologues: list[S
             if MAX_CONCURRENT_WORKERS == 1:
                 phase_results = [fn_deduplicate_subtopic_monologue(triple) for triple in subtopic_monologue_triples]
             else:
-                with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_CONCURRENT_WORKERS) as executor:
+                with ContextThreadPoolExecutor(max_workers=MAX_CONCURRENT_WORKERS) as executor:
                     phase_results = list(executor.map(fn_deduplicate_subtopic_monologue, subtopic_monologue_triples))
 
             assert len(current_indices) == len(phase_results)
@@ -348,13 +352,13 @@ def deduplicate_subtopics_monologues(*, topic: str, subtopics_monologues: list[S
                 assert phase_result["name"] == subtopics_monologues[current_index]["name"]
                 subtopics_monologues[current_index] = phase_result
 
+        subtopics_monologues_size = sum(len(subtopic["text"]) for subtopic in subtopics_monologues)
+        subtopics_monologues_size_ratio = subtopics_monologues_size / original_subtopics_monologues_size
         if all(subtopic_monologue["is_deduplicated"] for subtopic_monologue in subtopics_monologues):
-            print(f"All {num_subtopics} subtopic monologues are deduplicated after iteration {iteration}/{max_iterations}.")
+            print(f"All {num_subtopics} subtopic monologues are deduplicated after iteration {iteration}/{max_iterations}, having {subtopics_monologues_size_ratio:.2%} of the original length.")
             break
         else:
             num_deduplicated = sum(subtopic_monologue["is_deduplicated"] for subtopic_monologue in subtopics_monologues)
-            subtopics_monologues_size = sum(len(subtopic["text"]) for subtopic in subtopics_monologues)
-            subtopics_monologues_size_ratio = subtopics_monologues_size / original_subtopics_monologues_size
             print(f"After iteration {iteration}/{max_iterations}, only {num_deduplicated}/{num_subtopics} subtopic monologues are deduplicated, having {subtopics_monologues_size_ratio:.2%} of the original length.")
 
     subtopic_monologues: list[SubtopicText] = [SubtopicText(name=subtopic_monologue["name"], text=subtopic_monologue["text"]) for subtopic_monologue in subtopics_monologues]
@@ -364,13 +368,14 @@ def deduplicate_subtopics_monologues(*, topic: str, subtopics_monologues: list[S
 def get_subtopic_duologue(*, topic: str, subtopics: list[str], subtopic: str, subtopic_monologue: str, boundary_voice_sex: str, non_boundary_voice_sex: str, max_attempts: int = 3) -> list[SpeechLine]:
     """Return the duologue for a given subtopic within the context of the given topic and list of subtopics."""
     assert _NUMBERED_SUBTOPIC_PATTERN.match(subtopic), subtopic
-    cache_key_prefix = f"{subtopic[:MAX_TEXT_LENGTH_IN_FILENAME].rstrip()} (duologue)"
+    local_cache_key_prefix = f"{subtopic[:MAX_TEXT_LENGTH_IN_FILENAME].rstrip()} (duologue)"
     cache_path = get_topic_work_path(topic)
     subtopics_str = "\n".join(subtopics)
+    prompt_name = "generate_subtopic_duologue"
+    prompt = PROMPTS[prompt_name].render(topic=topic, subtopics=subtopics_str, numbered_subtopic=subtopic, subtopic_monologue=subtopic_monologue, boundary_voice_sex=boundary_voice_sex, non_boundary_voice_sex=non_boundary_voice_sex)
 
     for num_attempt in range(1, max_attempts + 1):
-        prompt = PROMPTS["generate_subtopic_duologue"].render(topic=topic, subtopics=subtopics_str, numbered_subtopic=subtopic, subtopic_monologue=subtopic_monologue, boundary_voice_sex=boundary_voice_sex, non_boundary_voice_sex=non_boundary_voice_sex)
-        duologue = get_cached_content(prompt, read_cache=num_attempt == 1, cache_key_prefix=cache_key_prefix, cache_path=cache_path)  # Default temperature and verbosity are used for duologue, considering it is derived from the monologue.
+        duologue = get_cached_content(prompt, read_cache=num_attempt == 1, local_cache_key_prefix=local_cache_key_prefix, cache_path=cache_path, remote_cache_key=prompt_name)  # Default temperature and verbosity are used for duologue, considering it is derived from the monologue.
         duologue = duologue.rstrip()
 
         validation_error = is_unmarked_subtopic_duologue_valid(duologue, numbered_name=subtopic, boundary_voice_sex=boundary_voice_sex, non_boundary_voice_sex=non_boundary_voice_sex)
@@ -398,7 +403,7 @@ def get_subtopics_duologues(*, topic: str, subtopics_monologues: list[SubtopicTe
         ]
     else:
         assert MAX_CONCURRENT_WORKERS > 1
-        with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_CONCURRENT_WORKERS) as executor:
+        with ContextThreadPoolExecutor(max_workers=MAX_CONCURRENT_WORKERS) as executor:
             fn_get_subtopic_duologue = lambda s: get_subtopic_duologue(topic=topic, subtopics=[s["name"] for s in subtopics_monologues], subtopic=s["name"], subtopic_monologue=s["text"], boundary_voice_sex=boundary_voice_sex, non_boundary_voice_sex=non_boundary_voice_sex)
             subtopic_duologues = [SubtopicDuologue(subtopic=s["name"], duologue=duologue) for s, duologue in zip(subtopics_monologues, executor.map(fn_get_subtopic_duologue, subtopics_monologues))]
     return subtopic_duologues
@@ -411,7 +416,7 @@ def get_subtopics_monologues(*, topic: str, document: str | None = None, subtopi
         subtopic_monologues = [SubtopicText(name=s, text=get_subtopic_monologue(topic=topic, document=document, subtopics=subtopics, subtopic=s)) for s in subtopics]
     else:
         assert MAX_CONCURRENT_WORKERS > 1
-        with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_CONCURRENT_WORKERS) as executor:
+        with ContextThreadPoolExecutor(max_workers=MAX_CONCURRENT_WORKERS) as executor:
             fn_get_subtopic_monologue = lambda subtopic: get_subtopic_monologue(topic=topic, document=document, subtopics=subtopics, subtopic=subtopic)
             subtopic_monologues = [SubtopicText(name=s, text=monologue) for s, monologue in zip(subtopics, executor.map(fn_get_subtopic_monologue, subtopics))]
     return subtopic_monologues

@@ -171,7 +171,6 @@ work/
 
 # LLM
 sources/
-spec/
 
 # Local
 scratch/

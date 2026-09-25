@@ -23,6 +23,19 @@ class Models(TypedDict):
     tts: Required[str]
 
 
+class TokenMetric(TypedDict):
+    """Token usage for one model request.
+
+    Missing token counts are represented by None.
+    """
+
+    prompt_cache_key: Required[str | None]
+    input_tokens: Required[int | None]
+    cache_read_tokens: Required[int | None]
+    cache_write_tokens: Required[int | None]
+    output_tokens: Required[int | None]
+
+
 class SpeechLine(TypedDict):
     speaker: Required[Literal["male", "female"]]
     speech: Required[str]

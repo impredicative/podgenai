@@ -13,6 +13,7 @@ dependencies = [
     "click>=8.5.0",  # https://github.com/pallets/click/releases
     "jinja2>=3.1.6",  # https://jinja.palletsprojects.com/en/stable/changes/
     "openai>=3.19.0",  # https://github.com/openai/openai-python/releases
+    "pandas>=3.0.6",  # https://github.com/pandas-dev/pandas/releases https://pandas.pydata.org/docs/whatsnew/index.html
     "pathvalidate>=3.3.1",  # https://github.com/thombashi/pathvalidate/releases
     "python-dotenv>=1.2.3",  # https://github.com/theskumar/python-dotenv/releases
     "semantic-text-splitter>=0.32.0",  # https://github.com/benbrandt/text-splitter/releases https://github.com/benbrandt/text-splitter/tree/main/bindings/python

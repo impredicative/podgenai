@@ -1,4 +1,5 @@
 import os
+from contextvars import ContextVar
 from pathlib import Path
 
 import openai
@@ -7,14 +8,17 @@ from openai.types.chat import ChatCompletion
 
 import podgenai.exceptions
 from podgenai.config import PACKAGE_NAME, VERIFY_PROMPT
-from podgenai.types import KeyValueOverride, Models, TextModel
+from podgenai.types import KeyValueOverride, Models, TextModel, TokenMetric
 from podgenai.util.binascii import hasher
+from podgenai.util.contextvars import RecordCollector, record
 from podgenai.util.dotenv_ import load_dotenv
 from podgenai.util.threading import exclusive_print, exclusive_prompt
 
 load_dotenv()
 
 OpenAI = openai.OpenAI
+
+TOKEN_METRICS: ContextVar[RecordCollector[TokenMetric] | None] = ContextVar("token_metrics", default=None)
 
 MODELS: Models = {
     "knowledge": [
@@ -61,32 +65,41 @@ def get_openai_client() -> OpenAI:
     return OpenAI()
 
 
-def get_completion(prompt: str, *, client: OpenAI | None = None, model: TextModel = MODELS["knowledge"], **kwargs) -> ChatCompletion:
+def get_completion(prompt: str, *, client: OpenAI | None = None, model: TextModel = MODELS["knowledge"], prompt_cache_key: str | None = None, **kwargs) -> ChatCompletion:
     """Return the completion for the given prompt.
+
+    Params:
+    * `prompt_cache_key`: Friendly cache identifying name of request, used for remote caching.
 
     Additional keyword arguments are forwarded to the OpenAI API client's `chat.completions.create` method.
     """
     if not client:
         client = get_openai_client()
     # exclusive_print(f"Requesting completion for prompt of length {len(prompt)}.")
+    completion = client.chat.completions.create(model=model["name"], messages=[{"role": "user", "content": prompt}], safety_identifier=PACKAGE_NAME, prompt_cache_key=prompt_cache_key, **kwargs)  #  Ref: https://platform.openai.com/docs/api-reference/chat/create
 
-    completion = client.chat.completions.create(model=model["name"], messages=[{"role": "user", "content": prompt}], safety_identifier=PACKAGE_NAME, **kwargs)  #  Ref: https://platform.openai.com/docs/api-reference/chat/create
-
-    if completion.usage and completion.usage.prompt_tokens_details and ((num_cached_prompt_tokens := completion.usage.prompt_tokens_details.cached_tokens) > 0):
-        num_prompt_tokens = completion.usage.prompt_tokens
-        pct_cached_prompt_tokens = num_cached_prompt_tokens / num_prompt_tokens
-        exclusive_print(f"Completion for prompt of {num_prompt_tokens} tokens used {num_cached_prompt_tokens} ({pct_cached_prompt_tokens:.0%}) cached input tokens.")
+    usage = completion.usage
+    details = usage.prompt_tokens_details if usage else None
+    metric: TokenMetric = {
+        "prompt_cache_key": prompt_cache_key,
+        "input_tokens": usage.prompt_tokens if usage else None,
+        "cache_read_tokens": details.cached_tokens if details else None,
+        "cache_write_tokens": details.cache_write_tokens if details else None,
+        "output_tokens": usage.completion_tokens if usage else None,
+    }
+    record(TOKEN_METRICS, metric)
+    # exclusive_print(f"Token metrics: key={metric['prompt_cache_key']!r} input={metric['input_tokens']} cache_read={metric['cache_read_tokens']} cache_write={metric['cache_write_tokens']} output={metric['output_tokens']}")
 
     return completion
 
 
-def get_content(prompt: str, *, client: OpenAI | None = None, model: TextModel = MODELS["knowledge"], completion: ChatCompletion | None = None, **kwargs) -> str:
+def get_content(prompt: str, *, client: OpenAI | None = None, model: TextModel = MODELS["knowledge"], remote_cache_key: str, completion: ChatCompletion | None = None, **kwargs) -> str:
     """Return the content for the given prompt.
 
     Additional keyword arguments are forwarded to `get_completion`.
     """
     if not completion:
-        completion = get_completion(prompt, client=client, model=model, **kwargs)
+        completion = get_completion(prompt, client=client, model=model, prompt_cache_key=remote_cache_key, **kwargs)
     content = completion.choices[0].message.content
     assert isinstance(content, str)
     content = content.strip()
@@ -94,31 +107,34 @@ def get_content(prompt: str, *, client: OpenAI | None = None, model: TextModel =
     return content
 
 
-def get_cached_content(prompt: str, *, read_cache: bool = True, cache_key_prefix: str, cache_path: Path, model: TextModel = MODELS["knowledge"], verify_prompt: bool = VERIFY_PROMPT, **kwargs) -> str:
+def get_cached_content(prompt: str, *, read_cache: bool = True, local_cache_key_prefix: str, cache_path: Path, remote_cache_key: str, model: TextModel = MODELS["knowledge"], verify_prompt: bool = VERIFY_PROMPT, **kwargs) -> str:
     """Return the content for the given prompt using the disk cache if available, otherwise normally.
 
     Params:
     * `read_cache`: If `True`, the disk cache is read if available. If `False`, the disk cache is not read, and it will be written or overwritten.
-    * `cache_key_prefix`: Friendly identifying name of request, used in filename in cache directory. Deduplication by prompt is done by this function; it does not have to be done externally.
+    * `local_cache_key_prefix`: Friendly local cache identifying name of request, used in filename in cache directory. Deduplication by prompt is done by this function; it does not have to be done externally.
+    * `remote_cache_key`: Friendly remote cache identifying name of request, used for remote caching.
     * `cache_path`: Cache directory.
 
     Additional keyword arguments, if valid for the model, are forwarded to `get_content` along with model's default keyword arguments.
     """
-    cache_key_prefix = cache_key_prefix.strip()
-    assert cache_key_prefix
-    assert cache_path.is_dir()
+    local_cache_key_prefix = local_cache_key_prefix.strip()
+    assert local_cache_key_prefix
 
-    sanitized_cache_key_prefix = pathvalidate.sanitize_filename(cache_key_prefix, platform="auto")
-    assert sanitized_cache_key_prefix
-    cache_key = f"{sanitized_cache_key_prefix} ({model['name']}) [{hasher(prompt)}].txt"
-    cache_file_path = cache_path / cache_key
+    sanitized_local_cache_key_prefix = pathvalidate.sanitize_filename(local_cache_key_prefix, platform="auto")
+    assert sanitized_local_cache_key_prefix
+    local_cache_key = f"{sanitized_local_cache_key_prefix} ({model['name']}) [{hasher(prompt)}].txt"
+    cache_file_path = cache_path / local_cache_key
     pathvalidate.validate_filepath(cache_file_path, platform="auto")
+    assert cache_path.is_dir()
+    assert not remote_cache_key.startswith(PACKAGE_NAME)
+    remote_cache_key = f"{PACKAGE_NAME}:{remote_cache_key}"
 
     with exclusive_prompt(prompt=prompt, enabled=verify_prompt):
         if read_cache and cache_file_path.exists():
             assert cache_file_path.is_file()
             content = cache_file_path.read_text().rstrip()  # rstrip is used in case the file is manually modified in an editor which adds a trailing newline.
-            exclusive_print(f"Read completion from disk for: {cache_key_prefix}")
+            exclusive_print(f"Read completion from disk for: {local_cache_key_prefix}")
         else:
             unsupported_kwargs = model.get("unsupported_kwargs", set())
             kwargs = {k: v for k, v in kwargs.items() if k not in unsupported_kwargs}
@@ -131,9 +147,9 @@ def get_cached_content(prompt: str, *, read_cache: bool = True, cache_key_prefix
             kwargs = {**model["extra_kwargs"], **kwargs}  # Note: Order of inclusion is relevant.
 
             kwargs_str = (f" with model={model['name']} " + " ".join(f"{k}={v}" for k, v in kwargs.items())) if kwargs else ""
-            exclusive_print(f"Requesting completion{kwargs_str} for: {cache_key_prefix}")
-            content = get_content(prompt, model=model, **kwargs)  # ty: ignore[invalid-argument-type]
-            exclusive_print(f"Received completion{kwargs_str} for: {cache_key_prefix}")
+            exclusive_print(f"Requesting completion{kwargs_str} for: {local_cache_key_prefix}")
+            content = get_content(prompt, model=model, remote_cache_key=remote_cache_key, **kwargs)  # ty: ignore[invalid-argument-type]
+            exclusive_print(f"Received completion{kwargs_str} for: {local_cache_key_prefix}")
             cache_file_path.write_text(content)
 
     assert content == content.rstrip()

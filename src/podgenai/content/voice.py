@@ -28,7 +28,7 @@ def get_monologue_voice_key(*, topic: str, max_attempts: int = 3, allowed_voice_
     prompt = PROMPTS[prompt_name].render(voices=voices, topic=topic)
 
     for num_attempt in range(1, max_attempts + 1):
-        raw_voice = get_cached_content(prompt, read_cache=num_attempt == 1, cache_key_prefix=f"0. {prompt_name}", cache_path=get_topic_work_path(topic))
+        raw_voice = get_cached_content(prompt, read_cache=num_attempt == 1, local_cache_key_prefix=f"0. {prompt_name}", cache_path=get_topic_work_path(topic), remote_cache_key=prompt_name)
         voice = raw_voice.strip().rstrip(".").lower()
         if voice in tts_voice_map:
             break
