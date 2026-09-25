@@ -128,9 +128,9 @@ def generate_media(topic: str, *, output_path: Path | None = None, document: str
             sum_output_tokens=("output_tokens", "sum"),
             avg_output_tokens=("output_tokens", "mean"),
         )
-        # for token_column in ("input_tokens", "output_tokens"):
-        #     avg_column = f"avg_{token_column}"
-        #     df_token_metrics_agg[avg_column] = df_token_metrics_agg[avg_column].round().astype(df_token_metrics[token_column].dtype)
+        for token_column in ("input_tokens", "output_tokens"):
+            avg_column = f"avg_{token_column}"
+            df_token_metrics_agg[avg_column] = df_token_metrics_agg[avg_column].round().astype(df_token_metrics[token_column].dtype)
         print(f"\nTOKENS:\n{df_token_metrics_agg.to_string()}\n")
 
     match speakers:
@@ -138,9 +138,9 @@ def generate_media(topic: str, *, output_path: Path | None = None, document: str
             speech_tasks = get_monologue_speech_tasks(subtopics_monologue_transcripts=subtopics_monologue_transcripts, topic=topic, voice_key=voice_key)
         case 2:
             speech_tasks = get_duologue_speech_tasks(subtopics_duologues=subtopics_duologues, topic=topic, male_voice_key=male_voice_key, female_voice_key=female_voice_key)
-    print("SPEECHES:")
-    for speech_task_num, speech_task in enumerate(speech_tasks, start=1):
-        print(f"{speech_task_num}: text_len={len(speech_task['text']):,} tone_len={len(speech_task['tone'] or ''):,}) pause_after={str(speech_task['pause_after']).lower()} stem={speech_task['path'].relative_to(work_path).stem!r}")
+    # print("SPEECHES:")
+    # for speech_task_num, speech_task in enumerate(speech_tasks, start=1):
+    #     print(f"{speech_task_num}: text_len={len(speech_task['text']):,} tone_len={len(speech_task['tone'] or ''):,}) pause_after={str(speech_task['pause_after']).lower()} stem={speech_task['path'].relative_to(work_path).stem!r}")
 
     if confirm:
         get_confirmation("speech audio generation")
