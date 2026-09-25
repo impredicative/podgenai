@@ -11,4 +11,6 @@ My project already uses Python's type annotations, but perhaps they're not as ti
 
 # Remarks
 
-For your reference, I have provisioned the file `spec/20260925_types/typing_doc_python3.14.txt` as the official documentation for Python 3.14's typing features.
+1. For your reference, I have provisioned the file `spec/20260925_types/typing_doc_python3.14.txt` as the official documentation for Python 3.14's typing features.
+2. There are no tests. None are required. Do not implement any tests.
+3. Do not run the code. I will functionally test it myself.
