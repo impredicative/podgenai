@@ -119,13 +119,18 @@ def generate_media(topic: str, *, output_path: Path | None = None, document: str
     else:
         df_token_metrics_agg = df_token_metrics.groupby("prompt_cache_key", dropna=False).agg(
             calls=("prompt_cache_key", "size"),
-            input_tokens=("input_tokens", "sum"),
-            cache_read_tokens=("cache_read_tokens", "sum"),
+            sum_input_tokens=("input_tokens", "sum"),
+            avg_input_tokens=("input_tokens", "mean"),
+            sum_cache_read_tokens=("cache_read_tokens", "sum"),
             calls_with_cache_read=("cache_read_tokens", lambda token_counts: (token_counts > 0).sum()),
-            cache_write_tokens=("cache_write_tokens", "sum"),
+            sum_cache_write_tokens=("cache_write_tokens", "sum"),
             calls_with_cache_write=("cache_write_tokens", lambda token_counts: (token_counts > 0).sum()),
-            output_tokens=("output_tokens", "sum"),
+            sum_output_tokens=("output_tokens", "sum"),
+            avg_output_tokens=("output_tokens", "mean"),
         )
+        # for token_column in ("input_tokens", "output_tokens"):
+        #     avg_column = f"avg_{token_column}"
+        #     df_token_metrics_agg[avg_column] = df_token_metrics_agg[avg_column].round().astype(df_token_metrics[token_column].dtype)
         print(f"\nTOKENS:\n{df_token_metrics_agg.to_string()}\n")
 
     match speakers:
