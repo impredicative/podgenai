@@ -1,10 +1,11 @@
 import functools
+from typing import Final
 
-from tiktoken import encoding_for_model, get_encoding
+from tiktoken import Encoding, encoding_for_model, get_encoding
 
 from podgenai.util.sys import print_warning
 
-_FALLBACK_ENCODING = get_encoding("o200k_base")
+_FALLBACK_ENCODING: Final[Encoding] = get_encoding("o200k_base")
 
 
 @functools.cache

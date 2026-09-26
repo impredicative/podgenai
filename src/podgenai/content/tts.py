@@ -1,5 +1,5 @@
 import concurrent.futures
-from collections.abc import Callable
+from collections.abc import Callable, Iterable, Sequence
 
 import pathvalidate
 
@@ -35,7 +35,7 @@ def get_duologue_pause(*, line_num: int, num_lines: int, part_num: int, num_part
     return None
 
 
-def get_monologue_speech_tasks(*, subtopics_monologue_transcripts: list[SubtopicText], topic: str, voice_key: str) -> list[SpeechTask]:
+def get_monologue_speech_tasks(*, subtopics_monologue_transcripts: Sequence[SubtopicText], topic: str, voice_key: str) -> list[SpeechTask]:
     """Return the list of speech tasks for the monologue."""
     work_path = get_topic_work_path(topic)
     voice = TTS_VOICE_MAP[voice_key]
@@ -103,7 +103,7 @@ def get_monologue_speech_tasks(*, subtopics_monologue_transcripts: list[Subtopic
     return speech_tasks
 
 
-def get_duologue_speech_tasks(*, subtopics_duologues: list[SubtopicDuologue], topic: str, male_voice_key: str, female_voice_key: str) -> list[SpeechTask]:
+def get_duologue_speech_tasks(*, subtopics_duologues: Sequence[SubtopicDuologue], topic: str, male_voice_key: str, female_voice_key: str) -> list[SpeechTask]:
     """Return the list of speech tasks for the duologue."""
     work_path = get_topic_work_path(topic)
     tts_model = MODELS["tts"]
@@ -173,7 +173,7 @@ def get_duologue_speech_tasks(*, subtopics_duologues: list[SubtopicDuologue], to
     return speech_tasks
 
 
-def ensure_speech_audio_files(speech_tasks: list[SpeechTask]) -> None:
+def ensure_speech_audio_files(speech_tasks: Iterable[SpeechTask]) -> None:
     """Ensure the speech audio files for the given speech tasks.
 
     If a given file path already exists, it is not rewritten. If it does not exist, it is written.

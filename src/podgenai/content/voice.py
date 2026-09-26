@@ -1,4 +1,6 @@
 import re
+from collections.abc import Collection
+from typing import Final
 
 import podgenai.exceptions
 from podgenai.config import PROMPTS
@@ -6,10 +8,10 @@ from podgenai.types import VoiceSex
 from podgenai.util.openai import TTS_VOICE_MAP, get_cached_content
 from podgenai.work import get_topic_work_path
 
-_JOINT_PATTERN = re.compile(r"(?P<key>[\w-]+)\s+\((?P<value>[^)]+)\)")
+_JOINT_PATTERN: Final[re.Pattern[str]] = re.compile(r"(?P<key>[\w-]+)\s+\((?P<value>[^)]+)\)")
 
 
-def get_monologue_voice_key(*, topic: str, max_attempts: int = 3, allowed_voice_keys: list[str] | None = None) -> str:
+def get_monologue_voice_key(*, topic: str, max_attempts: int = 3, allowed_voice_keys: Collection[str] | None = None) -> str:
     """Return the suggested voice key for the given topic.
 
     Params:

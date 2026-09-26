@@ -2,8 +2,9 @@ import datetime
 import functools
 import json
 import subprocess
+from collections.abc import Sequence
 from pathlib import Path
-from typing import NotRequired, TypedDict
+from typing import Final, NotRequired, TypedDict
 
 import pathvalidate
 
@@ -25,7 +26,7 @@ class _FFprobeOutput(TypedDict):
     streams: NotRequired[list[AudioFileMetadataForConcat]]
 
 
-_EXPECTED_AUDIO_FILE_METADATA_FOR_CONCAT: AudioFileMetadataForConcat = {
+_EXPECTED_AUDIO_FILE_METADATA_FOR_CONCAT: Final[AudioFileMetadataForConcat] = {
     "codec_name": "mp3",
     "codec_type": "audio",
     "sample_rate": "24000",
@@ -86,7 +87,7 @@ def get_output_file_path(output_path: Path | None, *, topic: str) -> Path:
     return output_path
 
 
-def merge_speech_paths(speech_tasks: list[SpeechTask], *, topic: str, output_path: Path) -> None:
+def merge_speech_paths(speech_tasks: Sequence[SpeechTask], *, topic: str, output_path: Path) -> None:
     """Merge the ordered list of preexisting audio file paths for the given topic to a single audio file having the given output file path."""
 
     paths: list[Path] = []
