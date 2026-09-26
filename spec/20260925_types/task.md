@@ -7,7 +7,8 @@ My project already uses Python's type annotations, but perhaps they're not as ti
 # Task
 
 1. Wherever sensible, tighten the Python type annotations in the `src/podgenai` codebase while keeping the annotations somewhat comprehensible. Avoid changing any runtime logic of the code.
-2. Ensure that `ty check` continues to pass as it does now.
+2. You are free to add any necessary type definitions into `src/podgenai/types.py` or elsewhere, but only so long as they don't over-tighten the type annotations. Take special care not to over-constrain the functions in `src/podgenai/util/openai.py`.
+3. Ensure that `ty check` continues to pass as it does now.
 
 # Remarks
 
