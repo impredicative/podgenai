@@ -4,7 +4,7 @@ import math
 import re
 from collections.abc import Callable
 from pathlib import Path
-from typing import NotRequired, TypedDict
+from typing import NotRequired, TypedDict, cast
 from xml.sax.saxutils import quoteattr
 
 import podgenai.exceptions
@@ -165,7 +165,7 @@ def is_unmarked_subtopic_duologue_valid(duologue: str, numbered_name: str, bound
 
     expected_keys = ("speaker", "speech", "tone")
     expected_speakers = (boundary_voice_sex, non_boundary_voice_sex)
-    prev_speaker: JSONValue = None
+    prev_speaker: VoiceSex | None = None
     for line_number, line in enumerate(lines, start=1):
         try:
             obj: JSONValue = json.loads(line)
@@ -190,7 +190,7 @@ def is_unmarked_subtopic_duologue_valid(duologue: str, numbered_name: str, bound
             return f"Subtopic duologue {numbered_name!r} is invalid because the last speaker must be {boundary_voice_sex!r}, but was {speaker!r}."
         if speaker == prev_speaker:
             print_warning(f"Subtopic duologue {numbered_name!r} has line {line_number} with the same speaker as the previous line: {speaker!r}.")
-        prev_speaker = speaker
+        prev_speaker = cast(VoiceSex, speaker)
 
         speech = obj["speech"]
         if not isinstance(speech, str) or not speech.strip():
