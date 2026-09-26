@@ -1,9 +1,10 @@
 import concurrent.futures
+from collections.abc import Callable, Iterable, Sequence
 
 import pathvalidate
 
 from podgenai.config import MAX_CONCURRENT_WORKERS, MAX_TEXT_LENGTH_IN_FILENAME, PAUSE_BETWEEN_PARTS, PAUSE_BETWEEN_SUBTOPICS, TTS_MONOLOGUE_TONE
-from podgenai.types import SpeechTask, SubtopicDuologue, SubtopicText
+from podgenai.types import SpeechTask, SubtopicDuologue, SubtopicText, VoiceSex
 from podgenai.util.binascii import hasher
 from podgenai.util.openai import MODELS, TTS_VOICE_MAP, ensure_speech_audio
 from podgenai.util.semantic_text_splitter import semantic_split_by_length, semantic_split_by_tokens
@@ -34,7 +35,7 @@ def get_duologue_pause(*, line_num: int, num_lines: int, part_num: int, num_part
     return None
 
 
-def get_monologue_speech_tasks(*, subtopics_monologue_transcripts: list[SubtopicText], topic: str, voice_key: str) -> list[SpeechTask]:
+def get_monologue_speech_tasks(*, subtopics_monologue_transcripts: Sequence[SubtopicText], topic: str, voice_key: str) -> list[SpeechTask]:
     """Return the list of speech tasks for the monologue."""
     work_path = get_topic_work_path(topic)
     voice = TTS_VOICE_MAP[voice_key]
@@ -42,7 +43,7 @@ def get_monologue_speech_tasks(*, subtopics_monologue_transcripts: list[Subtopic
     assert subtopics_monologue_transcripts
     num_subtopics = len(subtopics_monologue_transcripts)
 
-    speech_tasks = []
+    speech_tasks: list[SpeechTask] = []
     for subtopic_num, subtopic in enumerate(subtopics_monologue_transcripts, start=1):
         subtopic_title = subtopic["name"]
         subtopic_monologue = subtopic["text"]
@@ -102,15 +103,15 @@ def get_monologue_speech_tasks(*, subtopics_monologue_transcripts: list[Subtopic
     return speech_tasks
 
 
-def get_duologue_speech_tasks(*, subtopics_duologues: list[SubtopicDuologue], topic: str, male_voice_key: str, female_voice_key: str) -> list[SpeechTask]:
+def get_duologue_speech_tasks(*, subtopics_duologues: Sequence[SubtopicDuologue], topic: str, male_voice_key: str, female_voice_key: str) -> list[SpeechTask]:
     """Return the list of speech tasks for the duologue."""
     work_path = get_topic_work_path(topic)
     tts_model = MODELS["tts"]
-    voices = {"male": TTS_VOICE_MAP[male_voice_key], "female": TTS_VOICE_MAP[female_voice_key]}
+    voices: dict[VoiceSex, str] = {"male": TTS_VOICE_MAP[male_voice_key], "female": TTS_VOICE_MAP[female_voice_key]}
     assert subtopics_duologues
     num_subtopics = len(subtopics_duologues)
 
-    speech_tasks = []
+    speech_tasks: list[SpeechTask] = []
     for subtopic_num, subtopic_duologue in enumerate(subtopics_duologues, start=1):
         subtopic_title = subtopic_duologue["subtopic"]
         subtopic_path = f"{subtopic_title[:MAX_TEXT_LENGTH_IN_FILENAME]} (duologue) ({tts_model})"
@@ -172,7 +173,7 @@ def get_duologue_speech_tasks(*, subtopics_duologues: list[SubtopicDuologue], to
     return speech_tasks
 
 
-def ensure_speech_audio_files(speech_tasks: list[SpeechTask]) -> None:
+def ensure_speech_audio_files(speech_tasks: Iterable[SpeechTask]) -> None:
     """Ensure the speech audio files for the given speech tasks.
 
     If a given file path already exists, it is not rewritten. If it does not exist, it is written.
@@ -183,5 +184,5 @@ def ensure_speech_audio_files(speech_tasks: list[SpeechTask]) -> None:
     else:
         assert MAX_CONCURRENT_WORKERS > 1
         with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_CONCURRENT_WORKERS) as executor:
-            fn_ensure_speech_audio = lambda speech_task: ensure_speech_audio(text=speech_task["text"], path=speech_task["path"], voice=speech_task["voice"], tone=speech_task["tone"])
+            fn_ensure_speech_audio: Callable[[SpeechTask], None] = lambda speech_task: ensure_speech_audio(text=speech_task["text"], path=speech_task["path"], voice=speech_task["voice"], tone=speech_task["tone"])
             list(executor.map(fn_ensure_speech_audio, speech_tasks))

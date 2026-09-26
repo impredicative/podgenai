@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import difflib
 import re
+from typing import Final
 
 # Paragraph separator: one or more blank lines (possibly with spaces/tabs).
 # The capturing group ensures separators are retained by re.split.
-_PARAGRAPH_SEP_RE = re.compile(r"(\n\s*\n+)")
+_PARAGRAPH_SEP_RE: Final[re.Pattern[str]] = re.compile(r"(\n\s*\n+)")
 
 
 def _tokenize_with_whitespace(text: str) -> list[str]:

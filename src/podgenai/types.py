@@ -1,6 +1,10 @@
 from pathlib import Path
 from typing import Literal, NotRequired, Required, TypedDict
 
+type VoiceSex = Literal["male", "female"]
+type SpeakerCount = Literal[1, 2]
+type JSONValue = str | int | float | bool | None | list[JSONValue] | dict[str, JSONValue]
+
 
 class KeyValueOverride(TypedDict):
     key: Required[str]
@@ -37,7 +41,7 @@ class TokenMetric(TypedDict):
 
 
 class SpeechLine(TypedDict):
-    speaker: Required[Literal["male", "female"]]
+    speaker: Required[VoiceSex]
     speech: Required[str]
     tone: Required[str | None]
 
@@ -60,6 +64,9 @@ class SubtopicDuologue(TypedDict):
 class SubtopicText(TypedDict):
     name: Required[str]
     text: Required[str]
+
+
+type SubtopicMonologueTriple = tuple[SubtopicText | None, SubtopicText, SubtopicText | None]
 
 
 class DeduplicatedSubtopicText(SubtopicText):

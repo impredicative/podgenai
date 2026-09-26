@@ -8,6 +8,7 @@ from podgenai.content.topic import ensure_topic_is_valid
 from podgenai.content.tts import ensure_speech_audio_files, get_duologue_speech_tasks, get_monologue_speech_tasks
 from podgenai.content.voice import get_duologue_voice_keys, get_monologue_voice_key, get_voice_sex_from_voice_key
 from podgenai.exceptions import InputError
+from podgenai.types import SpeakerCount, VoiceSex
 from podgenai.util.contextvars import collect_records
 from podgenai.util.input import get_confirmation
 from podgenai.util.openai import MODELS, TOKEN_METRICS, TTS_VOICE_MAP, ensure_openai_key
@@ -15,7 +16,7 @@ from podgenai.util.tiktoken import get_token_count
 from podgenai.work import get_topic_work_path
 
 
-def generate_media(topic: str, *, output_path: Path | None = None, document: str | None = None, max_sections: int | None = None, speakers: int = 2, markers: bool = True, confirm: bool = False) -> Path:
+def generate_media(topic: str, *, output_path: Path | None = None, document: str | None = None, max_sections: int | None = None, speakers: SpeakerCount = 2, markers: bool = True, confirm: bool = False) -> Path:
     """Return the output path after generating and writing an audiobook podcast to file for the given topic.
 
     Params:
@@ -69,7 +70,7 @@ def generate_media(topic: str, *, output_path: Path | None = None, document: str
                 marker_voice_sex = get_voice_sex_from_voice_key(marker_voice_key)
                 boundary_voice_sex = get_voice_sex_from_voice_key(boundary_voice_key)
                 non_boundary_voice_sex = get_voice_sex_from_voice_key(non_boundary_voice_key)
-                voice_keys_by_sex = {boundary_voice_sex: boundary_voice_key, non_boundary_voice_sex: non_boundary_voice_key}
+                voice_keys_by_sex: dict[VoiceSex, str] = {boundary_voice_sex: boundary_voice_key, non_boundary_voice_sex: non_boundary_voice_key}
                 male_voice_key = voice_keys_by_sex["male"]
                 female_voice_key = voice_keys_by_sex["female"]
             case _:

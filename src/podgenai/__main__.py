@@ -8,6 +8,7 @@ import podgenai.exceptions
 from podgenai.config import NUM_SECTIONS_MAX, NUM_SECTIONS_MIN
 from podgenai.content.topic import ensure_topic_is_valid, get_topic
 from podgenai.podgenai import generate_media
+from podgenai.types import SpeakerCount
 from podgenai.util.openai import ensure_openai_key
 from podgenai.util.sys import print_error
 
@@ -38,7 +39,7 @@ from podgenai.util.sys import print_error
     default=True,
     help="Confirm before full-text and speech generation. If `--confirm`, a confirmation is interactively sought as each step of the workflow progresses, and this is the default. If `--no-confirm`, the full-text and speech are generated without confirmations.",
 )
-def main(topic: str | None, path: Path | None, document: Path | None, max_sections: int | None, speakers: int, markers: bool, confirm: bool) -> None:
+def main(topic: str | None, path: Path | None, document: Path | None, max_sections: int | None, speakers: SpeakerCount, markers: bool, confirm: bool) -> None:
     """Generate and write an audiobook podcast mp3 file for the given topic to the given output file path."""
     try:
         ensure_openai_key()

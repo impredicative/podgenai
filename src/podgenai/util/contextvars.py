@@ -5,6 +5,7 @@ from concurrent.futures import Future, ThreadPoolExecutor
 from contextlib import contextmanager
 from contextvars import ContextVar, copy_context
 from threading import Lock
+from typing import override
 
 import pandas as pd
 
@@ -73,6 +74,7 @@ class ContextThreadPoolExecutor(ThreadPoolExecutor):
     collection scope so every submission captures that scope's context.
     """
 
+    @override
     def submit[**P, R](self, fn: Callable[P, R], /, *args: P.args, **kwargs: P.kwargs) -> Future[R]:
         """Capture the current context separately for this submission."""
         context = copy_context()
