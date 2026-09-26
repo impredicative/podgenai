@@ -2,13 +2,15 @@ import io
 import json
 import math
 import re
-from typing import Any
+from collections.abc import Callable
+from pathlib import Path
+from typing import NotRequired, TypedDict
 from xml.sax.saxutils import quoteattr
 
 import podgenai.exceptions
 from podgenai.config import MAX_CONCURRENT_WORKERS, MAX_TEXT_LENGTH_IN_FILENAME, NUM_SECTIONS_MAX, NUM_SECTIONS_MIN, PROMPTS, TTS_DISCLAIMER_W_DOC, TTS_DISCLAIMER_WO_DOC
 from podgenai.content.document import get_document_tag
-from podgenai.types import DeduplicatedSubtopicText, SpeechLine, SubtopicDuologue, SubtopicText
+from podgenai.types import DeduplicatedSubtopicText, JSONValue, SpeechLine, SubtopicDuologue, SubtopicMonologueTriple, SubtopicText, VoiceSex
 from podgenai.util.contextvars import ContextThreadPoolExecutor
 
 # from podgenai.util.difflib import diff_texts_inline
@@ -19,6 +21,14 @@ from podgenai.work import get_topic_work_path
 _NUMBERED_SUBTOPIC_PATTERN = re.compile(r"^\d+\. \S.*$")  # Matches a numbered subtopic, e.g. "12. Foo bar".
 
 
+class _CachedContentKwargs(TypedDict):
+    local_cache_key_prefix: str
+    cache_path: Path
+    remote_cache_key: str
+    temperature: float
+    verbosity: NotRequired[str]
+
+
 def is_subtopics_list_valid(subtopics: list[str], max_sections: int | None) -> str | None:
     """Return an error message if the subtopics are structurally invalid, otherwise None."""
     if not subtopics:
@@ -27,7 +37,7 @@ def is_subtopics_list_valid(subtopics: list[str], max_sections: int | None) -> s
     if (max_sections is not None) and (len(subtopics) > max_sections):
         return f"Up to {max_sections} subtopics are allowed, but {len(subtopics)} exist."
 
-    seen = set()
+    seen: set[str] = set()
     for num, subtopic in enumerate(subtopics, start=1):
         if subtopic != subtopic.strip():
             return f"Subtopic {num} is invalid because it has leading or trailing whitespace: {subtopic!r}"
@@ -138,7 +148,7 @@ def is_subtopic_monologue_valid(monologue: str, numbered_name: str) -> str | Non
     return None
 
 
-def is_unmarked_subtopic_duologue_valid(duologue: str, numbered_name: str, boundary_voice_sex: str, non_boundary_voice_sex: str) -> str | None:
+def is_unmarked_subtopic_duologue_valid(duologue: str, numbered_name: str, boundary_voice_sex: VoiceSex, non_boundary_voice_sex: VoiceSex) -> str | None:
     """Return an error message if the unmarked subtopic duologue is structurally invalid, otherwise None."""
     assert _NUMBERED_SUBTOPIC_PATTERN.match(numbered_name), numbered_name
 
@@ -155,10 +165,10 @@ def is_unmarked_subtopic_duologue_valid(duologue: str, numbered_name: str, bound
 
     expected_keys = ("speaker", "speech", "tone")
     expected_speakers = (boundary_voice_sex, non_boundary_voice_sex)
-    prev_speaker = None
+    prev_speaker: JSONValue = None
     for line_number, line in enumerate(lines, start=1):
         try:
-            obj = json.loads(line)
+            obj: JSONValue = json.loads(line)
         except json.JSONDecodeError as exc:
             return f"Subtopic duologue {numbered_name!r} is invalid because line {line_number} is not valid JSON: {exc.msg} at column {exc.colno}."
 
@@ -205,7 +215,7 @@ def get_subtopic_monologue(*, topic: str, document: str | None = None, subtopics
     prompt_name = "generate_subtopic_monologue"
     prompt = PROMPTS[prompt_name].render(topic=topic, subtopics=subtopics_str, numbered_subtopic=subtopic, source=document, source_tag=document_tag)
     remote_cache_key = prompt_name if document is None else f"{prompt_name}:from_document"
-    common_kwargs: dict[str, Any] = {"local_cache_key_prefix": f"{subtopic[:MAX_TEXT_LENGTH_IN_FILENAME].rstrip()} (monologue)", "cache_path": get_topic_work_path(topic), "temperature": 0.5, "verbosity": "low", "remote_cache_key": remote_cache_key}
+    common_kwargs: _CachedContentKwargs = {"local_cache_key_prefix": f"{subtopic[:MAX_TEXT_LENGTH_IN_FILENAME].rstrip()} (monologue)", "cache_path": get_topic_work_path(topic), "temperature": 0.5, "verbosity": "low", "remote_cache_key": remote_cache_key}
 
     for num_attempt in range(1, max_attempts + 1):
         monologue = get_cached_content(prompt, read_cache=num_attempt == 1, model=model, **common_kwargs)
@@ -225,7 +235,7 @@ def get_subtopic_monologue(*, topic: str, document: str | None = None, subtopics
     return monologue
 
 
-def deduplicate_subtopic_monologue(*, topic: str, subtopics: list[str], subtopic_monologue_triple: tuple[SubtopicText | None, SubtopicText, SubtopicText | None], iteration: int, max_attempts: int = 3) -> DeduplicatedSubtopicText:
+def deduplicate_subtopic_monologue(*, topic: str, subtopics: list[str], subtopic_monologue_triple: SubtopicMonologueTriple, iteration: int, max_attempts: int = 3) -> DeduplicatedSubtopicText:
     """Return the deduplication result for the current monologue in one triple.
 
     The previous and next monologues are read-only context. The returned value
@@ -261,7 +271,7 @@ def deduplicate_subtopic_monologue(*, topic: str, subtopics: list[str], subtopic
     segments_xml_str = "\n".join(segments_xml)
 
     prompt_name = "dedup_subtopic_monologue"
-    common_kwargs: dict[str, Any] = {"local_cache_key_prefix": f"{subtopic[:MAX_TEXT_LENGTH_IN_FILENAME].rstrip()} (monologue) (dedup {iteration})", "cache_path": cache_path, "remote_cache_key": prompt_name, "temperature": 0.0}
+    common_kwargs: _CachedContentKwargs = {"local_cache_key_prefix": f"{subtopic[:MAX_TEXT_LENGTH_IN_FILENAME].rstrip()} (monologue) (dedup {iteration})", "cache_path": cache_path, "remote_cache_key": prompt_name, "temperature": 0.0}
     # Note: temperature=0.0 is specified in an attempt to minimize the iterations required for deduplication.
     prompt = PROMPTS[prompt_name].render(topic=topic, subtopics=subtopics_str, numbered_subtopic=subtopic, segments_xml=segments_xml_str)
 
@@ -321,7 +331,7 @@ def deduplicate_subtopics_monologues(*, topic: str, subtopics_monologues: list[S
 
             # No object in this snapshot is mutated. All results are collected before any are committed, which forms the phase barrier.
             phase_snapshot = [SubtopicText(name=s["name"], text=s["text"]) for s in subtopics_monologues]
-            subtopic_monologue_triples = [
+            subtopic_monologue_triples: list[SubtopicMonologueTriple] = [
                 (
                     phase_snapshot[idx - 1] if (idx > 0) else None,
                     phase_snapshot[idx],
@@ -329,7 +339,7 @@ def deduplicate_subtopics_monologues(*, topic: str, subtopics_monologues: list[S
                 )
                 for idx in current_indices
             ]
-            fn_deduplicate_subtopic_monologue = lambda triple, iteration=iteration: deduplicate_subtopic_monologue(
+            fn_deduplicate_subtopic_monologue: Callable[[SubtopicMonologueTriple], DeduplicatedSubtopicText] = lambda triple, iteration=iteration: deduplicate_subtopic_monologue(
                 topic=topic,
                 subtopics=subtopics,
                 subtopic_monologue_triple=triple,
@@ -365,7 +375,7 @@ def deduplicate_subtopics_monologues(*, topic: str, subtopics_monologues: list[S
     return subtopic_monologues
 
 
-def get_subtopic_duologue(*, topic: str, subtopics: list[str], subtopic: str, subtopic_monologue: str, boundary_voice_sex: str, non_boundary_voice_sex: str, max_attempts: int = 3) -> list[SpeechLine]:
+def get_subtopic_duologue(*, topic: str, subtopics: list[str], subtopic: str, subtopic_monologue: str, boundary_voice_sex: VoiceSex, non_boundary_voice_sex: VoiceSex, max_attempts: int = 3) -> list[SpeechLine]:
     """Return the duologue for a given subtopic within the context of the given topic and list of subtopics."""
     assert _NUMBERED_SUBTOPIC_PATTERN.match(subtopic), subtopic
     local_cache_key_prefix = f"{subtopic[:MAX_TEXT_LENGTH_IN_FILENAME].rstrip()} (duologue)"
@@ -394,7 +404,7 @@ def get_subtopic_duologue(*, topic: str, subtopics: list[str], subtopic: str, su
     return duologue_lines
 
 
-def get_subtopics_duologues(*, topic: str, subtopics_monologues: list[SubtopicText], boundary_voice_sex: str, non_boundary_voice_sex: str) -> list[SubtopicDuologue]:
+def get_subtopics_duologues(*, topic: str, subtopics_monologues: list[SubtopicText], boundary_voice_sex: VoiceSex, non_boundary_voice_sex: VoiceSex) -> list[SubtopicDuologue]:
     """Return the ordered subtopic duologue for each subtopic within the context of the given topic, ordered list of subtopics, and subtopic monologue."""
     assert subtopics_monologues
     if MAX_CONCURRENT_WORKERS == 1:
@@ -404,7 +414,7 @@ def get_subtopics_duologues(*, topic: str, subtopics_monologues: list[SubtopicTe
     else:
         assert MAX_CONCURRENT_WORKERS > 1
         with ContextThreadPoolExecutor(max_workers=MAX_CONCURRENT_WORKERS) as executor:
-            fn_get_subtopic_duologue = lambda s: get_subtopic_duologue(topic=topic, subtopics=[s["name"] for s in subtopics_monologues], subtopic=s["name"], subtopic_monologue=s["text"], boundary_voice_sex=boundary_voice_sex, non_boundary_voice_sex=non_boundary_voice_sex)
+            fn_get_subtopic_duologue: Callable[[SubtopicText], list[SpeechLine]] = lambda s: get_subtopic_duologue(topic=topic, subtopics=[s["name"] for s in subtopics_monologues], subtopic=s["name"], subtopic_monologue=s["text"], boundary_voice_sex=boundary_voice_sex, non_boundary_voice_sex=non_boundary_voice_sex)
             subtopic_duologues = [SubtopicDuologue(subtopic=s["name"], duologue=duologue) for s, duologue in zip(subtopics_monologues, executor.map(fn_get_subtopic_duologue, subtopics_monologues))]
     return subtopic_duologues
 
@@ -417,12 +427,12 @@ def get_subtopics_monologues(*, topic: str, document: str | None = None, subtopi
     else:
         assert MAX_CONCURRENT_WORKERS > 1
         with ContextThreadPoolExecutor(max_workers=MAX_CONCURRENT_WORKERS) as executor:
-            fn_get_subtopic_monologue = lambda subtopic: get_subtopic_monologue(topic=topic, document=document, subtopics=subtopics, subtopic=subtopic)
+            fn_get_subtopic_monologue: Callable[[str], str] = lambda subtopic: get_subtopic_monologue(topic=topic, document=document, subtopics=subtopics, subtopic=subtopic)
             subtopic_monologues = [SubtopicText(name=s, text=monologue) for s, monologue in zip(subtopics, executor.map(fn_get_subtopic_monologue, subtopics))]
     return subtopic_monologues
 
 
-def mark_subtopics_duologues(*, topic: str, is_from_document: bool, subtopics_duologues: list[SubtopicDuologue], markers: bool | None = True, marker_voice_sex: str) -> None:
+def mark_subtopics_duologues(*, topic: str, is_from_document: bool, subtopics_duologues: list[SubtopicDuologue], markers: bool = True, marker_voice_sex: VoiceSex) -> None:
     """Mark the subtopic duologue for each subtopic within the context of the given topic and ordered list of subtopics.
 
     If markers are enabled, markers are placed at the start of each subtopic section. The disclaimer is placed at the beginning of the first section.
@@ -431,10 +441,10 @@ def mark_subtopics_duologues(*, topic: str, is_from_document: bool, subtopics_du
     assert subtopics_duologues
     assert marker_voice_sex in ("male", "female")
 
-    mark = (lambda marker: marker) if markers else (lambda marker: "")
-    demark = (lambda marker: "") if markers else (lambda marker: marker)
+    mark: Callable[[str], str] = (lambda marker: marker) if markers else (lambda marker: "")
+    demark: Callable[[str], str] = (lambda marker: "") if markers else (lambda marker: marker)
 
-    process_subtopic_name = (lambda subtopic_name: subtopic_name.replace(".", ":", 1)) if markers else (lambda subtopic_name: subtopic_name.partition(". ")[2])
+    process_subtopic_name: Callable[[str], str] = (lambda subtopic_name: subtopic_name.replace(".", ":", 1)) if markers else (lambda subtopic_name: subtopic_name.partition(". ")[2])
     # Note: The section number is removed altogether from the subtopic name if markers are disabled. This is because the number risks not being correctly spoken in an intended foreign language, especially so for non-Latin languages.
 
     for subtopic_duologue in subtopics_duologues:
@@ -455,7 +465,7 @@ def get_subtopics_duologues_transcripts(*, subtopics_duologues: list[SubtopicDuo
     ]
 
 
-def get_subtopics_monologue_transcripts(*, topic: str, is_from_document: bool, subtopic_monologues: list[SubtopicText], markers: bool | None = True) -> list[SubtopicText]:
+def get_subtopics_monologue_transcripts(*, topic: str, is_from_document: bool, subtopic_monologues: list[SubtopicText], markers: bool = True) -> list[SubtopicText]:
     """Return the ordered monologue transcript for all subtopics within the context of the given topic and ordered list of subtopics.
 
     If markers are enabled, markers are placed at the start of each subtopic section. The disclaimer is placed at the beginning of the first section.
@@ -463,10 +473,10 @@ def get_subtopics_monologue_transcripts(*, topic: str, is_from_document: bool, s
     """
     assert subtopic_monologues
 
-    mark = (lambda marker: marker) if markers else (lambda marker: "")
-    demark = (lambda marker: "") if markers else (lambda marker: marker)
+    mark: Callable[[str], str] = (lambda marker: marker) if markers else (lambda marker: "")
+    demark: Callable[[str], str] = (lambda marker: "") if markers else (lambda marker: marker)
 
-    process_subtopic_name = (lambda subtopic_name: subtopic_name.replace(".", ":", 1)) if markers else (lambda subtopic_name: subtopic_name.partition(". ")[2])
+    process_subtopic_name: Callable[[str], str] = (lambda subtopic_name: subtopic_name.replace(".", ":", 1)) if markers else (lambda subtopic_name: subtopic_name.partition(". ")[2])
     # Note: The section number is removed altogether from the subtopic name if markers are disabled. This is because the number risks not being correctly spoken in an intended foreign language, especially so for non-Latin languages.
 
     for subtopic_monologue in subtopic_monologues:

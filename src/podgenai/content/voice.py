@@ -1,8 +1,8 @@
 import re
-from typing import Literal
 
 import podgenai.exceptions
 from podgenai.config import PROMPTS
+from podgenai.types import VoiceSex
 from podgenai.util.openai import TTS_VOICE_MAP, get_cached_content
 from podgenai.work import get_topic_work_path
 
@@ -44,7 +44,7 @@ def get_monologue_voice_key(*, topic: str, max_attempts: int = 3, allowed_voice_
     return voice
 
 
-def get_voice_sex_from_voice_key(voice_key: str) -> Literal["male", "female"]:
+def get_voice_sex_from_voice_key(voice_key: str) -> VoiceSex:
     """Return the sex of the voice for the given voice key as either "male" or "female"."""
     assert voice_key in TTS_VOICE_MAP, {"voice_key": voice_key, "voice_map": TTS_VOICE_MAP}
     voice_sex = {voice_key.endswith("-male"): "male", voice_key.endswith("-female"): "female"}[True]

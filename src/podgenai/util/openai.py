@@ -1,6 +1,7 @@
 import os
 from contextvars import ContextVar
 from pathlib import Path
+from typing import Any
 
 import openai
 import pathvalidate
@@ -65,7 +66,8 @@ def get_openai_client() -> OpenAI:
     return OpenAI()
 
 
-def get_completion(prompt: str, *, client: OpenAI | None = None, model: TextModel = MODELS["knowledge"], prompt_cache_key: str | None = None, **kwargs) -> ChatCompletion:
+# Forwarded keyword arguments intentionally remain open to SDK extensions.
+def get_completion(prompt: str, *, client: OpenAI | None = None, model: TextModel = MODELS["knowledge"], prompt_cache_key: str | None = None, **kwargs: Any) -> ChatCompletion:
     """Return the completion for the given prompt.
 
     Params:
@@ -93,7 +95,7 @@ def get_completion(prompt: str, *, client: OpenAI | None = None, model: TextMode
     return completion
 
 
-def get_content(prompt: str, *, client: OpenAI | None = None, model: TextModel = MODELS["knowledge"], remote_cache_key: str, completion: ChatCompletion | None = None, **kwargs) -> str:
+def get_content(prompt: str, *, client: OpenAI | None = None, model: TextModel = MODELS["knowledge"], remote_cache_key: str, completion: ChatCompletion | None = None, **kwargs: Any) -> str:
     """Return the content for the given prompt.
 
     Additional keyword arguments are forwarded to `get_completion`.
@@ -107,7 +109,7 @@ def get_content(prompt: str, *, client: OpenAI | None = None, model: TextModel =
     return content
 
 
-def get_cached_content(prompt: str, *, read_cache: bool = True, local_cache_key_prefix: str, cache_path: Path, remote_cache_key: str, model: TextModel = MODELS["knowledge"], verify_prompt: bool = VERIFY_PROMPT, **kwargs) -> str:
+def get_cached_content(prompt: str, *, read_cache: bool = True, local_cache_key_prefix: str, cache_path: Path, remote_cache_key: str, model: TextModel = MODELS["knowledge"], verify_prompt: bool = VERIFY_PROMPT, **kwargs: Any) -> str:
     """Return the content for the given prompt using the disk cache if available, otherwise normally.
 
     Params:
@@ -156,7 +158,7 @@ def get_cached_content(prompt: str, *, read_cache: bool = True, local_cache_key_
     return content
 
 
-def write_speech_audio(*, text: str, path: str | Path, voice: str, tone: str | None, client: OpenAI | None = None, **kwargs) -> None:
+def write_speech_audio(*, text: str, path: str | Path, voice: str, tone: str | None, client: OpenAI | None = None, **kwargs: Any) -> None:
     """Write the speech audio file for the given text to the given file path.
 
     Params:
