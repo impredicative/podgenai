@@ -24,6 +24,7 @@ For a given topic, the high-level generation approach is as follows:
 6. Speech is generated using text-to-speech (TTS), either concurrently for each subtopic in a monologue, or concurrently for each line in a duologue.
 7. The speech files are concatenated using `ffmpeg`, with appropriate pauses added between parts and subtopics, as well as between lines for a duologue.
 
+Explicit cache breakpoints are used across all LLM calls to optimize input token costs.
 
 ### Models used
 * Knowledge model (`gpt-6-sol`) is used for:
@@ -44,7 +45,6 @@ These generated mp3 files are available for download:
 |------|----------|------|-------|
 | two-speaker from model | modern-female (marin), modern-male (cedar) | Sinusitis | [Mega](https://mega.nz/file/9YdSFSJB#Gr6dB-1fe6dC0kny0ynt_Z4HbM9n6rDEZyTqdz8KR5Q), [Spotify](https://creators.spotify.com/pod/profile/podgenai/episodes/Sinusitis-e3paeog) |
 | two-speaker from [source](<sources/Prevention of myopia in a near-primate by supplemental indigo light suggests a hypothesis for the myopia boom (2026).md>) | modern-female (marin), modern-male (cedar) | Indigo light for myopia prevention | [Mega](https://mega.nz/file/pNdQkC4L#xudau_i13jilBtHdOY20f90iGDdUXUG1Bk7tBUoAoZs), [Spotify](https://creators.spotify.com/pod/profile/podgenai/episodes/Indigo-light-for-myopia-prevention-e3op95a) |
-| one-speaker from model | modern-female (marin) | New York City tourism: What's new | [Mega](https://mega.nz/file/VJ1WRbxZ#62PvDAD0ttO7JD3l9CywICB2KAMUhxLc6Jed7WkE3B4), [Spotify](https://creators.spotify.com/pod/profile/podgenai/episodes/New-York-City-tourism-Whats-new-e3njmjn) |
 
 There also is a related [podcast](https://podcasters.spotify.com/pod/podgenai) ([RSS](https://anchor.fm/s/f4868644/podcast/rss)) to which episodes may be posted over time.
 

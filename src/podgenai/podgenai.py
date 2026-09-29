@@ -132,7 +132,9 @@ def generate_media(topic: str, *, output_path: Path | None = None, document: str
         for token_column in ("input_tokens", "output_tokens"):
             avg_column = f"avg_{token_column}"
             df_token_metrics_agg[avg_column] = df_token_metrics_agg[avg_column].round().astype(df_token_metrics[token_column].dtype)
-        print(f"\nTOKENS:\n{df_token_metrics_agg.to_string()}\n")
+        cache_read_hit_rate = df_token_metrics_agg["calls_with_cache_read"].sum() / df_token_metrics_agg["calls"].sum()
+        cache_read_utilization_rate = df_token_metrics_agg["sum_cache_read_tokens"].sum() / df_token_metrics_agg["sum_input_tokens"].sum()
+        print(f"\nTOKENS: (hit={cache_read_hit_rate:.0%}, utilization={cache_read_utilization_rate:.0%})\n{df_token_metrics_agg.to_string()}\n")
 
     match speakers:
         case 1:

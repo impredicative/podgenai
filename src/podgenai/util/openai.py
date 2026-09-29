@@ -1,11 +1,13 @@
 import os
+import re
 from contextvars import ContextVar
 from pathlib import Path
 from typing import Any
 
 import openai
 import pathvalidate
-from openai.types.chat import ChatCompletion
+from openai.types.chat import ChatCompletion, ChatCompletionContentPartTextParam, ChatCompletionMessageParam
+from openai.types.chat.completion_create_params import PromptCacheOptions
 
 import podgenai.exceptions
 from podgenai.config import PACKAGE_NAME, VERIFY_PROMPT
@@ -19,6 +21,7 @@ load_dotenv()
 
 OpenAI = openai.OpenAI
 
+_CACHE_BREAK_MARKER_PATTERN = re.compile(rf"^{re.escape('<|PODGENAI_CACHE_BREAK|>')}(?:\n|\z)", flags=re.MULTILINE)  # Marker must be on a line by itself in prompt definitions.
 TOKEN_METRICS: ContextVar[RecordCollector[TokenMetric] | None] = ContextVar("token_metrics", default=None)
 
 MODELS: Models = {
@@ -79,7 +82,27 @@ def get_completion(prompt: str, *, client: OpenAI | None = None, model: TextMode
     if not client:
         client = get_openai_client()
     # exclusive_print(f"Requesting completion for prompt of length {len(prompt)}.")
-    completion = client.chat.completions.create(model=model["name"], messages=[{"role": "user", "content": prompt}], safety_identifier=PACKAGE_NAME, prompt_cache_key=prompt_cache_key, **kwargs)  #  Ref: https://platform.openai.com/docs/api-reference/chat/create
+
+    prompt_parts = [part for part in _CACHE_BREAK_MARKER_PATTERN.split(prompt)]
+    assert all(prompt_parts)
+    num_prompt_parts = len(prompt_parts)
+    assert num_prompt_parts <= 5  # A max of 4 explicit breakpoints are allowed by upstream.
+    messages: list[ChatCompletionMessageParam]
+    prompt_cache_options: PromptCacheOptions
+    if num_prompt_parts == 1:
+        messages = [{"role": "user", "content": prompt_parts[0]}]
+        prompt_cache_options = {"mode": "implicit"}
+    else:
+        content: list[ChatCompletionContentPartTextParam] = []
+        for part_num, part in enumerate(prompt_parts, start=1):
+            content_part: ChatCompletionContentPartTextParam = {"type": "text", "text": part}
+            if part_num < num_prompt_parts:
+                content_part["prompt_cache_breakpoint"] = {"mode": "explicit"}
+            content.append(content_part)
+        messages = [{"role": "user", "content": content}]
+        prompt_cache_options = {"mode": "explicit"}
+
+    completion = client.chat.completions.create(model=model["name"], messages=messages, safety_identifier=PACKAGE_NAME, prompt_cache_key=prompt_cache_key, prompt_cache_options=prompt_cache_options, **kwargs)  #  Ref: https://platform.openai.com/docs/api-reference/chat/create
 
     usage = completion.usage
     details = usage.prompt_tokens_details if usage else None
