@@ -8,4 +8,4 @@ Release steps as done locally:
 6. Run `poe changes` to list the commit messages since the last tagged release.
 7. Tag the release in GitHub with the new version, also supplying release notes.
 8. Run `git pull`, thereby obtaining the created tag.
-9. Run `git tag --sort=version:refname | tail`, ensuring that the created tag is listed.
+9. Run `poe tags` to list git tags in reverse chronological order, ensuring that the created tag is listed.

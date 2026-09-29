@@ -71,6 +71,7 @@ publish = "uv publish"
 release = ["check", "build", "publish"]
 release-dry = ["check", "build", "publish-dry"]
 changes = { shell = "git log \"$(git describe --tags --abbrev=0)..HEAD\" --format='* %s'", help = "List commit messages since the latest git tag." }
+tags = "git tag --sort=-version:refname"
 
 delete-remote-branch = { cmd = "git push origin --delete -- ${branch}", args = [{ name = "branch", positional = true, required = true }], help = "Delete a named remote git branch from origin." }
 
