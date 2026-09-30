@@ -79,6 +79,7 @@ def _format_token_metrics_table(table: _TokenMetricsTable) -> str:
     widths: list[int] = [max(len(row[index]) for row in rows) for index in range(len(headers))]
     return "\n".join("  ".join(value.ljust(widths[index]) if index == 0 else value.rjust(widths[index]) for index, value in enumerate(row)) for row in rows)
 
+
 """
 Sample output:
 
