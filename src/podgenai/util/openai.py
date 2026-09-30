@@ -2,12 +2,14 @@ import os
 import re
 from contextvars import ContextVar
 from pathlib import Path
+from time import perf_counter_ns
 from typing import Any
 
 import openai
 import pathvalidate
 from openai.types.chat import ChatCompletion, ChatCompletionContentPartTextParam, ChatCompletionMessageParam
 from openai.types.chat.completion_create_params import PromptCacheOptions
+from openai.types.completion_usage import CompletionTokensDetails, PromptTokensDetails
 
 import podgenai.exceptions
 from podgenai.config import PACKAGE_NAME, VERIFY_PROMPT
@@ -15,6 +17,7 @@ from podgenai.types import KeyValueOverride, Models, TextModel, TokenMetric
 from podgenai.util.binascii import hasher
 from podgenai.util.contextvars import RecordCollector, record
 from podgenai.util.dotenv import load_dotenv
+from podgenai.util.sys import print_warning
 from podgenai.util.threading import exclusive_print, exclusive_prompt
 
 load_dotenv()
@@ -30,7 +33,7 @@ MODELS: Models = {
         TextModel(name="gpt-5.6-sol", context_window=1_050_000, max_output=128_000, extra_kwargs={"max_completion_tokens": 128_000, "reasoning_effort": "none"}),  # Produces large list of subtopics.
         TextModel(name="gpt-6-astra", context_window=1_050_000, max_output=128_000, extra_kwargs={"max_completion_tokens": 128_000, "reasoning_effort": "low"}, unsupported_kwargs={"temperature"}, overridden_kwargs=[KeyValueOverride(key="reasoning_effort", value="none", override="low")]),  # Too expensive to use.
         TextModel(name="gpt-6-sol", context_window=1_050_000, max_output=128_000, extra_kwargs={"max_completion_tokens": 128_000, "reasoning_effort": "none"}),  # Produces small list of subtopics.
-        TextModel(name="gpt-6.1-sol", context_window=1_050_000, max_output=128_000, extra_kwargs={"max_completion_tokens": 128_000, "reasoning_effort": "low"}, unsupported_kwargs={"temperature"}, overridden_kwargs=[KeyValueOverride(key="reasoning_effort", value="none", override="low")]),  # Produces small list of subtopics.
+        TextModel(name="gpt-6.1-sol", context_window=1_050_000, max_output=128_000, extra_kwargs={"max_completion_tokens": 128_000, "reasoning_effort": "low"}, unsupported_kwargs={"temperature"}, overridden_kwargs=[KeyValueOverride(key="reasoning_effort", value="none", override="low")]),
     ][-1],  # Ref: https://platform.openai.com/docs/models
     "text": [
         TextModel(name="gpt-5.6-terra", context_window=1_050_000, max_output=128_000, extra_kwargs={"max_completion_tokens": 128_000, "reasoning_effort": "none"}),
@@ -76,6 +79,9 @@ def get_openai_client() -> OpenAI:
 def get_completion(prompt: str, *, client: OpenAI | None = None, model: TextModel = MODELS["knowledge"], prompt_cache_key: str | None = None, **kwargs: Any) -> ChatCompletion:
     """Return the completion for the given prompt.
 
+    Warn if there are no choices, or any choice has a finish reason other than
+    "stop", a refusal, or missing/blank text. This helper expects text responses.
+
     Params:
     * `prompt_cache_key`: Friendly cache identifying name of request, used for remote caching.
 
@@ -104,19 +110,37 @@ def get_completion(prompt: str, *, client: OpenAI | None = None, model: TextMode
         messages = [{"role": "user", "content": content}]
         prompt_cache_options = {"mode": "explicit"}
 
+    started_at_ns: int = perf_counter_ns()
     completion = client.chat.completions.create(model=model["name"], messages=messages, safety_identifier=PACKAGE_NAME, prompt_cache_key=prompt_cache_key, prompt_cache_options=prompt_cache_options, **kwargs)  #  Ref: https://platform.openai.com/docs/api-reference/chat/create
+    duration_ds: int = round((perf_counter_ns() - started_at_ns) / 100_000_000)
 
     usage = completion.usage
-    details = usage.prompt_tokens_details if usage else None
+    prompt_details: PromptTokensDetails | None = usage.prompt_tokens_details if usage else None
+    completion_details: CompletionTokensDetails | None = usage.completion_tokens_details if usage else None
     metric: TokenMetric = {
         "prompt_cache_key": prompt_cache_key,
+        "duration_ds": duration_ds,
         "input_tokens": usage.prompt_tokens if usage else None,
-        "cache_read_tokens": details.cached_tokens if details else None,
-        "cache_write_tokens": details.cache_write_tokens if details else None,
-        "output_tokens": usage.completion_tokens if usage else None,
+        "cache_read_tokens": prompt_details.cached_tokens if prompt_details else None,
+        "cache_write_tokens": prompt_details.cache_write_tokens if prompt_details else None,
+        "output_tokens": usage.completion_tokens if usage else None,  # Includes reasoning tokens.
+        "reasoning_tokens": completion_details.reasoning_tokens if completion_details else None,
     }
     record(TOKEN_METRICS, metric)
-    # exclusive_print(f"Token metrics: key={metric['prompt_cache_key']!r} input={metric['input_tokens']} cache_read={metric['cache_read_tokens']} cache_write={metric['cache_write_tokens']} output={metric['output_tokens']}")
+    # exclusive_print(f"Token metrics: key={metric['prompt_cache_key']!r} duration={metric['duration_ds']}ds input={metric['input_tokens']} cache_read={metric['cache_read_tokens']} cache_write={metric['cache_write_tokens']} output={metric['output_tokens']} reasoning={metric['reasoning_tokens']}")
+
+    warning_reasons: list[str] = []
+    if not completion.choices:
+        warning_reasons.append("no choices returned")
+    for choice in completion.choices:
+        if choice.finish_reason != "stop":
+            warning_reasons.append(f"choice {choice.index} has abnormal finish reason {choice.finish_reason!r}")
+        if choice.message.refusal:
+            warning_reasons.append(f"choice {choice.index} was refused")
+        if not (choice.message.content or "").strip():
+            warning_reasons.append(f"choice {choice.index} has missing or blank text content")
+    if warning_reasons:
+        print_warning(f"Abnormal completion was received: key={prompt_cache_key!r} model={completion.model!r} id={completion.id!r} reasons: {'; '.join(warning_reasons)}")
 
     return completion
 

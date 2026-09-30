@@ -28,22 +28,33 @@ class Models(TypedDict):
 
 
 class TokenMetric(TypedDict):
-    """Token usage for one model request.
+    """Token usage and duration for one successful model request.
 
-    Missing token counts are represented by None.
+    Missing token counts are represented by None. Reasoning tokens are a subset
+    of output tokens and must not be added to them when calculating totals.
+
+    Duration is measured locally around the SDK call, including network time,
+    server processing, and any SDK retries and retry delays.
+    It is rounded to integer deciseconds (ds), with ties rounded to the nearest
+    even integer.
     """
 
     prompt_cache_key: Required[str | None]
+    duration_ds: Required[int]
     input_tokens: Required[int | None]
     cache_read_tokens: Required[int | None]
     cache_write_tokens: Required[int | None]
     output_tokens: Required[int | None]
+    reasoning_tokens: Required[int | None]
 
 
 class TokenMetricsSummaryExtras(TypedDict):
     """Overall cache rates accompanying the token metrics table.
 
-    Rates with zero denominators are NaN.
+    Hit rate is the fraction of calls with positive cache-read tokens among calls
+    with available cache-read counts. Utilization is the ratio of summed
+    cache-read tokens to summed input tokens from calls where both counts are
+    available. Reported zeros are included. Rates with zero denominators are NaN.
     """
 
     cache_read_hit_rate: Required[float]

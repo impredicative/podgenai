@@ -85,7 +85,7 @@ def list_subtopics(topic: str, document: str | None = None, max_sections: int | 
     none_subtopics = ("none", "none.")
     invalid_subtopics = ("", *none_subtopics)
     rejection_error_prefix = "RequestError: "  # Defined in prompt.
-    reasoning_effort = ["none", "low"][0]  # Note: reasoning_effort=none is demonstrably sufficient at least when not having a document.
+    reasoning_effort = ["medium", "medium"][0]  # Previously: ("none", "low")[0]
     local_cache_key_prefix = f"0. {prompt_name}"
     remote_cache_key = prompt_name if document is None else f"{prompt_name}:from_document"
 

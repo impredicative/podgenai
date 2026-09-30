@@ -33,9 +33,9 @@ For your information, in a subsequent step, I will ask you to generate the corre
 
 As a special user request, limit the number of points to a maximum of {{ max_sections }}. Having said that, avoid writing each subtopic as a list in itself via an overuse of commas.{% endif %}
 
+<|PODGENAI_CACHE_BREAK|>
 The topic for the podcast is:
 
-<|PODGENAI_CACHE_BREAK|>
     {{ topic }}{% if variant.uses_source %}
 
 The remainder of the text is the source document, enclosed within the `<{{ source_tag }}>` and `</{{ source_tag }}>` tags:
