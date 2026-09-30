@@ -27,12 +27,12 @@ For a given topic, the high-level generation approach is as follows:
 Explicit cache breakpoints are used across all LLM calls to optimize input token costs.
 
 ### Models used
-* Knowledge model (`gpt-6-sol`) is used for:
+* Knowledge model (`gpt-6.1-sol`) is used for:
     - listing subtopics
     - voice selection
     - monologue text generation if the episode is to be created from the model's internal knowledge
     - duologue text generation
-* Text model (`gpt-6-sol`) is used for:
+* Text model (`gpt-6.1-sol`) is used for:
     - monologue text generation if the episode is to be created from a given source document
     - monologue text deduplication
 * Text-to-speech model (`gpt-4o-mini-tts-2025-12-15`) is used for:

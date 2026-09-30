@@ -40,6 +40,16 @@ class TokenMetric(TypedDict):
     output_tokens: Required[int | None]
 
 
+class TokenMetricsSummaryExtras(TypedDict):
+    """Overall cache rates accompanying the token metrics table.
+
+    Rates with zero denominators are NaN.
+    """
+
+    cache_read_hit_rate: Required[float]
+    cache_read_utilization_rate: Required[float]
+
+
 class SpeechLine(TypedDict):
     speaker: Required[VoiceSex]
     speech: Required[str]

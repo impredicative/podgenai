@@ -1,3 +1,4 @@
+- Ensure that new code is type annotated.
 - There are no tests. None are required. Do not implement any tests.
 - Do not run the code. The user will functionally test it.
 - Before and after completion of code edits, run `poe check` to ensure that no new errors have been introduced.

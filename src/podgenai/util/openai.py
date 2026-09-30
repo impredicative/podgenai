@@ -30,10 +30,12 @@ MODELS: Models = {
         TextModel(name="gpt-5.6-sol", context_window=1_050_000, max_output=128_000, extra_kwargs={"max_completion_tokens": 128_000, "reasoning_effort": "none"}),  # Produces large list of subtopics.
         TextModel(name="gpt-6-astra", context_window=1_050_000, max_output=128_000, extra_kwargs={"max_completion_tokens": 128_000, "reasoning_effort": "low"}, unsupported_kwargs={"temperature"}, overridden_kwargs=[KeyValueOverride(key="reasoning_effort", value="none", override="low")]),  # Too expensive to use.
         TextModel(name="gpt-6-sol", context_window=1_050_000, max_output=128_000, extra_kwargs={"max_completion_tokens": 128_000, "reasoning_effort": "none"}),  # Produces small list of subtopics.
+        TextModel(name="gpt-6.1-sol", context_window=1_050_000, max_output=128_000, extra_kwargs={"max_completion_tokens": 128_000, "reasoning_effort": "low"}, unsupported_kwargs={"temperature"}, overridden_kwargs=[KeyValueOverride(key="reasoning_effort", value="none", override="low")]),  # Produces small list of subtopics.
     ][-1],  # Ref: https://platform.openai.com/docs/models
     "text": [
         TextModel(name="gpt-5.6-terra", context_window=1_050_000, max_output=128_000, extra_kwargs={"max_completion_tokens": 128_000, "reasoning_effort": "none"}),
         TextModel(name="gpt-6-sol", context_window=1_050_000, max_output=128_000, extra_kwargs={"max_completion_tokens": 128_000, "reasoning_effort": "none"}),
+        TextModel(name="gpt-6.1-sol", context_window=1_050_000, max_output=128_000, extra_kwargs={"max_completion_tokens": 128_000, "reasoning_effort": "low"}, unsupported_kwargs={"temperature"}, overridden_kwargs=[KeyValueOverride(key="reasoning_effort", value="none", override="low")]),
     ][-1],  # Ref: https://platform.openai.com/docs/models
     "tts": [  # Demo: https://platform.openai.com/audio/tts
         "tts-1",  # Note: tts-1-hd is twice as expensive, and was observed to have a more limited concurrent usage quota resulting in openai.RateLimitError.

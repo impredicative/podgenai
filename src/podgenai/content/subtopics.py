@@ -408,9 +408,7 @@ def get_subtopics_duologues(*, topic: str, subtopics_monologues: Sequence[Subtop
     """Return the ordered subtopic duologue for each subtopic within the context of the given topic, ordered list of subtopics, and subtopic monologue."""
     assert subtopics_monologues
     if MAX_CONCURRENT_WORKERS == 1:
-        subtopic_duologues = [
-            SubtopicDuologue(subtopic=s["name"], duologue=get_subtopic_duologue(topic=topic, subtopics=[s["name"] for s in subtopics_monologues], subtopic=s["name"], subtopic_monologue=s["text"], boundary_voice_sex=boundary_voice_sex, non_boundary_voice_sex=non_boundary_voice_sex)) for s in subtopics_monologues
-        ]
+        subtopic_duologues = [SubtopicDuologue(subtopic=s["name"], duologue=get_subtopic_duologue(topic=topic, subtopics=[s["name"] for s in subtopics_monologues], subtopic=s["name"], subtopic_monologue=s["text"], boundary_voice_sex=boundary_voice_sex, non_boundary_voice_sex=non_boundary_voice_sex)) for s in subtopics_monologues]
     else:
         assert MAX_CONCURRENT_WORKERS > 1
         with ContextThreadPoolExecutor(max_workers=MAX_CONCURRENT_WORKERS) as executor:
@@ -460,9 +458,7 @@ def mark_subtopics_duologues(*, topic: str, is_from_document: bool, subtopics_du
 def get_subtopics_duologues_transcripts(*, subtopics_duologues: Sequence[SubtopicDuologue]) -> list[SubtopicText]:
     """Return the ordered subtopic duologue transcript for each subtopic within the context of the given topic and ordered list of subtopics."""
     assert subtopics_duologues
-    return [
-        SubtopicText(name=subtopic_duologue["subtopic"], text="\n".join(f"#S{subtopic_num}L{line_num}: [{line['speaker']}] {line['speech']} (tone: {line.get('tone')})" for line_num, line in enumerate(subtopic_duologue["duologue"], start=0))) for subtopic_num, subtopic_duologue in enumerate(subtopics_duologues, start=1)
-    ]
+    return [SubtopicText(name=subtopic_duologue["subtopic"], text="\n".join(f"#S{subtopic_num}L{line_num}: [{line['speaker']}] {line['speech']} (tone: {line.get('tone')})" for line_num, line in enumerate(subtopic_duologue["duologue"], start=0))) for subtopic_num, subtopic_duologue in enumerate(subtopics_duologues, start=1)]
 
 
 def get_subtopics_monologue_transcripts(*, topic: str, is_from_document: bool, subtopic_monologues: Sequence[SubtopicText], markers: bool = True) -> list[SubtopicText]:

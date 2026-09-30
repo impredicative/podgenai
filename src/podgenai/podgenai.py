@@ -8,6 +8,7 @@ from podgenai.content.topic import ensure_topic_is_valid
 from podgenai.content.tts import ensure_speech_audio_files, get_duologue_speech_tasks, get_monologue_speech_tasks
 from podgenai.content.voice import get_duologue_voice_keys, get_monologue_voice_key, get_voice_sex_from_voice_key
 from podgenai.exceptions import InputError
+from podgenai.metrics import summarize_token_metrics
 from podgenai.types import SpeakerCount, VoiceSex
 from podgenai.util.contextvars import collect_records
 from podgenai.util.input import get_confirmation
@@ -114,27 +115,11 @@ def generate_media(topic: str, *, output_path: Path | None = None, document: str
             case _:
                 assert False
 
-    df_token_metrics = token_metrics_collector.to_dataframe()
-    if df_token_metrics.empty:
+    token_metrics_summary_table, token_metrics_summary_extras = summarize_token_metrics(token_metrics_collector.records())
+    if not token_metrics_summary_table:
         print("\nTOKENS: (none)\n")
     else:
-        df_token_metrics_agg = df_token_metrics.groupby("prompt_cache_key", dropna=False).agg(
-            calls=("prompt_cache_key", "size"),
-            sum_input_tokens=("input_tokens", "sum"),
-            avg_input_tokens=("input_tokens", "mean"),
-            sum_cache_read_tokens=("cache_read_tokens", "sum"),
-            calls_with_cache_read=("cache_read_tokens", lambda token_counts: (token_counts > 0).sum()),
-            sum_cache_write_tokens=("cache_write_tokens", "sum"),
-            calls_with_cache_write=("cache_write_tokens", lambda token_counts: (token_counts > 0).sum()),
-            sum_output_tokens=("output_tokens", "sum"),
-            avg_output_tokens=("output_tokens", "mean"),
-        )
-        for token_column in ("input_tokens", "output_tokens"):
-            avg_column = f"avg_{token_column}"
-            df_token_metrics_agg[avg_column] = df_token_metrics_agg[avg_column].round().astype(df_token_metrics[token_column].dtype)
-        cache_read_hit_rate = df_token_metrics_agg["calls_with_cache_read"].sum() / df_token_metrics_agg["calls"].sum()
-        cache_read_utilization_rate = df_token_metrics_agg["sum_cache_read_tokens"].sum() / df_token_metrics_agg["sum_input_tokens"].sum()
-        print(f"\nTOKENS: (hit={cache_read_hit_rate:.0%}, utilization={cache_read_utilization_rate:.0%})\n{df_token_metrics_agg.to_string()}\n")
+        print(f"\nTOKENS: (hit={token_metrics_summary_extras['cache_read_hit_rate']:.0%}, utilization={token_metrics_summary_extras['cache_read_utilization_rate']:.0%})\n{token_metrics_summary_table}\n")
 
     match speakers:
         case 1:

@@ -1,13 +1,11 @@
 """Collect records in a context-local scope and propagate context to worker threads."""
 
-from collections.abc import Callable, Generator, Mapping
+from collections.abc import Callable, Generator
 from concurrent.futures import Future, ThreadPoolExecutor
 from contextlib import contextmanager
 from contextvars import ContextVar, copy_context
 from threading import Lock
 from typing import override
-
-import pandas as pd
 
 
 class RecordCollector[T]:
@@ -30,15 +28,6 @@ class RecordCollector[T]:
         """
         with self._lock:
             return list(self._records)
-
-    def to_dataframe[R: Mapping[str, object]](self: RecordCollector[R]) -> pd.DataFrame:
-        """Return string-keyed mapping records as a DataFrame with keys as columns.
-
-        This method requires mapping records; other record types can use records().
-        Conversion uses a synchronized list snapshot and runs outside the lock.
-        An empty collector produces an empty DataFrame.
-        """
-        return pd.DataFrame.from_records(self.records()).convert_dtypes()
 
 
 @contextmanager
