@@ -77,7 +77,7 @@ def get_monologue_speech_tasks(*, subtopics_monologue_transcripts: Sequence[Subt
                 filename_stem = f"{subtopic_title[:MAX_TEXT_LENGTH_IN_FILENAME]} (monologue) ({tts_model}) ({voice}) [{subtopic_dedup_hash}]"
                 filename_stem = pathvalidate.sanitize_filename(filename_stem, platform="auto")
                 max_tts_input_token_len = 2000
-                overuse_mitigation_len = 100
+                overuse_mitigation_len = max(100, get_token_count(tone_instructions or "", model=tts_model))
                 max_tts_input_token_len -= overuse_mitigation_len
                 # Note: Overuse mitigation is performed to address an observed error such as the following:
                 # openai.BadRequestError: Error code: 400 - {'error': {'message': 'Input of 2009 tokens is over the maximum input limit of 2000 tokens. Please shorten your input.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_value'}}

@@ -12,9 +12,9 @@ license-files = ["LICENSE"]
 dependencies = [
     "click>=8.5.0",  # https://github.com/pallets/click/releases
     "jinja2>=3.1.6",  # https://jinja.palletsprojects.com/en/stable/changes/
-    "openai>=3.22.1",  # https://github.com/openai/openai-python/releases
+    "openai>=3.23.0",  # https://github.com/openai/openai-python/releases
     "pathvalidate>=3.3.1",  # https://github.com/thombashi/pathvalidate/releases
-    "python-dotenv>=1.2.3",  # https://github.com/theskumar/python-dotenv/releases
+    "python-dotenv>=1.2.4",  # https://github.com/theskumar/python-dotenv/releases
     "semantic-text-splitter>=0.33.0",  # https://github.com/benbrandt/text-splitter/releases https://github.com/benbrandt/text-splitter/tree/main/bindings/python
     "tiktoken>=0.14.0",  # https://github.com/openai/tiktoken/releases https://github.com/openai/tiktoken/blob/main/CHANGELOG.md
 ]
@@ -37,7 +37,8 @@ Changelog = "https://github.com/impredicative/podgenai/releases"
 [dependency-groups]
 dev = [
     "poethepoet>=0.48.0",
-    "ruff>=0.16.9",
+    "pytest>=9.1.1",
+    "ruff>=0.16.10",
     "ty>=0.0.84",
 ]
 
@@ -46,7 +47,11 @@ requires = ["uv_build>=0.12.5,<0.13.0"]
 build-backend = "uv_build"
 
 [tool.uv.build-backend]
-source-exclude = ["/.env", "/archive", "/docs", "/scripts", "/work"]
+source-exclude = ["/.env", "/archive", "/docs", "/scripts", "/tests", "/work"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = ["--import-mode=importlib"]
 
 [tool.ruff]
 line-length = 999
@@ -59,6 +64,7 @@ check-lint = "ruff check"
 check-format = "ruff format --check"
 check-type = "ty check"
 check = ["check-lint", "check-format", "check-type"]
+test = ["check", { cmd = "pytest" }]
 
 fix-lint = "ruff check --fix"
 fix-format = "ruff format"
