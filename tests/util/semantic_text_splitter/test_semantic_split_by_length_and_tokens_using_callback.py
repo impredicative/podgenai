@@ -7,7 +7,7 @@ import tiktoken
 
 from podgenai.util.semantic_text_splitter import semantic_split_by_length_and_tokens_using_callback
 
-MODEL: str = "gpt-4o-mini-tts-2025-12-15"
+MODEL: str = "gpt-4o-mini-tts"
 
 
 @pytest.fixture(scope="module", params=[MODEL, "gpt-4"], ids=["o200k_base", "cl100k_base"])

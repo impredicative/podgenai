@@ -120,7 +120,7 @@ def semantic_split_by_length_and_tokens_using_search(
     can actually increase its token count.
 
     For example, with the tiktoken encoding used by
-    `gpt-4o-mini-tts-2025-12-15`:
+    `gpt-4o-mini-tts`:
 
         "establishment" -> [376, 160388]       # 2 tokens
         "establis"      -> [376, 18122, 276]   # 3 tokens

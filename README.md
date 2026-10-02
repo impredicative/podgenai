@@ -35,7 +35,7 @@ Explicit cache breakpoints are used across all LLM calls to optimize input token
 * Text model (`gpt-6.1-sol`) is used for:
     - monologue text generation if the episode is to be created from a given source document
     - monologue text deduplication
-* Text-to-speech model (`gpt-4o-mini-tts-2025-12-15`) is used for:
+* Text-to-speech model (`gpt-4o-mini-tts`) is used for:
     - speech generation
 
 ## Samples

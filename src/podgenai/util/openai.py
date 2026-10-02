@@ -42,7 +42,7 @@ MODELS: Models = {
     ][-1],  # Ref: https://platform.openai.com/docs/models
     "tts": [  # Demo: https://platform.openai.com/audio/tts
         "tts-1",  # Note: tts-1-hd is twice as expensive, and was observed to have a more limited concurrent usage quota resulting in openai.RateLimitError.
-        "gpt-4o-mini-tts-2025-12-15",  # Ref: https://developers.openai.com/api/docs/models/gpt-4o-mini-tts.
+        "gpt-4o-mini-tts",  # Ref: https://developers.openai.com/api/docs/models/gpt-4o-mini-tts.
     ][-1],
 }
 

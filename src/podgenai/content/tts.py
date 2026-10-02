@@ -71,7 +71,7 @@ def get_monologue_speech_tasks(*, subtopics_monologue_transcripts: Sequence[Subt
                         pause_after = get_monologue_pause(part_num=part_num, num_parts=num_parts, subtopic_num=subtopic_num, num_subtopics=num_subtopics)
                         speech_task = SpeechTask(path=part_path, text=part, part_num=part_num, num_parts=num_parts, voice=voice, tone=None, pause_after=pause_after)  # Note: Tone instructions are not supported by this TTS model.
                         speech_tasks.append(speech_task)
-            case "gpt-4o-mini-tts-2025-12-15":
+            case "gpt-4o-mini-tts":
                 tone_instructions = TTS_MONOLOGUE_TONE
                 subtopic_dedup_hash = hasher(f"{subtopic_monologue}\n\n{tone_instructions}")
                 filename_stem = f"{subtopic_title[:MAX_TEXT_LENGTH_IN_FILENAME]} (monologue) ({tts_model}) ({voice}) [{subtopic_dedup_hash}]"
@@ -139,7 +139,7 @@ def get_duologue_speech_tasks(*, subtopics_duologues: Sequence[SubtopicDuologue]
                     max_tts_input_char_len = 4096
                     parts = [speech] if len(speech) <= max_tts_input_char_len else semantic_split_by_length(speech, max_tts_input_char_len)
                     tone = None  # Tone instructions are not supported by this TTS model.
-                case "gpt-4o-mini-tts-2025-12-15":
+                case "gpt-4o-mini-tts":
                     max_tts_input_token_len = 2000
                     overuse_mitigation_len = max(100, get_token_count(tone or "", model=tts_model))
                     max_tts_input_token_len -= overuse_mitigation_len
@@ -156,7 +156,7 @@ def get_duologue_speech_tasks(*, subtopics_duologues: Sequence[SubtopicDuologue]
                     case "tts-1":
                         assert len(part) <= max_tts_input_char_len
                         assert tone is None
-                    case "gpt-4o-mini-tts-2025-12-15":
+                    case "gpt-4o-mini-tts":
                         assert get_token_count(part, model=tts_model) <= max_tts_input_token_len
                     case _:
                         assert False
