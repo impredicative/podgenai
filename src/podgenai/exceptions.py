@@ -18,6 +18,10 @@ class LanguageModelOutputError(ModelOutputError):
     """Language model output error."""
 
 
+class LanguageModelOutputCompletionError(LanguageModelOutputError):
+    """Language model output completion error."""
+
+
 class LanguageModelOutputRejectionError(LanguageModelOutputError):
     """Language model output rejection error."""
 

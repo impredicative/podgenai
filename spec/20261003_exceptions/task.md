@@ -1,0 +1,1 @@
+In `src/podgenai/util/openai.py`, in its `get_completion` function, toward the function's end, there are various warning reasons that are captured and printed. Instead of capturing and printing them, raise an exception when one is encountered. I think the exception `LanguageModelOutputCompletionError` defined in `src/podgenai/exceptions.py` is appropriate for this purpose.

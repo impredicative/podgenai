@@ -17,7 +17,6 @@ from podgenai.types import KeyValueOverride, Models, TextModel, TokenMetric
 from podgenai.util.binascii import hasher
 from podgenai.util.contextvars import RecordCollector, record
 from podgenai.util.dotenv import load_dotenv
-from podgenai.util.sys import print_warning
 from podgenai.util.threading import exclusive_print, exclusive_prompt
 
 load_dotenv()
@@ -79,8 +78,9 @@ def get_openai_client() -> OpenAI:
 def get_completion(prompt: str, *, client: OpenAI | None = None, model: TextModel = MODELS["knowledge"], prompt_cache_key: str | None = None, **kwargs: Any) -> ChatCompletion:
     """Return the completion for the given prompt.
 
-    Warn if there are no choices, or any choice has a finish reason other than
-    "stop", a refusal, or missing/blank text. This helper expects text responses.
+    Raise `LanguageModelOutputCompletionError` if there are no choices, or any
+    choice has a finish reason other than "stop", a refusal, or missing/blank text.
+    This helper expects text responses.
 
     Params:
     * `prompt_cache_key`: Friendly cache identifying name of request, used for remote caching.
@@ -129,18 +129,16 @@ def get_completion(prompt: str, *, client: OpenAI | None = None, model: TextMode
     record(TOKEN_METRICS, metric)
     # exclusive_print(f"Token metrics: key={metric['prompt_cache_key']!r} duration={metric['duration_ds']}ds input={metric['input_tokens']} cache_read={metric['cache_read_tokens']} cache_write={metric['cache_write_tokens']} output={metric['output_tokens']} reasoning={metric['reasoning_tokens']}")
 
-    warning_reasons: list[str] = []
+    error_prefix: str = f"Abnormal completion was received: key={prompt_cache_key!r} model={completion.model!r} id={completion.id!r} reason: "
     if not completion.choices:
-        warning_reasons.append("no choices returned")
+        raise podgenai.exceptions.LanguageModelOutputCompletionError(f"{error_prefix}no choices returned")
     for choice in completion.choices:
         if choice.finish_reason != "stop":
-            warning_reasons.append(f"choice {choice.index} has abnormal finish reason {choice.finish_reason!r}")
+            raise podgenai.exceptions.LanguageModelOutputCompletionError(f"{error_prefix}choice {choice.index} has abnormal finish reason {choice.finish_reason!r}")
         if choice.message.refusal:
-            warning_reasons.append(f"choice {choice.index} was refused")
+            raise podgenai.exceptions.LanguageModelOutputCompletionError(f"{error_prefix}choice {choice.index} was refused")
         if not (choice.message.content or "").strip():
-            warning_reasons.append(f"choice {choice.index} has missing or blank text content")
-    if warning_reasons:
-        print_warning(f"Abnormal completion was received: key={prompt_cache_key!r} model={completion.model!r} id={completion.id!r} reasons: {'; '.join(warning_reasons)}")
+            raise podgenai.exceptions.LanguageModelOutputCompletionError(f"{error_prefix}choice {choice.index} has missing or blank text content")
 
     return completion
 
