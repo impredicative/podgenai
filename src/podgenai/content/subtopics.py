@@ -308,7 +308,7 @@ def deduplicate_subtopics_monologues(*, topic: str, subtopics_monologues: Sequen
     assert MAX_CONCURRENT_WORKERS >= 1, MAX_CONCURRENT_WORKERS
     num_subtopics = len(subtopics_monologues)
     subtopics = [subtopic_monologue["name"] for subtopic_monologue in subtopics_monologues]
-    max_iterations: int | None = [math.ceil(2 * math.log2(num_subtopics)), math.ceil(2 * math.sqrt(num_subtopics)), None][0]  # Empirically satisfactory safeguard. log2 is more conservative than sqrt. Set to None to disable.
+    max_iterations: int | None = [math.ceil(2 * math.log2(num_subtopics)), math.ceil(2 * math.sqrt(num_subtopics)), None][1]  # Empirically satisfactory safeguard. log2 is more conservative than sqrt. Set to None to disable.
 
     subtopics_monologues: list[DeduplicatedSubtopicText] = [DeduplicatedSubtopicText(**s, is_deduplicated=False) for s in subtopics_monologues]
 
