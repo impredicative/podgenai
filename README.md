@@ -43,8 +43,8 @@ These generated mp3 files are available for download:
 
 | Type | Voice(s) | Name | Links |
 |------|----------|------|-------|
-| two-speaker from model | modern-female (marin), modern-male (cedar) | Sinusitis | [Mega](https://mega.nz/file/9YdSFSJB#Gr6dB-1fe6dC0kny0ynt_Z4HbM9n6rDEZyTqdz8KR5Q), [Spotify](https://creators.spotify.com/pod/profile/podgenai/episodes/Sinusitis-e3paeog) |
-| two-speaker from [source](<sources/Prevention of myopia in a near-primate by supplemental indigo light suggests a hypothesis for the myopia boom (2026).md>) | modern-female (marin), modern-male (cedar) | Indigo light for myopia prevention | [Mega](https://mega.nz/file/pNdQkC4L#xudau_i13jilBtHdOY20f90iGDdUXUG1Bk7tBUoAoZs), [Spotify](https://creators.spotify.com/pod/profile/podgenai/episodes/Indigo-light-for-myopia-prevention-e3op95a) |
+| two-speaker from model | modern-female (marin), modern-male (cedar) | SQLite database optimization | [Mega](https://mega.nz/file/RFNXkTQY#nFb9PYsAFwcL2-_kD0csSgWi92IpRjeX6ooY3hDO3PU), [Spotify](https://creators.spotify.com/pod/profile/podgenai/episodes/SQLite-database-optimization-e3pk0uh) |
+| two-speaker from [source](<sources/Using GPT-6.1 Sol (2026).md>) | modern-male (cedar), modern-female (marin) | Using GPT-6.1 Sol | [Mega](https://mega.nz/file/dUtSxBjZ#O2imKm-7F8fHgems5Mm23avltG0ZWrATDYrhGJtsmYM), [Spotify](https://creators.spotify.com/pod/profile/podgenai/episodes/Using-GPT-6-1-Sol-e3qdiot) |
 
 There also is a related [podcast](https://podcasters.spotify.com/pod/podgenai) ([RSS](https://anchor.fm/s/f4868644/podcast/rss)) to which episodes may be posted over time.
 

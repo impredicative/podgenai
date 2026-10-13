@@ -49,16 +49,25 @@ class TokenMetric(TypedDict):
 
 
 class TokenMetricsSummaryExtras(TypedDict):
-    """Overall cache rates accompanying the token metrics table.
+    """Overall cache rates and weighted output speeds accompanying the token metrics table.
 
     Hit rate is the fraction of calls with positive cache-read tokens among calls
     with available cache-read counts. Utilization is the ratio of summed
     cache-read tokens to summed input tokens from calls where both counts are
     available. Reported zeros are included. Rates with zero denominators are NaN.
+
+    Output speeds use records with positive output counts and durations. For
+    output length L and duration D in seconds, each speed L / D has weight
+    sqrt(L * D). avg_output_speed is the weighted arithmetic mean;
+    med_output_speed is the weighted median, averaging adjacent speeds when
+    cumulative weight reaches exactly half. Both are unrounded floats in
+    tokens per second and are NaN when no records qualify.
     """
 
     cache_read_hit_rate: Required[float]
     cache_read_utilization_rate: Required[float]
+    avg_output_speed: Required[float]
+    med_output_speed: Required[float]
 
 
 class SpeechLine(TypedDict):
