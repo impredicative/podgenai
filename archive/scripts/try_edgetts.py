@@ -26,7 +26,7 @@ def main() -> None:
     voices = asyncio.run(edge_tts.list_voices())
     num_voices = len(voices)
     num_en_us_voices = sum(1 for voice in voices if voice["Locale"] == "en-US")
-    print(f"Voices (total={num_voices}, en-US={num_en_us_voices}):")
+    print(f"en-US Voices (total={num_voices}, en-US={num_en_us_voices}):")
     en_us_voices = [voice for voice in voices if voice["Locale"] == "en-US"]
     for voice_num, voice in enumerate(en_us_voices, start=1):
         print(f"{voice_num}. {voice}")
