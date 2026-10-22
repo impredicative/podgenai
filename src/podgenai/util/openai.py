@@ -234,7 +234,7 @@ def write_speech_audio(*, text: str, path: str | Path, voice: str, tone: str | N
         kwargs["instructions"] = tone
         # exclusive_print(f"Using OpenAI tone instructions for: {path.stem!r}: {tone}")
 
-    exclusive_print(f"Requesting speech audio in {voice} voice for: {path.stem}")
+    exclusive_print(f"Requesting OpenAI speech audio in {voice} voice for: {path.stem}")
     # Ref: https://developers.openai.com/api/docs/guides/text-to-speech#quickstart
     with client.audio.speech.with_streaming_response.create(model=model, voice=voice, input=text, response_format="mp3", **kwargs) as response:
         response.stream_to_file(path)
