@@ -232,14 +232,14 @@ def write_speech_audio(*, text: str, path: str | Path, voice: str, tone: str | N
     if tone:
         assert "instructions" not in kwargs
         kwargs["instructions"] = tone
-        # exclusive_print(f"Using tone instructions for: {path.stem!r}: {tone}")
+        # exclusive_print(f"Using OpenAI tone instructions for: {path.stem!r}: {tone}")
 
     exclusive_print(f"Requesting speech audio in {voice} voice for: {path.stem}")
     # Ref: https://developers.openai.com/api/docs/guides/text-to-speech#quickstart
     with client.audio.speech.with_streaming_response.create(model=model, voice=voice, input=text, response_format="mp3", **kwargs) as response:
         response.stream_to_file(path)
     assert path.exists(), path
-    exclusive_print(f"Received speech audio in {voice} voice for: {path.stem}")
+    exclusive_print(f"Received OpenAI speech audio in {voice} voice for: {path.stem}")
 
 
 def ensure_speech_audio(*, text: str, path: Path, voice: str, tone: str | None) -> None:
@@ -247,6 +247,6 @@ def ensure_speech_audio(*, text: str, path: Path, voice: str, tone: str | None) 
 
     if path.exists():
         assert path.is_file()
-        exclusive_print(f"Speech audio file exists on disk for: {path.stem}")
+        exclusive_print(f"OpenAI speech audio file exists on disk for: {path.stem}")
         return
     write_speech_audio(text=text, path=path, voice=voice, tone=tone)
