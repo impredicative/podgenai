@@ -2,6 +2,7 @@ from pathlib import Path
 
 import edge_tts
 
+from podgenai.util.sys import print_warning
 from podgenai.util.threading import exclusive_print, limit_concurrency
 
 _TTS_MAX_CONCURRENCY: int = 1
@@ -30,6 +31,10 @@ def write_speech_audio(*, text: str, path: str | Path, voice: str) -> None:
         path = Path(path)
     assert path.suffix == ".mp3"
     path.parent.mkdir(parents=True, exist_ok=True)  # Note: This is necessary for duologue subtopic directories.
+
+    text_len_bytes = len(text.encode("utf-8"))
+    if text_len_bytes > TTS_CHUNK_BYTES_CAPACITY:
+        print_warning(f"EdgeTTS text of {text_len_bytes:,} bytes exceeds the advised limit of {TTS_CHUNK_BYTES_CAPACITY:,} bytes and will be split by EdgeTTS into chunks.")
 
     exclusive_print(f"Requesting EdgeTTS speech audio in {voice} voice for: {path.stem}")
     communicate = edge_tts.Communicate(text, voice)
