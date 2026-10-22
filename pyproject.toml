@@ -12,7 +12,7 @@ license-files = ["LICENSE"]
 dependencies = [
     "click>=8.5.0",  # https://github.com/pallets/click/releases
     "jinja2>=3.1.6",  # https://jinja.palletsprojects.com/en/stable/changes/
-    "openai>=3.29.0",  # https://github.com/openai/openai-python/releases
+    "openai>=3.36.0",  # https://github.com/openai/openai-python/releases
     "pathvalidate>=3.3.1",  # https://github.com/thombashi/pathvalidate/releases
     "python-dotenv>=1.2.4",  # https://github.com/theskumar/python-dotenv/releases
     "semantic-text-splitter>=0.33.0",  # https://github.com/benbrandt/text-splitter/releases https://github.com/benbrandt/text-splitter/tree/main/bindings/python
@@ -36,10 +36,10 @@ Changelog = "https://github.com/impredicative/podgenai/releases"
 
 [dependency-groups]
 dev = [
-    "poethepoet>=0.48.0",
+    "poethepoet>=0.49.0",  # https://github.com/nat-n/poethepoet/releases
     "pytest>=9.1.1",
-    "ruff>=0.17.0",  # https://github.com/astral-sh/ruff/releases
-    "ty>=0.0.86",
+    "ruff>=0.17.1",  # https://github.com/astral-sh/ruff/releases
+    "ty>=0.0.90",
 ]
 
 [build-system]
@@ -58,6 +58,9 @@ line-length = 999
 
 [tool.ruff.lint]
 ignore = ["DTZ005", "E731"]
+
+[tool.ty.src]
+exclude = ["archive/"]
 
 [tool.poe.tasks]  # Run as "uv run poe <command>" or as "poe <command>".
 check-lint = "ruff check"
