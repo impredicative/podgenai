@@ -67,4 +67,4 @@ class ContextThreadPoolExecutor(ThreadPoolExecutor):
     def submit[**P, R](self, fn: Callable[P, R], /, *args: P.args, **kwargs: P.kwargs) -> Future[R]:
         """Capture the current context separately for this submission."""
         context = copy_context()
-        return super().submit(context.run, fn, *args, **kwargs)  # ty: ignore[invalid-return-type]
+        return super().submit(context.run, fn, *args, **kwargs)  # ty: ignore[invalid-explicit-return]
